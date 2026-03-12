@@ -21,7 +21,7 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Versions** | 17 major iterations (v1 → v17) |
 | **Total LOC** | ~76,300 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-11 04:31 UTC |
+| **Last auto-update** | 2026-03-12 19:51 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -1561,26 +1561,7 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
-d0e8d21 auto: 2026-03-10 23:30:59
-0b9dbd2 docs(auto): update README stats [skip ci]
-964cd0f auto: 2026-03-10 23:30:26
-f898315 docs(auto): update README stats [skip ci]
-fdcafd5 auto: 2026-03-10 23:29:51
-4ab4a68 docs(auto): update README stats [skip ci]
-d947f21 auto: 2026-03-10 23:25:43
-9a9762f docs(auto): update README stats [skip ci]
-8b86364 auto: 2026-03-10 23:22:08
-5783659 docs(auto): update README stats [skip ci]
-3b7a7f5 auto: 2026-03-10 23:21:34
-77c1984 docs(auto): update README stats [skip ci]
-4a48c3b auto: 2026-03-10 23:21:00
-df898a9 docs(auto): update README stats [skip ci]
-1056978 auto: 2026-03-10 23:20:26
-171cece docs(auto): update README stats [skip ci]
-d6ba693 auto: 2026-03-10 23:16:48
-1fd6ffb docs(auto): update README stats [skip ci]
-89c28f1 auto: 2026-03-10 23:15:44
-ef86da0 docs(auto): update README stats [skip ci]
+49f8319 Resolve merge conflict in Known Limitations section
 ```
 <!-- AUTO:GIT:END -->
 

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tuesday Test — ROI Calculator — Praxis</title>
+  <style>
+    :root {
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-5: 1.5rem; --space-6: 2rem; --space-7: 3rem; --space-8: 4rem;
+      --bg-primary: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.035);
+      --bg-card-hover: rgba(255,255,255,0.055);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.50);
+      --text-dim: rgba(255,255,255,0.30);
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.30);
+      --accent-secondary: #50e3c2;
+      --shadow-card: 0 2px 16px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.03);
+      --shadow-card-hover: 0 6px 28px rgba(99,102,241,0.10), 0 0 0 1px rgba(255,255,255,0.06);
+      --radius-sm: 8px; --radius-md: 12px; --radius-card: 16px; --radius-pill: 999px;
+      --line-tight: 1.3; --line-normal: 1.5; --line-relaxed: 1.65;
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg-primary); color: var(--text-primary);
+      min-height: 100vh; line-height: var(--line-relaxed);
+    }
+
+    /* ── Aurora + noise ── */
+    .aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .aurora::before {
+      content: ''; position: absolute; width: 550px; height: 550px; border-radius: 50%;
+      filter: blur(140px); opacity: 0.15;
+      background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+      top: -10%; left: -5%;
+    }
+    .aurora::after {
+      content: ''; position: absolute; width: 400px; height: 400px; border-radius: 50%;
+      filter: blur(120px); opacity: 0.10;
+      background: radial-gradient(circle, #50e3c2 0%, transparent 70%);
+      bottom: -10%; right: -8%;
+    }
+    .noise {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.018;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 256px;
+    }
+
+    /* ── Nav ── */
+    .nav-bar {
+      position: sticky; top: 0; z-index: 100;
+      padding: var(--space-3) var(--space-5);
+      display: flex; align-items: center; justify-content: center; gap: var(--space-6);
+      background: rgba(6,6,14,0.75);
+      backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.25);
+    }
+    .nav-bar a {
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px;
+      transition: color var(--transition-fast);
+    }
+    .nav-bar a:hover { color: var(--text-primary); }
+    .nav-bar a.active { color: var(--accent); }
+    .nav-logo { font-weight: 700; font-size: 0.95rem; color: var(--text-primary) !important; letter-spacing: -0.5px; }
+
+    /* ── Layout ── */
+    .content {
+      position: relative; z-index: 2;
+      max-width: 900px; margin: 0 auto;
+      padding: var(--space-7) var(--space-5) var(--space-8);
+    }
+    .content h2 {
+      font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px;
+      margin-bottom: var(--space-2); line-height: var(--line-tight);
+      background: linear-gradient(135deg, #f0f0f5, #6366f1);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .subtitle {
+      color: var(--text-secondary); font-size: 0.88rem; margin-bottom: var(--space-7);
+      max-width: 600px; line-height: var(--line-relaxed);
+    }
+
+    /* ── Form ── */
+    .calc-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+    @media (max-width: 640px) { .calc-grid { grid-template-columns: 1fr; } }
+    .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label {
+      font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .form-group select, .form-group input, .form-group textarea {
+      background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4);
+      color: var(--text-primary); font-size: 0.88rem; font-family: inherit;
+      transition: all var(--transition-fast); outline: none;
+    }
+    .form-group select:focus, .form-group input:focus, .form-group textarea:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group select option { background: #14141f; }
+
+    /* ── Slider ── */
+    .slider-row { display: flex; align-items: center; gap: var(--space-3); }
+    .slider-row input[type=range] {
+      flex: 1; -webkit-appearance: none; appearance: none; height: 4px;
+      background: rgba(255,255,255,0.08); border-radius: 2px; outline: none;
+      border: none; padding: 0;
+    }
+    .slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--accent); cursor: pointer;
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+    .slider-val {
+      min-width: 50px; text-align: right; font-size: 0.88rem; font-weight: 600;
+      color: var(--accent-secondary); font-variant-numeric: tabular-nums;
+    }
+
+    /* ── CTA ── */
+    .btn-run {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-3) var(--space-6);
+      background: linear-gradient(135deg, var(--accent), #6366f1); color: white;
+      border: none; border-radius: var(--radius-sm); cursor: pointer;
+      font-size: 0.88rem; font-weight: 700; font-family: inherit;
+      letter-spacing: 0.3px;
+      box-shadow: 0 2px 12px var(--accent-glow);
+      transition: all var(--transition-fast);
+    }
+    .btn-run:hover {
+      transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow);
+    }
+    .btn-run:active { transform: translateY(0); }
+    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ── Results Panel ── */
+    .results-panel {
+      display: none; margin-top: var(--space-7);
+      background: var(--bg-card); border-radius: var(--radius-card); padding: var(--space-6);
+      box-shadow: var(--shadow-card); position: relative; overflow: hidden;
+    }
+    .results-panel::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent-secondary), var(--accent), var(--accent-secondary));
+    }
+    .results-panel.visible { display: block; animation: slideUp 0.4s ease-out; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .results-panel h3 {
+      font-size: 1.15rem; font-weight: 700; margin-bottom: var(--space-5);
+      color: var(--text-primary);
+    }
+
+    .verdict-badge {
+      display: inline-block; padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-pill); font-size: 0.82rem; font-weight: 700;
+      margin-bottom: var(--space-5); letter-spacing: 0.3px;
+    }
+    .verdict-transformative { background: rgba(80,227,194,0.15); color: #50e3c2; border: 1px solid rgba(80,227,194,0.3); }
+    .verdict-nobrainer      { background: rgba(99,102,241,0.15); color: #6366f1; border: 1px solid rgba(99,102,241,0.3); }
+    .verdict-worthexploring  { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
+    .verdict-marginal        { background: rgba(231,76,60,0.15); color: #ef4444; border: 1px solid rgba(231,76,60,0.3); }
+
+    .metric-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-4); margin-bottom: var(--space-5);
+    }
+    .metric {
+      background: rgba(255,255,255,0.025); border-radius: var(--radius-sm);
+      padding: var(--space-4); text-align: center;
+    }
+    .metric-value {
+      font-size: 1.6rem; font-weight: 800; line-height: 1;
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(135deg, var(--accent-secondary), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .metric-label {
+      font-size: 0.72rem; color: var(--text-dim); margin-top: var(--space-2);
+      text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+    }
+
+    .confidence-bar {
+      margin-top: var(--space-5); padding-top: var(--space-4);
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .confidence-track {
+      height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px;
+      overflow: hidden; margin-top: var(--space-2);
+    }
+    .confidence-fill {
+      height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      transition: width 0.8s ease-out;
+    }
+    .confidence-label {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.75rem; color: var(--text-dim);
+    }
+
+    .assumptions {
+      margin-top: var(--space-5); padding: var(--space-4);
+      background: rgba(255,255,255,0.015); border-radius: var(--radius-sm);
+      font-size: 0.75rem; color: var(--text-dim); line-height: 1.6;
+    }
+    .assumptions strong { color: var(--text-secondary); }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
+    ::selection { background: rgba(99,102,241,0.3); color: white; }
+
+    @media (max-width: 768px) {
+      .nav-bar { gap: var(--space-4); font-size: 0.75rem; overflow-x: auto; justify-content: flex-start; padding-left: var(--space-4); }
+      .metric-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="noise"></div>
+
+  <nav class="nav-bar">
+    <a href="/" class="nav-logo">Praxis</a>
+    <a href="/">Search</a>
+    <a href="/static/journey.html">Journey</a>
+    <a href="/static/tools.html">All Tools</a>
+    <a href="/static/tuesday-test.html" class="active">ROI Calculator</a>
+    <a href="/static/rfp.html">RFP Builder</a>
+    <a href="/static/manifesto.html">Methodology</a>
+  </nav>
+
+  <div class="content">
+    <h2>The Tuesday Test</h2>
+    <p class="subtitle">
+      If a new hire started next Tuesday, how fast would this AI tool pay for itself?
+      Enter your scenario below and get a data-driven ROI estimate in seconds.
+    </p>
+
+    <div class="calc-grid">
+      <div class="form-group">
+        <label for="region">Region</label>
+        <select id="region">
+          <option value="midwest">Midwest</option>
+          <option value="northeast">Northeast</option>
+          <option value="southeast">Southeast</option>
+          <option value="west_coast">West Coast</option>
+          <option value="remote_national">Remote / National</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Role</label>
+        <select id="role">
+          <option value="admin">Admin / Office Manager</option>
+          <option value="manager">Operations Manager</option>
+          <option value="specialist">Marketing / Sales Specialist</option>
+          <option value="executive">Executive / Owner</option>
+        </select>
+      </div>
+
+      <div class="form-group full">
+        <label for="task">Task Description</label>
+        <textarea id="task" placeholder="e.g. Manually reconciling invoices from three vendors, copying data between spreadsheets, sending follow-up emails…"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Hours Spent / Week on This Task</label>
+        <div class="slider-row">
+          <input type="range" id="hours" min="1" max="40" value="10" />
+          <span class="slider-val" id="hoursVal">10 hrs</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Estimated Error Rate (%)</label>
+        <div class="slider-row">
+          <input type="range" id="errors" min="0" max="50" value="5" />
+          <span class="slider-val" id="errorsVal">5%</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="toolCost">Tool Monthly Cost ($)</label>
+        <input type="number" id="toolCost" value="25" min="0" step="5" />
+      </div>
+
+      <div class="form-group">
+        <label for="category">Tool Category</label>
+        <select id="category">
+          <option value="automation">Workflow Automation</option>
+          <option value="analytics">Analytics / BI</option>
+          <option value="communication">Communication</option>
+          <option value="crm">CRM</option>
+          <option value="document_management">Document Management</option>
+          <option value="marketing">Marketing</option>
+          <option value="project_management">Project Management</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-run" id="runBtn" onclick="runTest()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Run the Tuesday Test
+    </button>
+
+    <!-- ── Results ── -->
+    <div class="results-panel" id="results">
+      <div id="verdictBadge" class="verdict-badge"></div>
+      <h3>Your ROI Breakdown</h3>
+      <div class="metric-grid" id="metrics"></div>
+
+      <div class="confidence-bar">
+        <div class="confidence-label">
+          <span>Confidence</span>
+          <span id="confPct"></span>
+        </div>
+        <div class="confidence-track">
+          <div class="confidence-fill" id="confFill" style="width:0"></div>
+        </div>
+      </div>
+
+      <div class="assumptions" id="assumptions"></div>
+    </div>
+  </div>
+
+  <script>
+    /* Sliders */
+    var hoursSlider = document.getElementById('hours');
+    var errorsSlider = document.getElementById('errors');
+    hoursSlider.oninput = function() { document.getElementById('hoursVal').textContent = this.value + ' hrs'; };
+    errorsSlider.oninput = function() { document.getElementById('errorsVal').textContent = this.value + '%'; };
+
+    async function runTest() {
+      var btn = document.getElementById('runBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span style="animation:pulse 1s infinite">Calculating…</span>';
+
+      var body = {
+        region: document.getElementById('region').value,
+        role: document.getElementById('role').value,
+        task_description: document.getElementById('task').value || 'General administrative task',
+        hours_per_week: parseInt(hoursSlider.value),
+        error_rate_pct: parseInt(errorsSlider.value),
+        tool_monthly_cost: parseFloat(document.getElementById('toolCost').value) || 25,
+        tool_category: document.getElementById('category').value
+      };
+
+      try {
+        var res = await fetch('/tuesday-test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        var d = await res.json();
+        showResults(d);
+      } catch (e) {
+        alert('Calculation failed: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run the Tuesday Test';
+      }
+    }
+
+    function showResults(d) {
+      var panel = document.getElementById('results');
+      panel.classList.add('visible');
+
+      /* Verdict badge */
+      var badge = document.getElementById('verdictBadge');
+      var v = (d.tuesday_verdict || '').toLowerCase();
+      var cls = 'verdict-worthexploring';
+      if (v.indexOf('transformative') !== -1) cls = 'verdict-transformative';
+      else if (v.indexOf('no-brainer') !== -1) cls = 'verdict-nobrainer';
+      else if (v.indexOf('marginal') !== -1 || v.indexOf('negative') !== -1) cls = 'verdict-marginal';
+      badge.className = 'verdict-badge ' + cls;
+      badge.textContent = d.tuesday_verdict;
+
+      /* Metrics */
+      var metricsDiv = document.getElementById('metrics');
+      var items = [
+        { val: '$' + fmt(d.net_monthly_savings), label: 'Net Monthly Savings' },
+        { val: '$' + fmt(d.annual_savings), label: 'Projected Annual Savings' },
+        { val: d.break_even_days + ' days', label: 'Break-Even' },
+        { val: fmt(d.roi_percentage) + '%', label: 'ROI' },
+        { val: d.hours_saved_weekly + ' hrs', label: 'Hours Saved / Week' },
+        { val: d.hours_saved_monthly + ' hrs', label: 'Hours Saved / Month' },
+        { val: '$' + fmt(d.labor_savings_monthly), label: 'Labor Savings / Month' },
+        { val: '$' + fmt(d.error_cost_reduction_monthly), label: 'Error Cost Reduction / Month' }
+      ];
+      metricsDiv.innerHTML = '';
+      items.forEach(function(m) {
+        metricsDiv.innerHTML += '<div class="metric"><div class="metric-value">' + m.val + '</div><div class="metric-label">' + m.label + '</div></div>';
+      });
+
+      /* Confidence bar */
+      var conf = d.confidence || 0.7;
+      var confPct = Math.round(conf * 100);
+      document.getElementById('confPct').textContent = confPct + '%';
+      setTimeout(function() {
+        document.getElementById('confFill').style.width = confPct + '%';
+      }, 100);
+
+      /* Assumptions */
+      document.getElementById('assumptions').innerHTML =
+        '<strong>Assumptions:</strong> Region: ' + d.region + ' · Role: ' + d.role +
+        ' · Hourly wage: $' + fmt(d.hourly_wage) + '/hr' +
+        ' · Automation efficiency: 65% · Error reduction: 80%' +
+        ' · Tool cost: $' + fmt(d.tool_monthly_cost) + '/mo' +
+        '<br><em>These figures are estimates based on regional wage data and standard automation benchmarks. Actual results may vary.</em>';
+
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function fmt(n) {
+      if (n === undefined || n === null) return '–';
+      return parseFloat(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+  </script>
+</body>
+</html>

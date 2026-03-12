@@ -1,0 +1,850 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Praxis — Fort Knox Security Architecture</title>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:rgba(255,255,255,0.035);--surface-hover:rgba(255,255,255,0.055);
+  --elevated:rgba(255,255,255,0.06);--border:rgba(255,255,255,0.06);
+  --text:#f0f0f5;--muted:rgba(255,255,255,0.50);--dim:rgba(255,255,255,0.30);
+  --accent:#6366f1;--accent-glow:rgba(99,102,241,0.30);--secondary:#50e3c2;
+  --warn:#fb923c;--danger:#ef4444;--success:#34d399;--info:#38bdf8;
+  --gold:#fbbf24;--gold-glow:rgba(251,191,36,0.25);
+  --shadow-card:0 2px 20px rgba(0,0,0,0.28),0 0 0 1px rgba(255,255,255,0.04);
+  --radius:12px;--radius-lg:16px;--radius-pill:999px;
+  --ease:cubic-bezier(0.16,1,0.3,1);--fast:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden;}
+
+/* ── Aurora ── */
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(140px);opacity:0.15;animation:af 20s ease-in-out infinite alternate;}
+.aurora::before{width:600px;height:600px;background:radial-gradient(circle,var(--gold) 0%,transparent 70%);top:-12%;left:-6%;}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#6366f1 0%,transparent 70%);bottom:-15%;right:-6%;animation-delay:-9s;}
+.aurora-third{position:absolute;width:350px;height:350px;border-radius:50%;filter:blur(120px);opacity:0.12;background:radial-gradient(circle,var(--danger) 0%,transparent 70%);top:40%;right:20%;animation:af 25s ease-in-out infinite alternate-reverse;}
+@keyframes af{0%{transform:translate(0,0) scale(1);}50%{transform:translate(25px,-18px) scale(1.06);}100%{transform:translate(-18px,10px) scale(0.96);}}
+.noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.03;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* ── Container ── */
+.container{max-width:1440px;margin:0 auto;padding:2rem;position:relative;z-index:2;}
+
+/* ── Header ── */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--gold) 20%,#f0f0f5 60%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.subtitle{color:var(--muted);font-size:0.9rem;}
+.status-live{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.75rem;color:var(--success);font-weight:600;}
+.status-live .pulse{width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse-glow 2s ease-in-out infinite;}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 4px var(--success);}50%{box-shadow:0 0 16px var(--success),0 0 32px rgba(52,211,153,0.3);}}
+
+/* ── Nav ── */
+.nav{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.nav a{padding:0.4rem 1rem;background:var(--surface);color:var(--muted);text-decoration:none;border-radius:var(--radius-pill);font-size:0.8rem;font-weight:500;transition:all var(--fast);backdrop-filter:blur(12px);}
+.nav a:hover,.nav a.active{background:var(--surface-hover);color:var(--text);}
+.nav a.active{border:1px solid var(--gold);color:var(--gold);}
+
+/* ── Grids ── */
+.grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:2rem;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:1100px){.grid-5{grid-template-columns:repeat(3,1fr);}.grid-3{grid-template-columns:1fr;}}
+@media(max-width:800px){.grid-5{grid-template-columns:repeat(2,1fr);}.grid-2,.grid-2-1{grid-template-columns:1fr;}}
+
+/* ── Cards ── */
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);transition:border-color var(--fast);}
+.card-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+
+/* ── Axiom Cards ── */
+.axiom-card{position:relative;overflow:hidden;cursor:default;border:1px solid transparent;}
+.axiom-card:hover{border-color:rgba(255,255,255,0.08);}
+.axiom-card .axiom-num{position:absolute;top:0.75rem;right:1rem;font-size:2.5rem;font-weight:900;opacity:0.06;line-height:1;}
+.axiom-icon{font-size:1.8rem;margin-bottom:0.75rem;}
+.axiom-label{font-size:0.92rem;font-weight:700;margin-bottom:0.3rem;}
+.axiom-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+.axiom-status{margin-top:0.75rem;display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;font-weight:600;}
+.axiom-status.active{color:var(--success);}
+.axiom-status.warning{color:var(--warn);}
+.axiom-status.critical{color:var(--danger);}
+
+/* ── Topology Visualization ── */
+.topology-container{position:relative;width:100%;min-height:520px;background:rgba(0,0,0,0.25);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.topo-svg{width:100%;height:520px;}
+
+/* Layer backgrounds for SVG */
+.layer-bg{rx:12;ry:12;transition:opacity 0.3s ease;}
+.layer-label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;fill:rgba(255,255,255,0.35);font-weight:600;}
+.node-box{rx:8;ry:8;stroke-width:1.5;transition:all 0.3s ease;cursor:pointer;}
+.node-box:hover{filter:brightness(1.3);stroke-width:2.5;}
+.node-label{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;font-size:11px;fill:#f0f0f5;font-weight:600;pointer-events:none;text-anchor:middle;dominant-baseline:central;}
+.node-sublabel{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;font-size:8.5px;fill:rgba(255,255,255,0.45);font-weight:400;pointer-events:none;text-anchor:middle;dominant-baseline:central;}
+
+/* Flow arrows */
+.flow-line{fill:none;stroke-width:2;opacity:0.6;transition:opacity 0.3s ease;}
+.flow-line:hover{opacity:1;stroke-width:3;}
+.flow-line.allowed{stroke:var(--success);marker-end:url(#arrow-green);}
+.flow-line.blocked{stroke:var(--danger);stroke-dasharray:6 4;opacity:0.35;marker-end:url(#arrow-red);}
+
+/* Animated data packet */
+.data-packet{r:4;fill:var(--secondary);filter:drop-shadow(0 0 6px rgba(80,227,194,0.6));}
+@keyframes packet-flow{0%{offset-distance:0%;}100%{offset-distance:100%;}}
+
+/* ── Threat Matrix ── */
+.threat-row{display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;transition:background var(--fast);}
+.threat-row:last-child{border-bottom:none;}
+.threat-row:hover{background:rgba(99,102,241,0.04);}
+.threat-icon{font-size:1.1rem;min-width:28px;text-align:center;margin-top:0.1rem;}
+.threat-body{flex:1;}
+.threat-name{font-weight:600;margin-bottom:0.15rem;}
+.threat-desc{font-size:0.75rem;color:var(--muted);line-height:1.4;}
+.threat-defense{font-size:0.72rem;color:var(--info);margin-top:0.2rem;}
+.threat-badge{display:inline-flex;padding:0.12rem 0.4rem;border-radius:var(--radius-pill);font-size:0.62rem;font-weight:700;letter-spacing:0.03em;}
+.threat-badge.blocked{background:rgba(52,211,153,0.12);color:var(--success);}
+.threat-badge.mitigated{background:rgba(56,189,248,0.12);color:var(--info);}
+
+/* ── Data Flow Timeline ── */
+.flow-timeline{position:relative;padding-left:2rem;}
+.flow-timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--gold),var(--accent),var(--secondary));}
+.flow-step{position:relative;padding:0.75rem 0;padding-left:1rem;}
+.flow-step::before{content:'';position:absolute;left:-1.55rem;top:1rem;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--accent);z-index:1;}
+.flow-step.active::before{background:var(--accent);box-shadow:0 0 12px var(--accent-glow);}
+.flow-step-num{font-size:0.68rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.05em;}
+.flow-step-title{font-size:0.88rem;font-weight:600;margin:0.15rem 0 0.1rem;}
+.flow-step-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+
+/* ── PRISM Engine ── */
+.prism-ring{display:flex;justify-content:center;gap:2rem;margin:1.5rem 0;flex-wrap:wrap;}
+.prism-agent{text-align:center;padding:1.25rem;background:rgba(99,102,241,0.06);border-radius:var(--radius-lg);border:1px solid rgba(99,102,241,0.15);min-width:140px;transition:all var(--fast);}
+.prism-agent:hover{border-color:var(--accent);transform:translateY(-2px);}
+.prism-agent-icon{font-size:2rem;margin-bottom:0.5rem;}
+.prism-agent-name{font-size:0.82rem;font-weight:700;margin-bottom:0.2rem;}
+.prism-agent-role{font-size:0.72rem;color:var(--muted);}
+
+/* ── Stats Banner ── */
+.stats-row{display:flex;gap:1.5rem;margin-bottom:2rem;flex-wrap:wrap;}
+.stat-box{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.25rem;background:var(--surface);border-radius:var(--radius-lg);backdrop-filter:blur(12px);flex:1;min-width:180px;}
+.stat-icon{font-size:1.3rem;}
+.stat-value{font-size:1.6rem;font-weight:800;line-height:1;}
+.stat-label{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;}
+.stat-value.gold{color:var(--gold);}
+.stat-value.green{color:var(--success);}
+.stat-value.blue{color:var(--info);}
+
+/* ── Safeguard Pills ── */
+.safeguard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+@media(max-width:900px){.safeguard-grid{grid-template-columns:repeat(2,1fr);}}
+.sg-card{padding:1.25rem;background:var(--surface);border-radius:var(--radius-lg);border:1px solid transparent;transition:all var(--fast);cursor:default;}
+.sg-card:hover{border-color:rgba(255,255,255,0.08);}
+.sg-card .sg-icon{font-size:1.4rem;margin-bottom:0.5rem;}
+.sg-card .sg-name{font-size:0.85rem;font-weight:700;margin-bottom:0.2rem;}
+.sg-card .sg-desc{font-size:0.72rem;color:var(--muted);line-height:1.4;margin-bottom:0.5rem;}
+.sg-card .sg-status{font-size:0.68rem;font-weight:700;}
+.sg-card .sg-status.pass{color:var(--success);}
+.sg-card .sg-status.fail{color:var(--danger);}
+.sg-card .sg-status.pending{color:var(--warn);}
+
+/* ── Section Headers ── */
+.section-header{font-size:1.15rem;font-weight:700;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.5rem;}
+.section-header .badge{font-size:0.65rem;padding:0.15rem 0.5rem;border-radius:var(--radius-pill);background:rgba(99,102,241,0.12);color:var(--accent);font-weight:700;}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all var(--fast);}
+.btn-primary{background:linear-gradient(135deg,var(--gold),#f59e0b);color:#1a1a2e;box-shadow:0 2px 12px var(--gold-glow);}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-ghost{background:var(--surface);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);}
+
+/* ── Loading/Spinner ── */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;color:var(--dim);font-size:0.82rem;}
+.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Tooltip ── */
+.card[data-tooltip]{position:relative;}
+.card[data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:var(--text);padding:0.4rem 0.6rem;border-radius:6px;font-size:0.72rem;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity var(--fast);}
+.card[data-tooltip]:hover::after{opacity:1;}
+
+/* ── Kbd tag ── */
+kbd{background:rgba(255,255,255,0.06);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.72rem;font-family:monospace;border:1px solid rgba(255,255,255,0.08);}
+
+/* ── Selection ── */
+::selection{background:rgba(251,191,36,0.3);color:white;}
+</style>
+</head>
+<body>
+
+<!-- Aurora Background -->
+<div class="aurora"><div class="aurora-third"></div></div>
+<div class="noise"></div>
+
+<div class="container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>🏛️ Fort Knox — Security Architecture</h1>
+      <span class="subtitle">Hexagonal Topology · 5 Axiom Defense · PRISM Engine · Hybrid GraphRAG &nbsp;
+        <span class="status-live" id="statusBadge"><span class="pulse"></span> LIVE</span>
+      </span>
+    </div>
+    <nav class="nav">
+      <a href="/static/home.html">Home</a>
+      <a href="/static/cognitive-dashboard.html">Cognitive</a>
+      <a href="/static/agent-orchestration.html">Agents</a>
+      <a href="/static/knowledge-explorer.html">Knowledge</a>
+      <a href="/static/observability-console.html">Observability</a>
+      <a href="/static/governance-center.html">Governance</a>
+      <a href="/static/economics-hub.html">Economics</a>
+      <a href="/static/fort-knox.html" class="active">Fort Knox</a>
+      <a href="/static/pipeline.html">Pipeline</a>
+    </nav>
+  </div>
+
+  <!-- ═══ Live Defence Statistics ═══ -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-box">
+      <span class="stat-icon">🛡️</span>
+      <div>
+        <div class="stat-value gold" id="statAxioms">5</div>
+        <div class="stat-label">Security Axioms</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">🔧</span>
+      <div>
+        <div class="stat-value blue" id="statTools">—</div>
+        <div class="stat-label">Tools Loaded</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">🏗️</span>
+      <div>
+        <div class="stat-value green" id="statModules">—</div>
+        <div class="stat-label">Active Modules</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">🔒</span>
+      <div>
+        <div class="stat-value gold" id="statRasp">—</div>
+        <div class="stat-label">RASP Mode</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">⚡</span>
+      <div>
+        <div class="stat-value green" id="statSafeguards">—</div>
+        <div class="stat-label">Safeguards</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 5 Security Axioms ═══ -->
+  <div class="section-header">The 5 Security Axioms <span class="badge">Fail-Closed</span></div>
+  <div class="grid-5" id="axiomGrid">
+    <div class="card axiom-card" id="axiom1">
+      <span class="axiom-num">01</span>
+      <div class="axiom-icon">🏰</div>
+      <div class="axiom-label">The Moat</div>
+      <div class="axiom-desc">Outer perimeter — CORS allowlist &amp; dynamic rate limiting. Session flood prevention at the transport layer.</div>
+      <div class="axiom-status active" id="axiom1Status">● ENFORCING</div>
+    </div>
+    <div class="card axiom-card" id="axiom2">
+      <span class="axiom-num">02</span>
+      <div class="axiom-icon">🚪</div>
+      <div class="axiom-label">The Sally Port</div>
+      <div class="axiom-desc">RASP middleware — deep runtime inspection of payloads. Prompt injection &amp; payload inflation detection.</div>
+      <div class="axiom-status active" id="axiom2Status">● ENFORCING</div>
+    </div>
+    <div class="card axiom-card" id="axiom3">
+      <span class="axiom-num">03</span>
+      <div class="axiom-icon">🔐</div>
+      <div class="axiom-label">Identity Gates</div>
+      <div class="axiom-desc">AuthN/AuthZ with Zero-Trust — cryptographic token validation, least-privilege enforcement.</div>
+      <div class="axiom-status active" id="axiom3Status">● ENFORCING</div>
+    </div>
+    <div class="card axiom-card" id="axiom4">
+      <span class="axiom-num">04</span>
+      <div class="axiom-icon">🔬</div>
+      <div class="axiom-label">Internal Scanners</div>
+      <div class="axiom-desc">AST taint propagation — tracks untrusted input from source to sink. Detects alias-chaining and logic mutation.</div>
+      <div class="axiom-status active" id="axiom4Status">● ENFORCING</div>
+    </div>
+    <div class="card axiom-card" id="axiom5">
+      <span class="axiom-num">05</span>
+      <div class="axiom-icon">🏦</div>
+      <div class="axiom-label">The Vault</div>
+      <div class="axiom-desc">Persistence protection — bounded write queues (maxsize 10k) and strict file-locking for atomic writes.</div>
+      <div class="axiom-status active" id="axiom5Status">● ENFORCING</div>
+    </div>
+  </div>
+
+  <!-- ═══ Architecture Topology ═══ -->
+  <div class="section-header">Hexagonal Topology — Live Data Flow <span class="badge">Zero Trust</span></div>
+  <div class="topology-container">
+    <svg class="topo-svg" viewBox="0 0 1000 520" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#34d399"/></marker>
+        <marker id="arrow-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#ef4444"/></marker>
+        <marker id="arrow-teal" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#50e3c2"/></marker>
+        <marker id="arrow-purple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#6366f1"/></marker>
+        <!-- Animated packet path -->
+        <path id="packetPath" d="M100,120 L250,120 L370,200 L500,200 L580,280 L680,280" fill="none"/>
+        <!-- Glow filter -->
+        <filter id="glow"><feGaussianBlur stdDeviation="3" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- ── Layer Backgrounds ── -->
+      <!-- External zone -->
+      <rect class="layer-bg" x="15" y="15" width="140" height="490" fill="rgba(251,113,133,0.04)" stroke="rgba(251,113,133,0.12)" stroke-width="1"/>
+      <text class="layer-label" x="85" y="40" text-anchor="middle">External</text>
+
+      <!-- Layer 1: Outer Perimeter -->
+      <rect class="layer-bg" x="175" y="15" width="210" height="490" fill="rgba(251,191,36,0.03)" stroke="rgba(251,191,36,0.10)" stroke-width="1"/>
+      <text class="layer-label" x="280" y="40" text-anchor="middle">Layer 1 — Outer Perimeter</text>
+
+      <!-- Layer 2: Workflow Core -->
+      <rect class="layer-bg" x="405" y="15" width="330" height="490" fill="rgba(99,102,241,0.04)" stroke="rgba(99,102,241,0.12)" stroke-width="1"/>
+      <text class="layer-label" x="570" y="40" text-anchor="middle">Layer 2 — The Vault (Workflow Core)</text>
+
+      <!-- Layer 3: Persistence -->
+      <rect class="layer-bg" x="755" y="15" width="230" height="490" fill="rgba(80,227,194,0.03)" stroke="rgba(80,227,194,0.10)" stroke-width="1"/>
+      <text class="layer-label" x="870" y="40" text-anchor="middle">Layer 3 — Persistence</text>
+
+      <!-- ── Nodes ── -->
+      <!-- External: User -->
+      <rect class="node-box" x="40" y="100" width="100" height="55" fill="rgba(56,189,248,0.12)" stroke="#38bdf8"/>
+      <text class="node-label" x="90" y="123">User / API</text>
+      <text class="node-sublabel" x="90" y="140">Client</text>
+
+      <!-- External: Adversary -->
+      <rect class="node-box" x="40" y="370" width="100" height="55" fill="rgba(251,113,133,0.12)" stroke="#ef4444"/>
+      <text class="node-label" x="90" y="393">Adversarial</text>
+      <text class="node-sublabel" x="90" y="410">Actor</text>
+
+      <!-- Layer 1: Moat -->
+      <rect class="node-box" x="200" y="100" width="160" height="55" fill="rgba(251,191,36,0.10)" stroke="var(--gold)"/>
+      <text class="node-label" x="280" y="120">🏰 The Moat</text>
+      <text class="node-sublabel" x="280" y="140">CORS + Rate Limiting</text>
+
+      <!-- Layer 1: RASP -->
+      <rect class="node-box" x="200" y="230" width="160" height="55" fill="rgba(251,191,36,0.10)" stroke="var(--gold)"/>
+      <text class="node-label" x="280" y="250">🚪 Sally Port</text>
+      <text class="node-sublabel" x="280" y="270">RASP Middleware</text>
+
+      <!-- Layer 2: Auth Gate -->
+      <rect class="node-box" x="425" y="100" width="140" height="50" fill="rgba(99,102,241,0.10)" stroke="#6366f1"/>
+      <text class="node-label" x="495" y="120">🔐 Auth Gate</text>
+      <text class="node-sublabel" x="495" y="138">JWT · Zero-Trust</text>
+
+      <!-- Layer 2: AST Scanner -->
+      <rect class="node-box" x="425" y="195" width="140" height="50" fill="rgba(99,102,241,0.10)" stroke="#6366f1"/>
+      <text class="node-label" x="495" y="215">🔬 AST Scanner</text>
+      <text class="node-sublabel" x="495" y="233">Taint Analysis</text>
+
+      <!-- Core Vault background -->
+      <rect x="430" y="280" width="290" height="180" rx="12" ry="12" fill="rgba(99,102,241,0.05)" stroke="rgba(99,102,241,0.18)" stroke-width="1" stroke-dasharray="4 2"/>
+      <text class="layer-label" x="575" y="300" text-anchor="middle" style="font-size:10px;fill:rgba(99,102,241,0.5);">Core Vault</text>
+
+      <!-- PRISM Engine -->
+      <rect class="node-box" x="450" y="315" width="120" height="50" fill="rgba(99,102,241,0.15)" stroke="#818cf8" filter="url(#glow)"/>
+      <text class="node-label" x="510" y="335">⚙️ PRISM</text>
+      <text class="node-sublabel" x="510" y="352">Engine</text>
+
+      <!-- NLP -->
+      <rect class="node-box" x="590" y="315" width="110" height="50" fill="rgba(80,227,194,0.10)" stroke="#50e3c2"/>
+      <text class="node-label" x="645" y="335">🧠 NLP</text>
+      <text class="node-sublabel" x="645" y="352">Sovereign</text>
+
+      <!-- GraphRAG -->
+      <rect class="node-box" x="500" y="395" width="140" height="50" fill="rgba(56,189,248,0.10)" stroke="#38bdf8"/>
+      <text class="node-label" x="570" y="415">📊 GraphRAG</text>
+      <text class="node-sublabel" x="570" y="432">Hybrid Retrieval</text>
+
+      <!-- Layer 3: Queue -->
+      <rect class="node-box" x="785" y="150" width="170" height="50" fill="rgba(80,227,194,0.10)" stroke="#50e3c2"/>
+      <text class="node-label" x="870" y="170">📋 Write Queue</text>
+      <text class="node-sublabel" x="870" y="188">Bounded (10k max)</text>
+
+      <!-- Layer 3: File Lock -->
+      <rect class="node-box" x="785" y="260" width="170" height="50" fill="rgba(80,227,194,0.10)" stroke="#50e3c2"/>
+      <text class="node-label" x="870" y="280">🔒 File Lock</text>
+      <text class="node-sublabel" x="870" y="298">SMB / NFS</text>
+
+      <!-- Layer 3: Database -->
+      <rect class="node-box" x="785" y="370" width="170" height="50" fill="rgba(80,227,194,0.10)" stroke="#50e3c2"/>
+      <text class="node-label" x="870" y="390">🗄️ Ledgers</text>
+      <text class="node-sublabel" x="870" y="408">Neo4j · Chroma</text>
+
+      <!-- ── Flow Lines (Allowed) ── -->
+      <!-- User → Moat -->
+      <line class="flow-line allowed" x1="140" y1="127" x2="198" y2="127"/>
+      <!-- Adversary → Moat (attempted) -->
+      <line class="flow-line blocked" x1="140" y1="397" x2="198" y2="170" style="opacity:0.2;"/>
+      <!-- Moat → RASP -->
+      <path class="flow-line allowed" d="M280,155 L280,228" marker-end="url(#arrow-green)"/>
+      <!-- RASP → Auth Gate -->
+      <path class="flow-line allowed" d="M360,257 L423,135" marker-end="url(#arrow-green)"/>
+      <!-- Auth → AST Scanner -->
+      <path class="flow-line allowed" d="M495,150 L495,193" marker-end="url(#arrow-green)"/>
+      <!-- AST → PRISM -->
+      <path class="flow-line allowed" d="M495,245 L510,313" marker-end="url(#arrow-purple)"/>
+      <!-- PRISM ↔ NLP -->
+      <line class="flow-line allowed" x1="570" y1="340" x2="588" y2="340" style="stroke:#50e3c2;" marker-end="url(#arrow-teal)"/>
+      <!-- PRISM ↔ GraphRAG -->
+      <path class="flow-line allowed" d="M510,365 L570,393" style="stroke:#38bdf8;" marker-end="url(#arrow-green)"/>
+      <!-- PRISM → Queue -->
+      <path class="flow-line allowed" d="M570,340 Q730,175 783,175" style="stroke:var(--secondary);" marker-end="url(#arrow-teal)"/>
+      <!-- Queue → File Lock -->
+      <path class="flow-line allowed" d="M870,200 L870,258" marker-end="url(#arrow-teal)"/>
+      <!-- File Lock → DB -->
+      <path class="flow-line allowed" d="M870,310 L870,368" marker-end="url(#arrow-teal)"/>
+
+      <!-- ── Blocked Lines (Topology Enforcement) ── -->
+      <!-- RASP ✕ Queue -->
+      <line class="flow-line blocked" x1="360" y1="257" x2="783" y2="175"/>
+      <text x="540" y="215" fill="var(--danger)" font-size="8" font-weight="700" text-anchor="middle" opacity="0.6">✕ BLOCKED BY TOPOLOGY</text>
+      <!-- Moat ✕ DB -->
+      <line class="flow-line blocked" x1="360" y1="145" x2="783" y2="395"/>
+      <text x="560" y="290" fill="var(--danger)" font-size="8" font-weight="700" text-anchor="middle" opacity="0.4">✕ BLOCKED BY TOPOLOGY</text>
+
+      <!-- ── Animated data packet ── -->
+      <circle class="data-packet" cx="0" cy="0" style="offset-path:path('M140,127 C200,127 250,155 280,230 C310,250 380,200 495,135 C500,165 500,200 510,313');offset-distance:0%;animation:packet-flow 6s linear infinite;">
+        <animate attributeName="opacity" values="0;1;1;1;0" dur="6s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+  </div>
+
+  <div style="height:2rem;"></div>
+
+  <!-- ═══ Cognitive Offloading Safeguards ═══ -->
+  <div class="section-header">Cognitive Offloading Safeguards <span class="badge">4 Active</span></div>
+  <div class="safeguard-grid" id="safeguardGrid">
+    <div class="sg-card" id="sg1">
+      <div class="sg-icon">🏗️</div>
+      <div class="sg-name">Architectural Boundaries</div>
+      <div class="sg-desc">Validates imports against Hexagonal Architecture layer rules. Domain code cannot import infrastructure.</div>
+      <div class="sg-status pending" id="sg1Status">◌ Checking…</div>
+    </div>
+    <div class="sg-card" id="sg2">
+      <div class="sg-icon">📏</div>
+      <div class="sg-name">Complexity Ceilings</div>
+      <div class="sg-desc">Enforces cyclomatic complexity ≤ 10 and nesting depth ≤ 5 on all generated code.</div>
+      <div class="sg-status pending" id="sg2Status">◌ Checking…</div>
+    </div>
+    <div class="sg-card" id="sg3">
+      <div class="sg-icon">🧬</div>
+      <div class="sg-name">LLM-to-LLM Verification</div>
+      <div class="sg-desc">AST mutation testing + dual-agent consistency check. Detects hallucination cascades.</div>
+      <div class="sg-status pending" id="sg3Status">◌ Checking…</div>
+    </div>
+    <div class="sg-card" id="sg4">
+      <div class="sg-icon">📐</div>
+      <div class="sg-name">Boring Code Optimisation</div>
+      <div class="sg-desc">KERNEL prompt framework enforcing ≤ 30 lines, docstrings, type hints, no nested ternaries.</div>
+      <div class="sg-status pending" id="sg4Status">◌ Checking…</div>
+    </div>
+  </div>
+
+  <!-- ═══ PRISM Engine ═══ -->
+  <div class="section-header">PRISM Agentic Framework <span class="badge">Multi-Agent</span></div>
+  <div class="card" style="margin-bottom:2rem;">
+    <div class="card-title"><span class="dot" style="background:var(--gold);box-shadow:0 0 8px var(--gold-glow);"></span>Parallel Reward Integration and Selector Mechanism</div>
+    <div class="prism-ring">
+      <div class="prism-agent">
+        <div class="prism-agent-icon">🔍</div>
+        <div class="prism-agent-name">Analyzer</div>
+        <div class="prism-agent-role">Decomposes multi-hop queries into tractable sub-questions</div>
+      </div>
+      <div class="prism-agent" style="border-color:rgba(80,227,194,0.2);">
+        <div class="prism-agent-icon">🎯</div>
+        <div class="prism-agent-name">Selector</div>
+        <div class="prism-agent-role">Filters context for maximum precision — quality control gate</div>
+      </div>
+      <div class="prism-agent" style="border-color:rgba(251,191,36,0.2);">
+        <div class="prism-agent-icon">⚖️</div>
+        <div class="prism-agent-name">Critic</div>
+        <div class="prism-agent-role">Rejects hallucinations, contradictions, and logical fallacies</div>
+      </div>
+      <div class="prism-agent" style="border-color:rgba(52,211,153,0.2);">
+        <div class="prism-agent-icon">➕</div>
+        <div class="prism-agent-name">Adder</div>
+        <div class="prism-agent-role">Maximizes recall — retrieves missing evidence for completeness</div>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:0.78rem;color:var(--muted);margin-top:0.5rem;">
+      Iterative <kbd>N</kbd>-turn loop — reduces epistemic uncertainty via mathematical subadditivity
+    </div>
+  </div>
+
+  <!-- ═══ Two-Column: Threat Matrix + Data Flow ═══ -->
+  <div class="grid-2">
+    <!-- Threat Mitigation Matrix -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--danger);"></span>Threat Mitigation Matrix</div>
+
+      <div class="threat-row">
+        <div class="threat-icon">🌊</div>
+        <div class="threat-body">
+          <div class="threat-name">Session Flooding <span class="threat-badge blocked">BLOCKED</span></div>
+          <div class="threat-desc">HTTP GET/POST flooding to exhaust orchestration memory and CPU.</div>
+          <div class="threat-defense">↳ Axiom 1 — Edge-level rate limiting, SASE authentication</div>
+        </div>
+      </div>
+
+      <div class="threat-row">
+        <div class="threat-icon">💣</div>
+        <div class="threat-body">
+          <div class="threat-name">Payload Inflation <span class="threat-badge blocked">BLOCKED</span></div>
+          <div class="threat-desc">Deep circular GraphQL queries, excessive aliases, batch overloading.</div>
+          <div class="threat-defense">↳ Axiom 2 — RASP AST analysis with dynamic upper limits</div>
+        </div>
+      </div>
+
+      <div class="threat-row">
+        <div class="threat-icon">💉</div>
+        <div class="threat-body">
+          <div class="threat-name">Prompt Injection <span class="threat-badge blocked">BLOCKED</span></div>
+          <div class="threat-desc">Direct/indirect injection to manipulate LLM behaviour or jailbreak.</div>
+          <div class="threat-defense">↳ Axiom 2 — Deep runtime inspection of execution paths</div>
+        </div>
+      </div>
+
+      <div class="threat-row">
+        <div class="threat-icon">🔗</div>
+        <div class="threat-body">
+          <div class="threat-name">AST Alias-Chaining <span class="threat-badge blocked">BLOCKED</span></div>
+          <div class="threat-desc">Recursive alias definitions hiding malicious logic in dynamic languages.</div>
+          <div class="threat-defense">↳ Axiom 4 — Taint propagation source→sink tracking</div>
+        </div>
+      </div>
+
+      <div class="threat-row">
+        <div class="threat-icon">⚡</div>
+        <div class="threat-body">
+          <div class="threat-name">Race Conditions <span class="threat-badge mitigated">MITIGATED</span></div>
+          <div class="threat-desc">Concurrent writes or file lock bypasses to corrupt persistent state.</div>
+          <div class="threat-defense">↳ Axiom 5 — Strict file-locking + bounded write queues</div>
+        </div>
+      </div>
+
+      <div class="threat-row">
+        <div class="threat-icon">🤖</div>
+        <div class="threat-body">
+          <div class="threat-name">Hallucination Cascades <span class="threat-badge mitigated">MITIGATED</span></div>
+          <div class="threat-desc">Incorrect LLM output contaminating downstream reasoning tasks.</div>
+          <div class="threat-defense">↳ PRISM Critic — evaluates outputs against GraphRAG evidence</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Flow Narrative -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--secondary);"></span>Data Flow — Query Lifecycle</div>
+      <div class="flow-timeline">
+        <div class="flow-step active">
+          <div class="flow-step-num">Step 1</div>
+          <div class="flow-step-title">Outer Perimeter (Moat)</div>
+          <div class="flow-step-desc">Validate CORS origin, assess rate parameters. If within threshold, pass to interior.</div>
+        </div>
+        <div class="flow-step active">
+          <div class="flow-step-num">Step 2</div>
+          <div class="flow-step-title">Payload Inspection (Sally Port)</div>
+          <div class="flow-step-desc">RASP intercepts — inspects for jailbreak heuristics, encoded manipulation, inflation.</div>
+        </div>
+        <div class="flow-step active">
+          <div class="flow-step-num">Step 3</div>
+          <div class="flow-step-title">Identity Verification</div>
+          <div class="flow-step-desc">Evaluate cryptographic SASE token. Confirm AuthZ access. Map to Workflow layer.</div>
+        </div>
+        <div class="flow-step active">
+          <div class="flow-step-num">Step 4</div>
+          <div class="flow-step-title">AST Taint Analysis</div>
+          <div class="flow-step-desc">Map data flow source→sink. Detect alias-chaining, unsafe deserialization.</div>
+        </div>
+        <div class="flow-step active">
+          <div class="flow-step-num">Step 5</div>
+          <div class="flow-step-title">PRISM Orchestration</div>
+          <div class="flow-step-desc">Analyzer decomposes query → Selector filters → Critic validates → Adder completes.</div>
+        </div>
+        <div class="flow-step active">
+          <div class="flow-step-num">Step 6</div>
+          <div class="flow-step-title">Hybrid GraphRAG Retrieval</div>
+          <div class="flow-step-desc">Vector search + graph traversal. Context aggregation for layered insights.</div>
+        </div>
+        <div class="flow-step active">
+          <div class="flow-step-num">Step 7</div>
+          <div class="flow-step-title">Selection &amp; Critique</div>
+          <div class="flow-step-desc">Filter outdated context, verify claims against source data, iterate if needed.</div>
+        </div>
+        <div class="flow-step active">
+          <div class="flow-step-num">Step 8</div>
+          <div class="flow-step-title">Persistence &amp; Safeguards</div>
+          <div class="flow-step-desc">Bounded queue → file-lock acquisition → atomic write → lock release.</div>
+        </div>
+        <div class="flow-step active">
+          <div class="flow-step-num">Step 9</div>
+          <div class="flow-step-title">Egress</div>
+          <div class="flow-step-desc">Verified response transmitted back through outbound Presentation port.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Architecture Report ═══ -->
+  <div class="section-header">Architecture Fitness Report <span class="badge">Real-Time</span></div>
+  <div class="grid-3" id="archSection">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--danger);"></span>Layer Violations</div>
+      <div id="violationsPanel" class="loading"><div class="spinner"></div><br>Scanning…</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--warn);"></span>Circular Dependencies</div>
+      <div id="cyclesPanel" class="loading"><div class="spinner"></div><br>Detecting…</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--success);"></span>Module Metrics</div>
+      <div id="metricsPanel" class="loading"><div class="spinner"></div><br>Computing…</div>
+    </div>
+  </div>
+
+  <!-- ═══ Live Security Test ═══ -->
+  <div class="section-header">Live Safeguard Probe <span class="badge">Interactive</span></div>
+  <div class="card" style="margin-bottom:2rem;">
+    <div class="card-title"><span class="dot"></span>Submit Code for Full Analysis</div>
+    <textarea id="probeInput" style="width:100%;min-height:120px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;color:var(--text);font-family:'Fira Code',monospace,monospace;font-size:0.85rem;resize:vertical;margin-bottom:1rem;" placeholder="def validate_user(email: str) -> bool:
+    &quot;&quot;&quot;Validate user email format.&quot;&quot;&quot;
+    import re
+    return bool(re.match(r'^[\\w.+-]+@[\\w-]+\\.[\\w.]+$', email))"></textarea>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+      <select id="probeLayer" style="padding:0.5rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.82rem;">
+        <option value="domain">Domain Layer</option>
+        <option value="use_cases">Use-Cases Layer</option>
+        <option value="adapters">Adapters Layer</option>
+      </select>
+      <button class="btn btn-primary" onclick="runProbe()">🛡️ Run Full Analysis</button>
+      <button class="btn btn-ghost" onclick="runSafeguardTest('boundaries')">Test S1</button>
+      <button class="btn btn-ghost" onclick="runSafeguardTest('complexity')">Test S2</button>
+      <button class="btn btn-ghost" onclick="runSafeguardTest('mutation')">Test S3</button>
+      <button class="btn btn-ghost" onclick="runSafeguardTest('boring')">Test S4</button>
+    </div>
+    <pre id="probeResult" style="margin-top:1rem;background:rgba(0,0,0,0.25);border-radius:var(--radius);padding:1rem;font-size:0.78rem;white-space:pre-wrap;word-break:break-word;display:none;max-height:400px;overflow-y:auto;"></pre>
+  </div>
+
+  <!-- ═══ Trilateral Layer Governance Table ═══ -->
+  <div class="section-header">Trilateral Layer Governance <span class="badge">Hexagonal Architecture</span></div>
+  <div class="card" style="margin-bottom:2rem;overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left;padding:0.75rem;color:var(--muted);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;">Layer</th>
+          <th style="text-align:left;padding:0.75rem;color:var(--muted);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;">Fort Knox Analogue</th>
+          <th style="text-align:left;padding:0.75rem;color:var(--muted);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;">Role</th>
+          <th style="text-align:left;padding:0.75rem;color:var(--muted);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;">Governance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.75rem;"><span style="color:var(--gold);font-weight:700;">Presentation</span><br><span style="font-size:0.72rem;color:var(--dim);">Outer Adapter</span></td>
+          <td style="padding:0.75rem;">🏰 The Moat &amp; Sally Port</td>
+          <td style="padding:0.75rem;">REST/GraphQL queries, API endpoints, UIs, webhooks</td>
+          <td style="padding:0.75rem;font-size:0.78rem;color:var(--muted);">Route sanitized payloads to Workflow. <strong style="color:var(--danger);">Barred</strong> from queries, vector stores, disk writes.</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.75rem;"><span style="color:var(--accent);font-weight:700;">Workflow</span><br><span style="font-size:0.72rem;color:var(--dim);">Domain Core</span></td>
+          <td style="padding:0.75rem;">🏦 The Vault</td>
+          <td style="padding:0.75rem;">PRISM engine, state management, multi-agent pipelines, business rules</td>
+          <td style="padding:0.75rem;font-size:0.78rem;color:var(--muted);">Validates all state transitions. Orchestrates agents, processes NLP, invokes Persistence via outbound Ports.</td>
+        </tr>
+        <tr>
+          <td style="padding:0.75rem;"><span style="color:var(--secondary);font-weight:700;">Persistence</span><br><span style="font-size:0.72rem;color:var(--dim);">Inner Adapter</span></td>
+          <td style="padding:0.75rem;">📒 The Ledgers</td>
+          <td style="padding:0.75rem;">Database transactions, vector stores, knowledge graphs, file systems</td>
+          <td style="padding:0.75rem;font-size:0.78rem;color:var(--muted);">Accepts commands from Workflow only. Bounded read/write. Strict file-locking semantics.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:2rem 0;font-size:0.72rem;color:var(--dim);">
+    Praxis Fort Knox Blueprint — Hexagonal Architecture · Fail-Closed · Zero-Trust · Sovereign AI
+  </div>
+</div>
+
+<script>
+const BASE = window.location.origin;
+
+// ── Health & Stats ──
+async function loadStats() {
+  try {
+    const r = await fetch(BASE + '/health');
+    const d = await r.json();
+    document.getElementById('statTools').textContent = d.tools_loaded || '—';
+    const mods = d.modules || {};
+    const active = Object.values(mods).filter(Boolean).length;
+    document.getElementById('statModules').textContent = active + '/' + Object.keys(mods).length;
+  } catch(e) {
+    document.getElementById('statTools').textContent = '?';
+    document.getElementById('statModules').textContent = '?';
+  }
+}
+
+// ── RASP Mode ──
+async function loadRasp() {
+  try {
+    const r = await fetch(BASE + '/fort-knox/status');
+    const d = await r.json();
+    document.getElementById('statRasp').textContent = (d.rasp_mode || 'enforce').toUpperCase();
+    document.getElementById('statSafeguards').textContent = d.safeguards_active + '/4';
+
+    // Update axiom statuses
+    for (const [key, val] of Object.entries(d.axioms || {})) {
+      const el = document.getElementById(key + 'Status');
+      if (el) {
+        el.textContent = val.active ? '● ENFORCING' : '○ INACTIVE';
+        el.className = 'axiom-status ' + (val.active ? 'active' : 'warning');
+      }
+    }
+
+    // Update safeguard statuses
+    for (let i = 1; i <= 4; i++) {
+      const sg = d.safeguard_status?.[i - 1];
+      const el = document.getElementById('sg' + i + 'Status');
+      if (el && sg) {
+        el.textContent = sg.operational ? '● OPERATIONAL' : '○ OFFLINE';
+        el.className = 'sg-status ' + (sg.operational ? 'pass' : 'fail');
+      }
+    }
+  } catch(e) {
+    document.getElementById('statRasp').textContent = '?';
+    document.getElementById('statSafeguards').textContent = '?';
+  }
+}
+
+// ── Architecture Report ──
+async function loadArchReport() {
+  // Violations
+  try {
+    const r = await fetch(BASE + '/v20/architecture/violations');
+    const d = await r.json();
+    const el = document.getElementById('violationsPanel');
+    if (d.count === 0) {
+      el.innerHTML = '<div style="color:var(--success);font-weight:700;font-size:1.2rem;">0</div><div style="color:var(--muted);font-size:0.78rem;">No cross-layer violations detected</div>';
+    } else {
+      let html = '<div style="color:var(--danger);font-weight:700;font-size:1.2rem;">' + d.count + '</div>';
+      d.violations.slice(0, 5).forEach(v => {
+        html += '<div style="font-size:0.72rem;color:var(--muted);padding:0.2rem 0;border-bottom:1px solid var(--border);">' +
+                '<strong style="color:var(--danger);">' + (v.source || '?') + '</strong> → ' + (v.target || '?') +
+                '</div>';
+      });
+      el.innerHTML = html;
+    }
+  } catch(e) {
+    document.getElementById('violationsPanel').innerHTML = '<div style="color:var(--dim);font-size:0.78rem;">Endpoint unavailable — run with admin access</div>';
+  }
+
+  // Cycles
+  try {
+    const r = await fetch(BASE + '/v20/architecture/cycles');
+    const d = await r.json();
+    const el = document.getElementById('cyclesPanel');
+    if (d.count === 0) {
+      el.innerHTML = '<div style="color:var(--success);font-weight:700;font-size:1.2rem;">0</div><div style="color:var(--muted);font-size:0.78rem;">No circular dependencies found</div>';
+    } else {
+      let html = '<div style="color:var(--warn);font-weight:700;font-size:1.2rem;">' + d.count + '</div>';
+      d.cycles.slice(0, 3).forEach(c => {
+        html += '<div style="font-size:0.72rem;color:var(--warn);padding:0.2rem 0;">' + c.join(' → ') + '</div>';
+      });
+      el.innerHTML = html;
+    }
+  } catch(e) {
+    document.getElementById('cyclesPanel').innerHTML = '<div style="color:var(--dim);font-size:0.78rem;">Endpoint unavailable — run with admin access</div>';
+  }
+
+  // Metrics summary
+  try {
+    const r = await fetch(BASE + '/v20/architecture/metrics');
+    const d = await r.json();
+    const mods = d.modules || [];
+    const el = document.getElementById('metricsPanel');
+    const totalLines = mods.reduce((s, m) => s + (m.lines || 0), 0);
+    const avgInstability = mods.length ? (mods.reduce((s, m) => s + (m.instability || 0), 0) / mods.length).toFixed(2) : '—';
+    el.innerHTML =
+      '<div style="display:flex;gap:1.5rem;flex-wrap:wrap;">' +
+        '<div><div style="font-weight:700;font-size:1.2rem;color:var(--info);">' + mods.length + '</div><div style="font-size:0.72rem;color:var(--muted);">Modules</div></div>' +
+        '<div><div style="font-weight:700;font-size:1.2rem;color:var(--accent);">' + totalLines.toLocaleString() + '</div><div style="font-size:0.72rem;color:var(--muted);">Total Lines</div></div>' +
+        '<div><div style="font-weight:700;font-size:1.2rem;color:var(--secondary);">' + avgInstability + '</div><div style="font-size:0.72rem;color:var(--muted);">Avg Instability</div></div>' +
+      '</div>';
+  } catch(e) {
+    document.getElementById('metricsPanel').innerHTML = '<div style="color:var(--dim);font-size:0.78rem;">Endpoint unavailable — run with admin access</div>';
+  }
+}
+
+// ── Live Safeguard Probe ──
+async function runProbe() {
+  const code = document.getElementById('probeInput').value;
+  const layer = document.getElementById('probeLayer').value;
+  const out = document.getElementById('probeResult');
+  out.style.display = 'block';
+  out.textContent = '⏳ Running full analysis across all 4 safeguards…';
+
+  try {
+    const r = await fetch(BASE + '/safeguards/full-analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, layer }),
+    });
+    const d = await r.json();
+    const pass = d.all_safeguards_pass;
+    out.textContent = (pass ? '✅' : '❌') + ' ' + d.summary + '\n\n' + JSON.stringify(d, null, 2);
+    out.style.borderLeft = '3px solid ' + (pass ? 'var(--success)' : 'var(--danger)');
+  } catch(e) {
+    out.textContent = '❌ Error: ' + e.message;
+    out.style.borderLeft = '3px solid var(--danger)';
+  }
+}
+
+async function runSafeguardTest(type) {
+  const code = document.getElementById('probeInput').value;
+  const layer = document.getElementById('probeLayer').value;
+  const out = document.getElementById('probeResult');
+  out.style.display = 'block';
+
+  const endpoints = {
+    boundaries: { url: '/safeguards/validate-boundaries', body: { code, layer } },
+    complexity: { url: '/safeguards/complexity-check', body: { code } },
+    mutation: { url: '/safeguards/mutation-test', body: { code } },
+    boring: { url: '/safeguards/boring-validate', body: { code } },
+  };
+
+  const ep = endpoints[type];
+  out.textContent = '⏳ Testing Safeguard — ' + type + '…';
+
+  try {
+    const r = await fetch(BASE + ep.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ep.body),
+    });
+    const d = await r.json();
+    out.textContent = JSON.stringify(d, null, 2);
+    const pass = d.valid !== false && d.accepted !== false && d.compliant !== false;
+    out.style.borderLeft = '3px solid ' + (pass ? 'var(--success)' : 'var(--warn)');
+  } catch(e) {
+    out.textContent = '❌ Error: ' + e.message;
+    out.style.borderLeft = '3px solid var(--danger)';
+  }
+}
+
+// ── Init ──
+loadStats();
+loadRasp();
+loadArchReport();
+</script>
+</body>
+</html>

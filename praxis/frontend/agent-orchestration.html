@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Praxis — Agent Orchestration</title>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:rgba(255,255,255,0.035);--surface-hover:rgba(255,255,255,0.055);
+  --elevated:rgba(255,255,255,0.06);--border:rgba(255,255,255,0.06);
+  --text:#f0f0f5;--muted:rgba(255,255,255,0.50);--dim:rgba(255,255,255,0.30);
+  --accent:#6366f1;--accent-glow:rgba(99,102,241,0.30);--secondary:#50e3c2;
+  --warn:#fb923c;--danger:#ef4444;--success:#34d399;--info:#38bdf8;
+  --shadow-card:0 2px 20px rgba(0,0,0,0.28),0 0 0 1px rgba(255,255,255,0.04);
+  --radius:12px;--radius-lg:16px;--radius-pill:999px;
+  --ease:cubic-bezier(0.16,1,0.3,1);--fast:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(140px);opacity:0.18;animation:af 20s ease-in-out infinite alternate;}
+.aurora::before{width:500px;height:500px;background:radial-gradient(circle,#6366f1 0%,transparent 70%);top:-12%;left:-6%;}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#50e3c2 0%,transparent 70%);bottom:-15%;right:-6%;animation-delay:-9s;}
+@keyframes af{0%{transform:translate(0,0) scale(1);}50%{transform:translate(25px,-18px) scale(1.06);}100%{transform:translate(-18px,10px) scale(0.96);}}
+
+.container{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:2;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#f0f0f5 30%,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.page-header .subtitle{color:var(--muted);font-size:0.9rem;}
+.nav{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.nav a{padding:0.4rem 1rem;background:var(--surface);color:var(--muted);text-decoration:none;border-radius:var(--radius-pill);font-size:0.8rem;font-weight:500;transition:all var(--fast);backdrop-filter:blur(12px);}
+.nav a:hover,.nav a.active{background:var(--surface-hover);color:var(--text);}
+.nav a.active{border:1px solid var(--accent);color:var(--accent);}
+
+.grid-main{display:grid;grid-template-columns:300px 1fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:900px){.grid-main{grid-template-columns:1fr;}}
+
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);}
+.card-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+
+/* Agent sidebar */
+.agent-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;margin-bottom:0.5rem;cursor:pointer;transition:all var(--fast);}
+.agent-card:hover{border-color:var(--accent);background:rgba(99,102,241,0.05);}
+.agent-card.selected{border-color:var(--accent);background:rgba(99,102,241,0.08);box-shadow:0 0 12px rgba(99,102,241,0.15);}
+.agent-card .ac-header{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;}
+.agent-card .ac-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.agent-card .ac-dot.active{background:var(--success);box-shadow:0 0 6px rgba(52,211,153,0.4);}
+.agent-card .ac-dot.idle{background:var(--warn);}
+.agent-card .ac-dot.offline{background:var(--danger);}
+.agent-card .ac-name{font-size:0.85rem;font-weight:600;}
+.agent-card .ac-role{font-size:0.72rem;color:var(--muted);}
+.agent-card .ac-stats{display:flex;gap:0.75rem;font-size:0.72rem;color:var(--dim);margin-top:0.3rem;}
+
+/* Canvas */
+#graphCanvas{width:100%;height:500px;border-radius:var(--radius);background:rgba(0,0,0,0.3);cursor:grab;}
+#graphCanvas:active{cursor:grabbing;}
+
+/* Controls */
+.controls{display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all var(--fast);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#818cf8);color:#fff;box-shadow:0 2px 12px var(--accent-glow);}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-ghost{background:var(--surface);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);}
+
+/* Detail panel */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:900px){.detail-grid{grid-template-columns:1fr;}}
+.metric-box{text-align:center;padding:1rem;}
+.metric-val{font-size:2rem;font-weight:700;color:var(--accent);}
+.metric-label{font-size:0.78rem;color:var(--muted);margin-top:0.2rem;}
+
+/* Broadcast log */
+.bc-log{max-height:250px;overflow-y:auto;}
+.bc-entry{padding:0.4rem 0.6rem;border-left:3px solid var(--accent);margin-bottom:0.4rem;background:rgba(99,102,241,0.04);border-radius:0 8px 8px 0;font-size:0.8rem;}
+.bc-entry .time{color:var(--dim);font-size:0.7rem;}
+.bc-entry .type{color:var(--secondary);font-weight:600;}
+
+.stat-badge{display:inline-flex;align-items:center;gap:0.3rem;padding:0.2rem 0.5rem;border-radius:var(--radius-pill);font-size:0.72rem;font-weight:600;}
+.stat-badge.green{background:rgba(52,211,153,0.12);color:var(--success);}
+.stat-badge.blue{background:rgba(56,189,248,0.12);color:var(--info);}
+.stat-badge.amber{background:rgba(251,146,60,0.12);color:var(--warn);}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1>Agent Orchestration</h1>
+      <span class="subtitle">Multi-Agent Graph IDE · Human-in-the-Loop · Broadcast Topology</span>
+    </div>
+    <nav class="nav">
+      <a href="/static/home.html">Home</a>
+      <a href="/static/cognitive-dashboard.html">Cognitive</a>
+      <a href="/static/agent-orchestration.html" class="active">Agents</a>
+      <a href="/static/knowledge-explorer.html">Knowledge</a>
+      <a href="/static/observability-console.html">Observability</a>
+      <a href="/static/governance-center.html">Governance</a>
+      <a href="/static/economics-hub.html">Economics</a>
+      <a href="/static/fort-knox.html">Fort Knox</a>
+      <a href="/static/pipeline.html">Pipeline</a>
+    </nav>
+  </div>
+
+  <div class="grid-main">
+    <!-- Sidebar: Agent list -->
+    <div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--success);"></span>Agents</div>
+        <div id="agentSidebar"><div style="color:var(--dim);font-size:0.82rem;">Loading…</div></div>
+        <div class="controls">
+          <button class="btn btn-primary" onclick="addAgent()">+ Agent</button>
+          <button class="btn btn-ghost" onclick="refreshAll()">↻</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main: Graph Canvas -->
+    <div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Agent Topology Graph</div>
+        <canvas id="graphCanvas" width="900" height="500"></canvas>
+        <div class="controls">
+          <button class="btn btn-ghost" onclick="resetLayout()">Reset Layout</button>
+          <button class="btn btn-ghost" onclick="submitBroadcast()">⚡ Broadcast</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail panels -->
+  <div class="detail-grid">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--info);"></span>Agent Detail</div>
+      <div id="agentDetail"><div style="color:var(--dim);font-size:0.82rem;">Select an agent to view details.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--secondary);"></span>Broadcast Log</div>
+      <div id="broadcastLog" class="bc-log"><div style="color:var(--dim);font-size:0.82rem;">No broadcasts yet.</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API=window.location.origin;
+let agents=[];
+let selectedAgent=null;
+let agentCounter=0;
+let nodePositions={};
+
+async function fetchJSON(url,opts){
+  try{const r=await fetch(API+url,opts);if(!r.ok)throw new Error(r.status);return await r.json();}
+  catch(e){console.warn('fetch:',url,e);return null;}
+}
+
+async function loadAgents(){
+  const d=await fetchJSON('/v21/cognitive/summary');
+  if(!d)return;
+  const ws=d.workspace||{};
+  agents=ws.agents||[];
+  renderSidebar();
+  drawGraph();
+}
+
+function renderSidebar(){
+  const el=document.getElementById('agentSidebar');
+  if(!agents.length){el.innerHTML='<div style="color:var(--dim);font-size:0.82rem;">No agents. Click + Agent.</div>';return;}
+  el.innerHTML=agents.map(a=>`
+    <div class="agent-card ${selectedAgent===a.agent_id?'selected':''}" onclick="selectAgent('${a.agent_id}')">
+      <div class="ac-header">
+        <div class="ac-dot ${a.status||'offline'}"></div>
+        <div class="ac-name">${a.agent_id}</div>
+      </div>
+      <div class="ac-role">${a.role||'—'}</div>
+      <div class="ac-stats">
+        <span>${(a.context_tokens||0).toLocaleString()} tok</span>
+        <span>${a.broadcasts_sent||0} sent</span>
+      </div>
+    </div>`).join('');
+}
+
+function selectAgent(id){
+  selectedAgent=id;
+  renderSidebar();
+  const a=agents.find(x=>x.agent_id===id);
+  if(!a){document.getElementById('agentDetail').innerHTML='<div style="color:var(--dim);">Agent not found.</div>';return;}
+  document.getElementById('agentDetail').innerHTML=`
+    <div style="margin-bottom:1rem;">
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.3rem;">${a.agent_id}</div>
+      <span class="stat-badge ${a.status==='active'?'green':'amber'}">${a.status||'unknown'}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div class="metric-box"><div class="metric-val">${a.role||'—'}</div><div class="metric-label">Role</div></div>
+      <div class="metric-box"><div class="metric-val">${(a.context_tokens||0).toLocaleString()}</div><div class="metric-label">Context Tokens</div></div>
+      <div class="metric-box"><div class="metric-val">${a.broadcasts_sent||0}</div><div class="metric-label">Broadcasts Sent</div></div>
+      <div class="metric-box"><div class="metric-val">${a.last_heartbeat?new Date(a.last_heartbeat*1000).toLocaleTimeString():'—'}</div><div class="metric-label">Last Heartbeat</div></div>
+    </div>
+    <div style="margin-top:1rem;">
+      <button class="btn btn-ghost" onclick="sendHeartbeat('${a.agent_id}')">♡ Heartbeat</button>
+      <button class="btn btn-ghost" onclick="removeAgent('${a.agent_id}')" style="margin-left:0.5rem;">✕ Remove</button>
+    </div>`;
+  drawGraph();
+}
+
+/* Graph Drawing */
+const canvas=document.getElementById('graphCanvas');
+const ctx=canvas.getContext('2d');
+let dpr=window.devicePixelRatio||1;
+
+function resizeCanvas(){
+  const rect=canvas.getBoundingClientRect();
+  canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
+  ctx.scale(dpr,dpr);
+}
+resizeCanvas();
+window.addEventListener('resize',()=>{resizeCanvas();drawGraph();});
+
+function initPositions(){
+  const w=canvas.getBoundingClientRect().width;
+  const h=canvas.getBoundingClientRect().height;
+  const cx=w/2,cy=h/2;
+  agents.forEach((a,i)=>{
+    if(!nodePositions[a.agent_id]){
+      const angle=(2*Math.PI*i)/Math.max(agents.length,1);
+      const r=Math.min(w,h)*0.3;
+      nodePositions[a.agent_id]={x:cx+r*Math.cos(angle),y:cy+r*Math.sin(angle)};
+    }
+  });
+}
+
+function drawGraph(){
+  const w=canvas.getBoundingClientRect().width;
+  const h=canvas.getBoundingClientRect().height;
+  ctx.clearRect(0,0,w,h);
+  initPositions();
+
+  // Edges (fully connected for demonstration)
+  ctx.strokeStyle='rgba(99,102,241,0.12)';ctx.lineWidth=1;
+  for(let i=0;i<agents.length;i++){
+    for(let j=i+1;j<agents.length;j++){
+      const a=nodePositions[agents[i].agent_id];
+      const b=nodePositions[agents[j].agent_id];
+      if(a&&b){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+    }
+  }
+
+  // Nodes
+  agents.forEach(ag=>{
+    const p=nodePositions[ag.agent_id];
+    if(!p)return;
+    const isSel=selectedAgent===ag.agent_id;
+    const r=isSel?22:16;
+
+    // Glow
+    if(ag.status==='active'){
+      ctx.beginPath();ctx.arc(p.x,p.y,r+8,0,Math.PI*2);
+      const grad=ctx.createRadialGradient(p.x,p.y,r,p.x,p.y,r+10);
+      grad.addColorStop(0,'rgba(52,211,153,0.15)');grad.addColorStop(1,'transparent');
+      ctx.fillStyle=grad;ctx.fill();
+    }
+
+    // Node circle
+    ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);
+    ctx.fillStyle=isSel?'rgba(99,102,241,0.3)':'rgba(255,255,255,0.06)';
+    ctx.strokeStyle=isSel?'#6366f1':ag.status==='active'?'#34d399':'rgba(255,255,255,0.15)';
+    ctx.lineWidth=isSel?2.5:1.5;ctx.fill();ctx.stroke();
+
+    // Label
+    ctx.fillStyle=isSel?'#f0f0f5':'rgba(255,255,255,0.6)';
+    ctx.font=(isSel?'bold ':'')+`${isSel?12:10}px -apple-system, sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText(ag.agent_id,p.x,p.y+r+6);
+    ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='9px sans-serif';
+    ctx.fillText(ag.role||'',p.x,p.y+r+20);
+  });
+}
+
+// Drag nodes
+let dragging=null;
+canvas.addEventListener('mousedown',e=>{
+  const rect=canvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  for(const ag of agents){
+    const p=nodePositions[ag.agent_id];
+    if(p&&Math.hypot(p.x-mx,p.y-my)<24){dragging=ag.agent_id;selectAgent(ag.agent_id);return;}
+  }
+});
+canvas.addEventListener('mousemove',e=>{
+  if(!dragging)return;
+  const rect=canvas.getBoundingClientRect();
+  nodePositions[dragging]={x:e.clientX-rect.left,y:e.clientY-rect.top};
+  drawGraph();
+});
+canvas.addEventListener('mouseup',()=>{dragging=null;});
+canvas.addEventListener('mouseleave',()=>{dragging=null;});
+
+function resetLayout(){nodePositions={};drawGraph();}
+
+/* Actions */
+async function addAgent(){
+  agentCounter++;
+  const roles=['planner','executor','critic','observer','synthesizer','router','validator'];
+  const role=roles[agentCounter%roles.length];
+  await fetchJSON('/v21/cognitive/agent',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({agent_id:'agent-'+agentCounter,role:role})});
+  logBroadcast('Registered agent-'+agentCounter+' ('+role+')');
+  refreshAll();
+}
+
+async function removeAgent(id){
+  await fetchJSON('/v21/cognitive/agent/'+id,{method:'DELETE'});
+  delete nodePositions[id];
+  if(selectedAgent===id)selectedAgent=null;
+  logBroadcast('Removed '+id);
+  refreshAll();
+}
+
+async function sendHeartbeat(id){
+  await fetchJSON('/v21/cognitive/heartbeat',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({agent_id:id})});
+  logBroadcast('Heartbeat from '+id);
+  refreshAll();
+}
+
+async function submitBroadcast(){
+  if(!selectedAgent){alert('Select an agent first');return;}
+  const types=['anomaly_detected','pattern_found','resource_alert','decision_required','insight'];
+  const t=types[Math.floor(Math.random()*types.length)];
+  await fetchJSON('/v21/cognitive/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({agent_id:selectedAgent,event_type:t,priority:Math.random().toFixed(2),payload:{detail:'Broadcast '+t}})});
+  logBroadcast(selectedAgent+' → '+t);
+  refreshAll();
+}
+
+function logBroadcast(msg){
+  const el=document.getElementById('broadcastLog');
+  const div=document.createElement('div');
+  div.className='bc-entry';
+  div.innerHTML=`<span class="time">${new Date().toLocaleTimeString()}</span> <span class="type">${msg}</span>`;
+  el.prepend(div);
+  if(el.children.length>50)el.lastChild.remove();
+}
+
+async function refreshAll(){await loadAgents();}
+refreshAll();
+setInterval(refreshAll,15000);
+</script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Praxis — RepE Transparency</title>
+<style>
+:root{--bg:#0a0a0f;--surface:rgba(255,255,255,0.035);--surface-hover:rgba(255,255,255,0.055);--border:rgba(255,255,255,0.06);--text:#f0f0f5;--muted:rgba(255,255,255,0.50);--dim:rgba(255,255,255,0.30);--accent:#6366f1;--accent-glow:rgba(99,102,241,0.30);--secondary:#50e3c2;--warn:#fb923c;--danger:#ef4444;--success:#34d399;--info:#38bdf8;--shadow-card:0 2px 20px rgba(0,0,0,0.28),0 0 0 1px rgba(255,255,255,0.04);--radius:12px;--radius-lg:16px;--radius-pill:999px;--ease:cubic-bezier(0.16,1,0.3,1);--fast:0.2s cubic-bezier(0.4,0,0.2,1);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(140px);opacity:0.18;animation:af 20s ease-in-out infinite alternate;}
+.aurora::before{width:500px;height:500px;background:radial-gradient(circle,#6366f1 0%,transparent 70%);top:-12%;left:-6%;}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#50e3c2 0%,transparent 70%);bottom:-15%;right:-6%;animation-delay:-9s;}
+@keyframes af{0%{transform:translate(0,0) scale(1);}50%{transform:translate(25px,-18px) scale(1.06);}100%{transform:translate(-18px,10px) scale(0.96);}}
+.container{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:2;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#f0f0f5 30%,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.page-header .subtitle{color:var(--muted);font-size:0.9rem;}
+.nav{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.nav a{padding:0.4rem 1rem;background:var(--surface);color:var(--muted);text-decoration:none;border-radius:var(--radius-pill);font-size:0.8rem;font-weight:500;transition:all var(--fast);backdrop-filter:blur(12px);}
+.nav a:hover,.nav a.active{background:var(--surface-hover);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.nav a.active{border:1px solid var(--accent);color:var(--accent);}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:1024px){.grid-3,.grid-2{grid-template-columns:1fr;}}
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);transition:all var(--fast);}
+.card:hover{box-shadow:0 8px 40px rgba(99,102,241,0.14),0 0 0 1px rgba(255,255,255,0.08);}
+.card-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+.concept-bar{display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid var(--border);}
+.concept-bar:last-child{border-bottom:none;}
+.concept-name{font-size:0.85rem;font-weight:600;min-width:130px;}
+.concept-track{flex:1;height:12px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden;position:relative;}
+.concept-fill{height:100%;border-radius:6px;transition:width 0.8s var(--ease);}
+.concept-val{font-size:0.78rem;color:var(--muted);min-width:50px;text-align:right;font-variant-numeric:tabular-nums;}
+.tag{display:inline-block;padding:0.15rem 0.5rem;border-radius:var(--radius-pill);font-size:0.72rem;font-weight:600;margin:0.15rem;}
+.tag-ok{background:rgba(52,211,153,0.15);color:var(--success);}
+.tag-warn{background:rgba(251,146,60,0.15);color:var(--warn);}
+.tag-err{background:rgba(251,113,133,0.15);color:var(--danger);}
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;border:none;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all var(--fast);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#818cf8);color:#fff;box-shadow:0 2px 16px var(--accent-glow);}
+.btn-primary:hover{box-shadow:0 6px 24px rgba(99,102,241,0.40);transform:translateY(-1px);}
+input,textarea{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.6rem 1rem;font-size:0.88rem;width:100%;font-family:inherit;transition:border var(--fast);}
+input:focus,textarea:focus{outline:none;border-color:var(--accent);}
+.loading{text-align:center;padding:3rem;color:var(--dim);}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:0.5rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.risk-flag{background:rgba(251,113,133,0.08);border-left:3px solid var(--danger);padding:0.5rem 0.75rem;margin-bottom:0.5rem;border-radius:0 8px 8px 0;font-size:0.82rem;color:var(--danger);}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1>RepE Transparency Console</h1>
+      <span class="subtitle">Representation Engineering · Concept Detection · Neural Signatures · Control Plans</span>
+    </div>
+    <nav class="nav">
+      <a href="/static/cognitive-dashboard.html">Cognitive</a>
+      <a href="/static/reasoning-router.html">Router</a>
+      <a href="/static/dsrp-ontology.html">DSRP</a>
+      <a href="/static/codes-resonance.html">CODES</a>
+      <a href="/static/coala-memory.html">CoALA</a>
+      <a href="/static/repe-transparency.html" class="active">RepE</a>
+      <a href="/static/mesias-governance.html">MESIAS</a>
+    </nav>
+  </div>
+
+  <!-- Concept Domains -->
+  <div class="card" style="margin-bottom:2rem;">
+    <div class="card-title"><span class="dot"></span>Concept Domains</div>
+    <div id="concept-domains"><div class="loading"><div class="spinner"></div></div></div>
+  </div>
+
+  <!-- Analyze Hidden States -->
+  <div class="card" style="margin-bottom:2rem;">
+    <div class="card-title"><span class="dot"></span>Analyze Hidden States</div>
+    <textarea id="system-desc" rows="2" placeholder="Describe the system to analyze..."></textarea>
+    <div style="font-size:0.82rem;color:var(--muted);margin:0.75rem 0;">Set concept scores (-1.0 to +1.0):</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.5rem;" id="score-inputs"></div>
+    <div style="display:flex;gap:0.75rem;margin-top:1rem;align-items:center;">
+      <button class="btn btn-primary" onclick="analyzeStates()">Analyze</button>
+      <span id="analyze-status" style="font-size:0.82rem;color:var(--muted);"></span>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="analysis-result" style="display:none;">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Activation Profile</div>
+        <div id="activation-bars"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Risk Flags & Signature</div>
+        <div id="risk-section"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:2rem;">
+      <div class="card-title"><span class="dot"></span>Control Plan</div>
+      <div id="control-plan"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API=window.location.origin;
+const CONCEPTS=['honesty','harmlessness','utility','power_aversion','security','fairness','transparency'];
+function init(){
+  const c=document.getElementById('score-inputs');
+  CONCEPTS.forEach(concept=>{
+    c.innerHTML+=`<div><label style="font-size:0.75rem;color:var(--muted);display:block;margin-bottom:0.2rem;">${concept.replace(/_/g,' ')}</label><input type="number" id="cs-${concept}" min="-1" max="1" step="0.1" value="0.5" style="width:100%;"/></div>`;
+  });
+}
+async function loadSummary(){
+  try{
+    const r=await fetch(API+'/v22/repe/summary');
+    const d=await r.json();
+    let h='';
+    for(const[concept,desc] of Object.entries(d.concepts||{})){
+      h+=`<div class="concept-bar"><span class="concept-name">${concept.replace(/_/g,' ')}</span><span style="font-size:0.8rem;color:var(--muted);flex:1;">${desc}</span><span class="concept-val">${(d.stimulus_library||{})[concept]||0} stimuli</span></div>`;
+    }
+    document.getElementById('concept-domains').innerHTML=h||'No data';
+  }catch(e){console.error(e);}
+}
+async function analyzeStates(){
+  const desc=document.getElementById('system-desc').value.trim()||'System under analysis';
+  const scores={};
+  CONCEPTS.forEach(c=>{scores[c]=parseFloat(document.getElementById('cs-'+c).value)||0;});
+  document.getElementById('analyze-status').textContent='Analyzing...';
+  try{
+    const r=await fetch(API+'/v22/repe/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_description:desc,concept_scores:scores})});
+    const d=await r.json();
+    document.getElementById('analysis-result').style.display='block';
+    // Activation bars
+    let bars='';
+    (d.activations||[]).forEach(a=>{
+      const pct=((a.activation_strength+1)/2)*100;
+      const color=a.activation_strength>0.3?'var(--success)':a.activation_strength>0?'var(--warn)':'var(--danger)';
+      bars+=`<div class="concept-bar"><span class="concept-name">${a.concept.replace(/_/g,' ')}</span><div class="concept-track"><div class="concept-fill" style="width:${pct}%;background:${color};"></div></div><span class="concept-val">${a.activation_strength.toFixed(2)}</span></div>`;
+    });
+    bars+=`<div style="margin-top:1rem;font-size:0.88rem;color:var(--muted);">Overall Alignment: <strong style="color:var(--accent);">${(d.overall_alignment||0).toFixed(3)}</strong></div>`;
+    document.getElementById('activation-bars').innerHTML=bars;
+    // Risks
+    let rh='';
+    (d.risk_flags||[]).forEach(f=>{rh+=`<div class="risk-flag">${f}</div>`;});
+    if(!rh)rh='<div style="font-size:0.85rem;color:var(--success);">No risk flags detected</div>';
+    document.getElementById('risk-section').innerHTML=rh;
+    // Control plan
+    const r2=await fetch(API+'/v22/repe/control-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_description:desc,concept_scores:scores})});
+    const cp=await r2.json();
+    let cph='';
+    (cp.actions||[]).forEach(a=>{
+      cph+=`<div style="padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
+        <strong>${a.concept}</strong> — ${a.direction} (magnitude: ${a.magnitude.toFixed(2)})
+        <div style="color:var(--muted);font-size:0.78rem;">${a.rationale}</div>
+      </div>`;
+    });
+    cph+=`<div style="margin-top:0.75rem;font-size:0.82rem;color:var(--muted);">Risk Level: <span class="tag ${cp.risk_level==='low'?'tag-ok':cp.risk_level==='medium'?'tag-warn':'tag-err'}">${cp.risk_level}</span></div>`;
+    document.getElementById('control-plan').innerHTML=cph;
+    document.getElementById('analyze-status').textContent='';
+  }catch(e){document.getElementById('analyze-status').textContent='Error: '+e.message;}
+}
+init();loadSummary();
+</script>
+</body>
+</html>

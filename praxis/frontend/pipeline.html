@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Praxis — Ingestion &amp; Curation Pipeline</title>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:rgba(255,255,255,0.035);--surface-hover:rgba(255,255,255,0.055);
+  --elevated:rgba(255,255,255,0.06);--border:rgba(255,255,255,0.06);
+  --text:#f0f0f5;--muted:rgba(255,255,255,0.50);--dim:rgba(255,255,255,0.30);
+  --accent:#6366f1;--accent-glow:rgba(99,102,241,0.30);--secondary:#50e3c2;
+  --warn:#fb923c;--danger:#ef4444;--success:#34d399;--info:#38bdf8;
+  --gold:#fbbf24;--gold-glow:rgba(251,191,36,0.25);
+  --shadow-card:0 2px 20px rgba(0,0,0,0.28),0 0 0 1px rgba(255,255,255,0.04);
+  --radius:12px;--radius-lg:16px;--radius-pill:999px;
+  --ease:cubic-bezier(0.16,1,0.3,1);--fast:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden;}
+
+/* ── Aurora ── */
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(140px);opacity:0.15;animation:af 20s ease-in-out infinite alternate;}
+.aurora::before{width:600px;height:600px;background:radial-gradient(circle,var(--secondary) 0%,transparent 70%);top:-12%;left:-6%;}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#6366f1 0%,transparent 70%);bottom:-15%;right:-6%;animation-delay:-9s;}
+.aurora-third{position:absolute;width:350px;height:350px;border-radius:50%;filter:blur(120px);opacity:0.12;background:radial-gradient(circle,var(--gold) 0%,transparent 70%);top:40%;right:20%;animation:af 25s ease-in-out infinite alternate-reverse;}
+@keyframes af{0%{transform:translate(0,0) scale(1);}50%{transform:translate(25px,-18px) scale(1.06);}100%{transform:translate(-18px,10px) scale(0.96);}}
+.noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0.03;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* ── Container ── */
+.container{max-width:1440px;margin:0 auto;padding:2rem;position:relative;z-index:2;}
+
+/* ── Header ── */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--secondary) 20%,#f0f0f5 60%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.subtitle{color:var(--muted);font-size:0.9rem;}
+.status-live{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.75rem;color:var(--success);font-weight:600;}
+.status-live .pulse{width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse-glow 2s ease-in-out infinite;}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 4px var(--success);}50%{box-shadow:0 0 16px var(--success),0 0 32px rgba(52,211,153,0.3);}}
+
+/* ── Nav ── */
+.nav{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.nav a{padding:0.4rem 1rem;background:var(--surface);color:var(--muted);text-decoration:none;border-radius:var(--radius-pill);font-size:0.8rem;font-weight:500;transition:all var(--fast);backdrop-filter:blur(12px);}
+.nav a:hover,.nav a.active{background:var(--surface-hover);color:var(--text);}
+.nav a.active{border:1px solid var(--secondary);color:var(--secondary);}
+
+/* ── Stats Row ── */
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:0.75rem;margin-bottom:2rem;}
+.stat-box{background:var(--surface);border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);display:flex;align-items:center;gap:0.75rem;transition:border-color var(--fast);border:1px solid transparent;}
+.stat-box:hover{border-color:rgba(255,255,255,0.08);}
+.stat-icon{font-size:1.4rem;}
+.stat-value{font-size:1.4rem;font-weight:800;line-height:1;}
+.stat-label{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.15rem;}
+.stat-value.gold{color:var(--gold);}
+.stat-value.green{color:var(--success);}
+.stat-value.teal{color:var(--secondary);}
+.stat-value.blue{color:var(--info);}
+.stat-value.purple{color:var(--accent);}
+.stat-value.orange{color:var(--warn);}
+.stat-value.red{color:var(--danger);}
+@media(max-width:1100px){.stats-row{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.stats-row{grid-template-columns:repeat(2,1fr);}}
+
+/* ── Grids ── */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+.grid-1-2{display:grid;grid-template-columns:1fr 2fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:1000px){.grid-3{grid-template-columns:1fr;}.grid-2,.grid-2-1,.grid-1-2{grid-template-columns:1fr;}}
+
+/* ── Cards ── */
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);transition:border-color var(--fast);border:1px solid transparent;}
+.card:hover{border-color:rgba(255,255,255,0.06);}
+.card-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;box-shadow:0 0 8px;}
+
+/* ── Section Titles ── */
+.section-title{font-size:1.1rem;font-weight:700;margin:2rem 0 1rem;padding-left:0.5rem;border-left:3px solid var(--accent);display:flex;align-items:center;gap:0.6rem;}
+.section-subtitle{font-size:0.82rem;color:var(--muted);margin-bottom:1rem;}
+
+/* ── Tier Bars ── */
+.tier-bar{display:flex;height:28px;border-radius:var(--radius);overflow:hidden;margin-bottom:0.5rem;}
+.tier-bar div{display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:rgba(0,0,0,0.7);transition:width 0.6s var(--ease);}
+.tier-1-fill{background:var(--success);}
+.tier-2-fill{background:var(--warn);}
+.tier-3-fill{background:var(--info);}
+.tier-rejected-fill{background:var(--danger);}
+.tier-legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:0.72rem;color:var(--muted);}
+.tier-legend span{display:flex;align-items:center;gap:0.35rem;}
+.tier-legend .legend-dot{width:10px;height:10px;border-radius:3px;}
+
+/* ── Review Queue ── */
+.queue-item{display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;border-radius:var(--radius);margin-bottom:0.5rem;transition:background var(--fast);border:1px solid var(--border);}
+.queue-item:hover{background:rgba(99,102,241,0.04);border-color:rgba(255,255,255,0.08);}
+.queue-icon{font-size:1.1rem;min-width:28px;text-align:center;margin-top:0.15rem;}
+.queue-body{flex:1;min-width:0;}
+.queue-tool-name{font-weight:600;font-size:0.9rem;margin-bottom:0.15rem;}
+.queue-meta{font-size:0.72rem;color:var(--muted);line-height:1.5;}
+.queue-score{display:flex;gap:1rem;margin-top:0.3rem;flex-wrap:wrap;}
+.queue-score span{font-size:0.68rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:var(--radius-pill);background:var(--surface-hover);}
+.queue-actions{display:flex;gap:0.4rem;align-items:center;flex-shrink:0;}
+.btn-approve,.btn-reject{border:none;cursor:pointer;font-size:0.72rem;font-weight:700;padding:0.35rem 0.8rem;border-radius:var(--radius-pill);transition:all var(--fast);}
+.btn-approve{background:rgba(52,211,153,0.15);color:var(--success);}
+.btn-approve:hover{background:rgba(52,211,153,0.3);}
+.btn-reject{background:rgba(251,113,133,0.15);color:var(--danger);}
+.btn-reject:hover{background:rgba(251,113,133,0.3);}
+
+/* ── Alert Rows ── */
+.alert-row{display:flex;align-items:flex-start;gap:0.75rem;padding:0.65rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;}
+.alert-row:last-child{border-bottom:none;}
+.alert-severity{font-size:0.62rem;font-weight:700;padding:0.12rem 0.4rem;border-radius:var(--radius-pill);text-transform:uppercase;letter-spacing:0.04em;flex-shrink:0;}
+.alert-severity.critical{background:rgba(251,113,133,0.15);color:var(--danger);}
+.alert-severity.high{background:rgba(251,146,60,0.15);color:var(--warn);}
+.alert-severity.medium{background:rgba(56,189,248,0.15);color:var(--info);}
+.alert-severity.low{background:rgba(52,211,153,0.12);color:var(--success);}
+.alert-body{flex:1;}
+.alert-tool{font-weight:600;}
+.alert-desc{font-size:0.75rem;color:var(--muted);margin-top:0.1rem;}
+.alert-time{font-size:0.68rem;color:var(--dim);flex-shrink:0;}
+
+/* ── SMB Score Gauge ── */
+.gauge-container{display:flex;flex-direction:column;align-items:center;gap:0.5rem;padding:1rem 0;}
+.gauge-ring{width:120px;height:120px;position:relative;}
+.gauge-ring svg{width:100%;height:100%;transform:rotate(-90deg);}
+.gauge-ring circle{fill:none;stroke-width:10;stroke-linecap:round;}
+.gauge-bg{stroke:rgba(255,255,255,0.06);}
+.gauge-fill{transition:stroke-dashoffset 1s var(--ease);}
+.gauge-value{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;line-height:1;}
+.gauge-label{font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.2rem;}
+
+/* ── Relationship Graph Mini ── */
+.rel-node{display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.65rem;border-radius:var(--radius-pill);background:var(--surface-hover);font-size:0.72rem;font-weight:600;margin:0.2rem;border:1px solid var(--border);}
+.rel-edge{display:inline-flex;align-items:center;padding:0.15rem 0.5rem;font-size:0.65rem;color:var(--dim);font-style:italic;}
+.rel-group{display:flex;flex-wrap:wrap;align-items:center;gap:0.2rem;padding:0.4rem 0;border-bottom:1px solid var(--border);}
+.rel-group:last-child{border-bottom:none;}
+
+/* ── Why Included Tooltip ── */
+.why-tooltip{position:relative;cursor:help;}
+.why-tooltip .why-content{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:rgba(6,6,14,0.95);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;font-size:0.75rem;min-width:260px;max-width:340px;box-shadow:0 8px 30px rgba(0,0,0,0.5);backdrop-filter:blur(16px);z-index:100;color:var(--text);line-height:1.5;}
+.why-tooltip:hover .why-content{display:block;}
+.why-tag{display:inline-block;padding:0.1rem 0.4rem;border-radius:var(--radius-pill);font-size:0.62rem;font-weight:700;margin:0.1rem;}
+.why-tag.match{background:rgba(52,211,153,0.15);color:var(--success);}
+.why-tag.smb{background:rgba(80,227,194,0.15);color:var(--secondary);}
+.why-tag.health{background:rgba(56,189,248,0.15);color:var(--info);}
+.why-tag.decay{background:rgba(251,146,60,0.15);color:var(--warn);}
+
+/* ── Buttons ── */
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--secondary));color:#0a0a0f;border:none;cursor:pointer;font-size:0.82rem;font-weight:700;padding:0.6rem 1.5rem;border-radius:var(--radius-pill);transition:all var(--fast);box-shadow:0 2px 12px var(--accent-glow);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px var(--accent-glow);}
+.btn-primary:active{transform:translateY(0);}
+.btn-secondary{background:var(--surface-hover);color:var(--text);border:1px solid var(--border);cursor:pointer;font-size:0.78rem;font-weight:600;padding:0.5rem 1.2rem;border-radius:var(--radius-pill);transition:all var(--fast);}
+.btn-secondary:hover{border-color:rgba(255,255,255,0.15);}
+
+/* ── Pipeline Progress ── */
+.pipeline-flow{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;padding:1rem 0;}
+.pipeline-stage{display:flex;flex-direction:column;align-items:center;gap:0.3rem;flex:1;min-width:100px;}
+.pipeline-stage-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;background:var(--surface-hover);border:2px solid var(--border);transition:all 0.3s var(--ease);}
+.pipeline-stage-dot.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 16px var(--accent-glow);}
+.pipeline-stage-dot.done{background:var(--success);border-color:var(--success);box-shadow:0 0 12px rgba(52,211,153,0.3);}
+.pipeline-stage-label{font-size:0.68rem;color:var(--muted);text-align:center;font-weight:500;}
+.pipeline-arrow{font-size:0.8rem;color:var(--dim);flex-shrink:0;}
+
+/* ── Loading Skeleton ── */
+.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-hover) 50%,var(--surface) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius);}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.skeleton-line{height:14px;margin-bottom:0.5rem;border-radius:4px;}
+.skeleton-line.w60{width:60%;}
+.skeleton-line.w80{width:80%;}
+.skeleton-line.w40{width:40%;}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:1000;padding:0.75rem 1.5rem;border-radius:var(--radius);font-size:0.82rem;font-weight:600;backdrop-filter:blur(16px);box-shadow:0 4px 20px rgba(0,0,0,0.4);transform:translateY(80px);opacity:0;transition:all 0.3s var(--ease);pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;pointer-events:auto;}
+.toast.success{background:rgba(52,211,153,0.15);color:var(--success);border:1px solid rgba(52,211,153,0.3);}
+.toast.error{background:rgba(251,113,133,0.15);color:var(--danger);border:1px solid rgba(251,113,133,0.3);}
+.toast.info{background:rgba(56,189,248,0.15);color:var(--info);border:1px solid rgba(56,189,248,0.3);}
+
+/* ── Empty State ── */
+.empty-state{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:0.85rem;}
+.empty-state .empty-icon{font-size:2rem;margin-bottom:0.5rem;opacity:0.5;}
+</style>
+</head>
+<body>
+
+<!-- Aurora Background -->
+<div class="aurora"><div class="aurora-third"></div></div>
+<div class="noise"></div>
+
+<div class="container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>🚀 Ingestion &amp; Curation Pipeline</h1>
+      <span class="subtitle">Triple Match · Survival Score · SMB Gate · Trust Decay · HITL Review &nbsp;
+        <span class="status-live" id="statusBadge"><span class="pulse"></span> <span id="statusText">LOADING</span></span>
+      </span>
+    </div>
+    <nav class="nav">
+      <a href="/static/home.html">Home</a>
+      <a href="/static/cognitive-dashboard.html">Cognitive</a>
+      <a href="/static/agent-orchestration.html">Agents</a>
+      <a href="/static/knowledge-explorer.html">Knowledge</a>
+      <a href="/static/observability-console.html">Observability</a>
+      <a href="/static/governance-center.html">Governance</a>
+      <a href="/static/economics-hub.html">Economics</a>
+      <a href="/static/fort-knox.html">Fort Knox</a>
+      <a href="/static/pipeline.html" class="active">Pipeline</a>
+    </nav>
+  </div>
+
+  <!-- ═══ Live Stats ═══ -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-box">
+      <span class="stat-icon">📦</span>
+      <div>
+        <div class="stat-value teal" id="statTotal">—</div>
+        <div class="stat-label">Total Ingested</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">✅</span>
+      <div>
+        <div class="stat-value green" id="statTier1">—</div>
+        <div class="stat-label">Tier 1 (Auto)</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">👁️</span>
+      <div>
+        <div class="stat-value orange" id="statTier2">—</div>
+        <div class="stat-label">Tier 2 (Review)</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">🧪</span>
+      <div>
+        <div class="stat-value blue" id="statTier3">—</div>
+        <div class="stat-label">Tier 3 (Sandbox)</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">⚠️</span>
+      <div>
+        <div class="stat-value red" id="statDecayAlerts">—</div>
+        <div class="stat-label">Decay Alerts</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">🔗</span>
+      <div>
+        <div class="stat-value purple" id="statRelations">—</div>
+        <div class="stat-label">Relationships</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Pipeline Flow Visualization ═══ -->
+  <div class="card" style="margin-bottom:2rem;">
+    <div class="card-title"><span class="dot" style="background:var(--secondary);box-shadow:0 0 8px rgba(80,227,194,0.4);"></span> Pipeline Flow</div>
+    <div class="pipeline-flow" id="pipelineFlow">
+      <div class="pipeline-stage">
+        <div class="pipeline-stage-dot done" id="stage-fetch">1</div>
+        <div class="pipeline-stage-label">Directory Fetch</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage">
+        <div class="pipeline-stage-dot" id="stage-match">2</div>
+        <div class="pipeline-stage-label">Triple Match</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage">
+        <div class="pipeline-stage-dot" id="stage-enrich">3</div>
+        <div class="pipeline-stage-label">Enrichment</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage">
+        <div class="pipeline-stage-dot" id="stage-score">4</div>
+        <div class="pipeline-stage-label">Survival Score</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage">
+        <div class="pipeline-stage-dot" id="stage-tier">5</div>
+        <div class="pipeline-stage-label">Tier Assignment</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage">
+        <div class="pipeline-stage-dot" id="stage-hitl">6</div>
+        <div class="pipeline-stage-label">HITL Review</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:0.75rem;align-items:center;justify-content:flex-end;margin-top:0.5rem;">
+      <span id="lastRunLabel" style="font-size:0.72rem;color:var(--muted);">Last run: never</span>
+      <button class="btn-primary" onclick="triggerPipeline()">▶ Run Pipeline</button>
+    </div>
+  </div>
+
+  <!-- ═══ Tier Distribution + SMB Average ═══ -->
+  <div class="grid-2-1">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--success);box-shadow:0 0 8px rgba(52,211,153,0.4);"></span> Tier Distribution</div>
+      <div class="tier-bar" id="tierBar">
+        <div class="tier-1-fill" style="width:0%"></div>
+        <div class="tier-2-fill" style="width:0%"></div>
+        <div class="tier-3-fill" style="width:0%"></div>
+        <div class="tier-rejected-fill" style="width:0%"></div>
+      </div>
+      <div class="tier-legend">
+        <span><span class="legend-dot" style="background:var(--success);"></span> Tier 1 — Auto-Approved</span>
+        <span><span class="legend-dot" style="background:var(--warn);"></span> Tier 2 — HITL Review</span>
+        <span><span class="legend-dot" style="background:var(--info);"></span> Tier 3 — Sandbox</span>
+        <span><span class="legend-dot" style="background:var(--danger);"></span> Rejected</span>
+      </div>
+      <div id="tierDetails" style="margin-top:1rem;font-size:0.78rem;color:var(--muted);"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--info);box-shadow:0 0 8px rgba(56,189,248,0.4);"></span> SMB Relevance</div>
+      <div class="gauge-container" id="smbGauge">
+        <div class="gauge-ring">
+          <svg viewBox="0 0 140 140">
+            <circle class="gauge-bg" cx="70" cy="70" r="55"/>
+            <circle class="gauge-fill" cx="70" cy="70" r="55" stroke="var(--secondary)"
+              stroke-dasharray="345.58" stroke-dashoffset="345.58" id="smbGaugeFill"/>
+          </svg>
+          <div class="gauge-value">
+            <span id="smbGaugeValue">—</span>
+            <span class="gauge-label">avg score</span>
+          </div>
+        </div>
+      </div>
+      <div id="smbBreakdown" style="font-size:0.72rem;color:var(--muted);text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- ═══ HITL Review Queue ═══ -->
+  <div class="section-title">👁️ Human-in-the-Loop Review Queue</div>
+  <div class="section-subtitle">Tier 2 tools awaiting curator approval — approve to promote, reject to archive</div>
+  <div class="card" style="margin-bottom:2rem;">
+    <div id="reviewQueue">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        Loading review queue…
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Trust Decay Alerts + Relationships ═══ -->
+  <div class="grid-2">
+    <!-- Trust Decay -->
+    <div>
+      <div class="section-title">🔻 Trust Decay Alerts</div>
+      <div class="card">
+        <div id="decayAlerts">
+          <div class="empty-state">
+            <div class="empty-icon">🛡️</div>
+            Loading trust decay data…
+          </div>
+        </div>
+        <div style="margin-top:0.75rem;display:flex;justify-content:flex-end;">
+          <button class="btn-secondary" onclick="runDecaySweep()">🔍 Run Trust Sweep</button>
+        </div>
+      </div>
+    </div>
+    <!-- Relationships -->
+    <div>
+      <div class="section-title">🔗 Tool Relationship Graph</div>
+      <div class="card">
+        <div id="relationshipGraph">
+          <div class="empty-state">
+            <div class="empty-icon">🕸️</div>
+            Loading relationship data…
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Approved Tools (Tier 1) ═══ -->
+  <div class="section-title" style="margin-top:2rem;">✅ Approved Tools (Tier 1)</div>
+  <div class="section-subtitle">Tools that passed Triple Match verification with Survival Score ≥ 70</div>
+  <div class="card" style="margin-bottom:2rem;">
+    <div id="approvedTools">
+      <div class="empty-state">
+        <div class="empty-icon">✨</div>
+        Loading approved tools…
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Sandbox (Tier 3) ═══ -->
+  <div class="section-title">🧪 Sandbox (Tier 3)</div>
+  <div class="section-subtitle">Emerging tools under observation — auto-promoted after 90 days if metrics hold</div>
+  <div class="card" style="margin-bottom:2rem;">
+    <div id="sandboxTools">
+      <div class="empty-state">
+        <div class="empty-icon">🔬</div>
+        Loading sandbox tools…
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Pipeline Constants ═══ -->
+  <div class="section-title">⚙️ Pipeline Configuration</div>
+  <div class="card" style="margin-bottom:2rem;">
+    <div id="pipelineConstants">
+      <div class="empty-state">
+        <div class="empty-icon">🔧</div>
+        Loading constants…
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.container -->
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+const BASE = window.location.origin;
+
+// ── Toast ──
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+// ── Stage Updater ──
+function setStage(stageId, state) {
+  const el = document.getElementById(stageId);
+  if (!el) return;
+  el.classList.remove('active', 'done');
+  if (state === 'active') el.classList.add('active');
+  if (state === 'done') el.classList.add('done');
+}
+
+// ── Pipeline Trigger ──
+async function triggerPipeline() {
+  showToast('⏳ Pipeline triggered — running ingestion cycle…', 'info');
+  const stages = ['stage-fetch', 'stage-match', 'stage-enrich', 'stage-score', 'stage-tier', 'stage-hitl'];
+  stages.forEach(s => setStage(s, ''));
+
+  try {
+    // Animate stages
+    for (let i = 0; i < stages.length; i++) {
+      setStage(stages[i], 'active');
+      await new Promise(r => setTimeout(r, 400));
+      if (i > 0) setStage(stages[i - 1], 'done');
+    }
+
+    const r = await fetch(BASE + '/pipeline/ingest/trigger', { method: 'POST' });
+    const d = await r.json();
+
+    stages.forEach(s => setStage(s, 'done'));
+    showToast('✅ Pipeline complete — ' + (d.summary?.total_matched || 0) + ' tools processed', 'success');
+    document.getElementById('lastRunLabel').textContent = 'Last run: ' + new Date().toLocaleTimeString();
+
+    // Refresh all panels
+    setTimeout(() => { loadAll(); }, 500);
+  } catch (e) {
+    showToast('❌ Pipeline error: ' + e.message, 'error');
+    stages.forEach(s => setStage(s, ''));
+  }
+}
+
+// ── Load Pipeline Status ──
+async function loadPipelineStatus() {
+  try {
+    const r = await fetch(BASE + '/pipeline/status');
+    const d = await r.json();
+
+    document.getElementById('statTotal').textContent = d.total_tools || 0;
+    document.getElementById('statTier1').textContent = d.tier_1 || 0;
+    document.getElementById('statTier2').textContent = d.tier_2 || 0;
+    document.getElementById('statTier3').textContent = d.tier_3 || 0;
+    document.getElementById('statusText').textContent = d.status === 'active' ? 'LIVE' : 'IDLE';
+
+    if (d.last_run) {
+      document.getElementById('lastRunLabel').textContent = 'Last run: ' + new Date(d.last_run).toLocaleString();
+    }
+
+    // Tier bar
+    const total = (d.tier_1 || 0) + (d.tier_2 || 0) + (d.tier_3 || 0) + (d.rejected || 0);
+    if (total > 0) {
+      const bar = document.getElementById('tierBar');
+      bar.children[0].style.width = ((d.tier_1 / total) * 100) + '%';
+      bar.children[0].textContent = d.tier_1;
+      bar.children[1].style.width = ((d.tier_2 / total) * 100) + '%';
+      bar.children[1].textContent = d.tier_2;
+      bar.children[2].style.width = ((d.tier_3 / total) * 100) + '%';
+      bar.children[2].textContent = d.tier_3;
+      bar.children[3].style.width = (((d.rejected || 0) / total) * 100) + '%';
+      bar.children[3].textContent = d.rejected || 0;
+    }
+
+    document.getElementById('tierDetails').innerHTML =
+      'Survival Score threshold: <strong>70.0</strong> · SMB gate: <strong>50.0</strong> · Auto-confidence: <strong>85%</strong>';
+
+    // Animate stages if last run exists
+    if (d.last_run) {
+      ['stage-fetch','stage-match','stage-enrich','stage-score','stage-tier','stage-hitl'].forEach(s => setStage(s, 'done'));
+    }
+  } catch (e) {
+    document.getElementById('statusText').textContent = 'OFFLINE';
+    document.getElementById('statusBadge').querySelector('.pulse').style.background = 'var(--danger)';
+  }
+}
+
+// ── Load Review Queue ──
+async function loadReviewQueue() {
+  try {
+    const r = await fetch(BASE + '/pipeline/review-queue');
+    const d = await r.json();
+    const el = document.getElementById('reviewQueue');
+
+    if (!d.queue || d.queue.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">✨</div>No tools pending review — queue is clear</div>';
+      return;
+    }
+
+    el.innerHTML = d.queue.map(t => `
+      <div class="queue-item" id="queue-${CSS.escape(t.name)}">
+        <div class="queue-icon">🔧</div>
+        <div class="queue-body">
+          <div class="queue-tool-name">
+            <span class="why-tooltip">${t.name}
+              <div class="why-content" id="why-${CSS.escape(t.name)}">Loading…</div>
+            </span>
+          </div>
+          <div class="queue-meta">${t.category || 'Uncategorized'} · Matched ${t.match_count || '?'}/3 directories</div>
+          <div class="queue-score">
+            <span style="color:var(--success);">Survival: ${(t.survival_score || 0).toFixed(1)}</span>
+            <span style="color:var(--secondary);">SMB: ${(t.smb_score || 0).toFixed(1)}</span>
+            <span style="color:var(--info);">Health: ${(t.maintenance_health || 0).toFixed(1)}</span>
+          </div>
+        </div>
+        <div class="queue-actions">
+          <button class="btn-approve" onclick="approveReject('${t.name}', 'approve')">✓ Approve</button>
+          <button class="btn-reject" onclick="approveReject('${t.name}', 'reject')">✕ Reject</button>
+        </div>
+      </div>
+    `).join('');
+
+    // Lazy-load "Why Included?" tooltips
+    d.queue.forEach(t => loadWhyIncluded(t.name));
+  } catch (e) {
+    document.getElementById('reviewQueue').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load review queue — ' + e.message + '</div>';
+  }
+}
+
+// ── Load Why Included ──
+async function loadWhyIncluded(toolName) {
+  try {
+    const r = await fetch(BASE + '/pipeline/why-included/' + encodeURIComponent(toolName));
+    const d = await r.json();
+    const el = document.getElementById('why-' + CSS.escape(toolName));
+    if (!el) return;
+
+    let html = '<strong>Why Included?</strong><br/>';
+    html += '<div style="margin-top:0.4rem;">';
+    if (d.triple_match) html += '<span class="why-tag match">Triple Match: ' + d.triple_match + '/3</span> ';
+    if (d.survival_score) html += '<span class="why-tag health">Survival: ' + d.survival_score.toFixed(1) + '</span> ';
+    if (d.smb_relevance) html += '<span class="why-tag smb">SMB: ' + d.smb_relevance.toFixed(1) + '</span> ';
+    if (d.trust_status) html += '<span class="why-tag decay">Trust: ' + d.trust_status + '</span> ';
+    html += '</div>';
+    if (d.explanation) html += '<div style="margin-top:0.4rem;font-size:0.72rem;color:var(--muted);">' + d.explanation + '</div>';
+    el.innerHTML = html;
+  } catch (e) {
+    // silently ignore
+  }
+}
+
+// ── Approve / Reject ──
+async function approveReject(toolName, action) {
+  try {
+    const r = await fetch(BASE + '/pipeline/' + action + '/' + encodeURIComponent(toolName), { method: 'POST' });
+    const d = await r.json();
+
+    if (d.status === 'approved' || d.status === 'rejected' || d.result) {
+      const row = document.getElementById('queue-' + CSS.escape(toolName));
+      if (row) {
+        row.style.opacity = '0.3';
+        row.style.pointerEvents = 'none';
+        setTimeout(() => row.remove(), 600);
+      }
+      showToast((action === 'approve' ? '✅' : '🗑️') + ' ' + toolName + ' ' + action + 'd', action === 'approve' ? 'success' : 'info');
+      // Refresh stats
+      setTimeout(loadPipelineStatus, 500);
+    }
+  } catch (e) {
+    showToast('❌ Could not ' + action + ' ' + toolName, 'error');
+  }
+}
+
+// ── Load Decay Alerts ──
+async function loadDecayAlerts() {
+  try {
+    const r = await fetch(BASE + '/trust-decay/alerts');
+    const d = await r.json();
+    const el = document.getElementById('decayAlerts');
+
+    const alerts = d.alerts || d;
+    document.getElementById('statDecayAlerts').textContent = Array.isArray(alerts) ? alerts.length : 0;
+
+    if (!Array.isArray(alerts) || alerts.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div>No trust decay alerts — all vendors healthy</div>';
+      return;
+    }
+
+    el.innerHTML = alerts.slice(0, 8).map(a => `
+      <div class="alert-row">
+        <span class="alert-severity ${(a.severity || 'medium').toLowerCase()}">${a.severity || 'MED'}</span>
+        <div class="alert-body">
+          <div class="alert-tool">${a.tool_name || a.tool || 'Unknown'}</div>
+          <div class="alert-desc">${a.signal_type || a.type || ''} — ${a.description || a.detail || ''}</div>
+        </div>
+        <span class="alert-time">${a.detected_at ? new Date(a.detected_at).toLocaleDateString() : ''}</span>
+      </div>
+    `).join('');
+  } catch (e) {
+    document.getElementById('decayAlerts').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">⚠️</div>Trust decay service unavailable</div>';
+  }
+}
+
+// ── Run Decay Sweep ──
+async function runDecaySweep() {
+  showToast('🔍 Running trust decay sweep…', 'info');
+  try {
+    const r = await fetch(BASE + '/trust-decay/sweep', { method: 'POST' });
+    const d = await r.json();
+    showToast('✅ Sweep complete — ' + (d.total_alerts || 0) + ' alerts found', 'success');
+    setTimeout(loadDecayAlerts, 500);
+  } catch (e) {
+    showToast('❌ Sweep failed: ' + e.message, 'error');
+  }
+}
+
+// ── Load Relationships ──
+async function loadRelationships() {
+  try {
+    const r = await fetch(BASE + '/relationships/summary');
+    const d = await r.json();
+
+    document.getElementById('statRelations').textContent = d.total_relationships || d.total || 0;
+    const el = document.getElementById('relationshipGraph');
+
+    const rels = d.relationships || d.groups || [];
+    if (!Array.isArray(rels) || rels.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">🕸️</div>No relationships extracted yet — run extraction on tools</div>';
+      return;
+    }
+
+    el.innerHTML = rels.slice(0, 10).map(r => `
+      <div class="rel-group">
+        <span class="rel-node" style="border-color:var(--accent);">${r.source || r.tool_a}</span>
+        <span class="rel-edge">— ${r.relation_type || r.relationship || 'related'} →</span>
+        <span class="rel-node" style="border-color:var(--secondary);">${r.target || r.tool_b}</span>
+        <span style="font-size:0.62rem;color:var(--dim);margin-left:auto;">${r.confidence ? (r.confidence * 100).toFixed(0) + '% conf' : ''}</span>
+      </div>
+    `).join('');
+  } catch (e) {
+    document.getElementById('relationshipGraph').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">⚠️</div>Relationship service unavailable</div>';
+  }
+}
+
+// ── Load Approved Tools ──
+async function loadApprovedTools() {
+  try {
+    const r = await fetch(BASE + '/pipeline/approved');
+    const d = await r.json();
+    const el = document.getElementById('approvedTools');
+    const tools = d.tools || d;
+
+    if (!Array.isArray(tools) || tools.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div>No approved tools yet — run the pipeline or approve from the review queue</div>';
+      return;
+    }
+
+    el.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;">' +
+      tools.slice(0, 50).map(t => {
+        const name = typeof t === 'string' ? t : (t.name || t.tool_name || 'Unknown');
+        const score = typeof t === 'object' ? t.survival_score : null;
+        return `<div class="rel-node" style="border-color:var(--success);">
+          <span style="color:var(--success);font-size:0.68rem;">✓</span> ${name}
+          ${score ? '<span style="font-size:0.58rem;color:var(--muted);margin-left:0.3rem;">' + score.toFixed(0) + '</span>' : ''}
+        </div>`;
+      }).join('') +
+    '</div>';
+  } catch (e) {
+    document.getElementById('approvedTools').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load approved tools</div>';
+  }
+}
+
+// ── Load Sandbox Tools ──
+async function loadSandboxTools() {
+  try {
+    const r = await fetch(BASE + '/pipeline/sandbox');
+    const d = await r.json();
+    const el = document.getElementById('sandboxTools');
+    const tools = d.tools || d;
+
+    if (!Array.isArray(tools) || tools.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">🧪</div>No sandbox tools — emerging tools will appear here</div>';
+      return;
+    }
+
+    el.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;">' +
+      tools.slice(0, 30).map(t => {
+        const name = typeof t === 'string' ? t : (t.name || t.tool_name || 'Unknown');
+        return `<div class="rel-node" style="border-color:var(--info);">
+          <span style="color:var(--info);font-size:0.68rem;">🧪</span> ${name}
+        </div>`;
+      }).join('') +
+    '</div>';
+  } catch (e) {
+    document.getElementById('sandboxTools').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load sandbox</div>';
+  }
+}
+
+// ── Load SMB Average ──
+async function loadSMBAverage() {
+  try {
+    const r = await fetch(BASE + '/smb/score-all');
+    const d = await r.json();
+    const scores = d.scores || d;
+
+    if (Array.isArray(scores) && scores.length > 0) {
+      const avg = scores.reduce((s, t) => s + (t.total_score || t.score || 0), 0) / scores.length;
+      const circ = 2 * Math.PI * 55; // ~345.58
+      const offset = circ * (1 - avg / 100);
+      document.getElementById('smbGaugeFill').style.strokeDashoffset = offset;
+      document.getElementById('smbGaugeValue').textContent = avg.toFixed(0);
+
+      const aboveGate = scores.filter(t => (t.total_score || t.score || 0) >= 50).length;
+      document.getElementById('smbBreakdown').innerHTML =
+        aboveGate + '/' + scores.length + ' tools pass SMB gate (≥ 50)';
+
+      // Color the gauge based on score
+      const fill = document.getElementById('smbGaugeFill');
+      if (avg >= 70) fill.style.stroke = 'var(--success)';
+      else if (avg >= 50) fill.style.stroke = 'var(--secondary)';
+      else fill.style.stroke = 'var(--warn)';
+    } else {
+      document.getElementById('smbGaugeValue').textContent = '—';
+      document.getElementById('smbBreakdown').innerHTML = 'No SMB scoring data available';
+    }
+  } catch (e) {
+    document.getElementById('smbGaugeValue').textContent = '—';
+    document.getElementById('smbBreakdown').innerHTML = 'SMB scoring service unavailable';
+  }
+}
+
+// ── Load Pipeline Constants ──
+async function loadConstants() {
+  try {
+    const r = await fetch(BASE + '/pipeline/constants');
+    const d = await r.json();
+    const el = document.getElementById('pipelineConstants');
+
+    const sections = [
+      { label: 'Weights', data: d.weights || d.WEIGHTS, color: 'var(--accent)' },
+      { label: 'Thresholds', data: { survival_min: d.tier_1_min_survival || d.TIER_1_MIN_SURVIVAL, smb_min: d.tier_1_min_smb || d.TIER_1_MIN_SMB, auto_conf: d.tier_1_confidence_auto || d.TIER_1_CONFIDENCE_AUTO }, color: 'var(--success)' },
+      { label: 'Trust Decay', data: { interval_hrs: d.trust_decay_interval || d.TRUST_DECAY_INTERVAL_HOURS, sweep: 'Every 72h' }, color: 'var(--warn)' },
+    ];
+
+    el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">' +
+      sections.map(s => {
+        const entries = s.data && typeof s.data === 'object'
+          ? Object.entries(s.data).map(([k, v]) =>
+              '<div style="display:flex;justify-content:space-between;padding:0.2rem 0;border-bottom:1px solid var(--border);font-size:0.72rem;">' +
+                '<span style="color:var(--muted);">' + k.replace(/_/g, ' ') + '</span>' +
+                '<span style="font-weight:600;">' + (typeof v === 'number' ? v.toFixed(2) : v) + '</span>' +
+              '</div>'
+            ).join('')
+          : '<div style="font-size:0.72rem;color:var(--dim);">Not available</div>';
+        return '<div>' +
+          '<div style="font-size:0.72rem;font-weight:700;color:' + s.color + ';margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.06em;">' + s.label + '</div>' +
+          entries +
+        '</div>';
+      }).join('') +
+    '</div>';
+  } catch (e) {
+    document.getElementById('pipelineConstants').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load pipeline constants</div>';
+  }
+}
+
+// ── Load All ──
+function loadAll() {
+  loadPipelineStatus();
+  loadReviewQueue();
+  loadDecayAlerts();
+  loadRelationships();
+  loadApprovedTools();
+  loadSandboxTools();
+  loadSMBAverage();
+  loadConstants();
+}
+
+// ── Init ──
+loadAll();
+// Auto-refresh every 30 seconds
+setInterval(loadAll, 30000);
+</script>
+</body>
+</html>

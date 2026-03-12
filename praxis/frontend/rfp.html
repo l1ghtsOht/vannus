@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RFP Builder — Praxis</title>
+  <style>
+    :root {
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-5: 1.5rem; --space-6: 2rem; --space-7: 3rem; --space-8: 4rem;
+      --bg-primary: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.035);
+      --bg-card-hover: rgba(255,255,255,0.055);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.50);
+      --text-dim: rgba(255,255,255,0.30);
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.30);
+      --accent-secondary: #50e3c2;
+      --shadow-card: 0 2px 16px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.03);
+      --radius-sm: 8px; --radius-md: 12px; --radius-card: 16px; --radius-pill: 999px;
+      --line-tight: 1.3; --line-normal: 1.5; --line-relaxed: 1.65;
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg-primary); color: var(--text-primary);
+      min-height: 100vh; line-height: var(--line-relaxed);
+    }
+
+    .aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .aurora::before {
+      content: ''; position: absolute; width: 550px; height: 550px; border-radius: 50%;
+      filter: blur(140px); opacity: 0.15;
+      background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+      top: -10%; left: -5%;
+    }
+    .aurora::after {
+      content: ''; position: absolute; width: 400px; height: 400px; border-radius: 50%;
+      filter: blur(120px); opacity: 0.10;
+      background: radial-gradient(circle, #50e3c2 0%, transparent 70%);
+      bottom: -10%; right: -8%;
+    }
+    .noise {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.018;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 256px;
+    }
+
+    .nav-bar {
+      position: sticky; top: 0; z-index: 100;
+      padding: var(--space-3) var(--space-5);
+      display: flex; align-items: center; justify-content: center; gap: var(--space-6);
+      background: rgba(6,6,14,0.75);
+      backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.25);
+    }
+    .nav-bar a {
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px;
+      transition: color var(--transition-fast);
+    }
+    .nav-bar a:hover { color: var(--text-primary); }
+    .nav-bar a.active { color: var(--accent); }
+    .nav-logo { font-weight: 700; font-size: 0.95rem; color: var(--text-primary) !important; letter-spacing: -0.5px; }
+
+    .content {
+      position: relative; z-index: 2;
+      max-width: 900px; margin: 0 auto;
+      padding: var(--space-7) var(--space-5) var(--space-8);
+    }
+    .content h2 {
+      font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px;
+      margin-bottom: var(--space-2); line-height: var(--line-tight);
+      background: linear-gradient(135deg, #f0f0f5, #6366f1);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .subtitle {
+      color: var(--text-secondary); font-size: 0.88rem; margin-bottom: var(--space-7);
+      max-width: 650px; line-height: var(--line-relaxed);
+    }
+
+    /* Form */
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label {
+      font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .form-group select, .form-group input, .form-group textarea {
+      background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4);
+      color: var(--text-primary); font-size: 0.88rem; font-family: inherit;
+      transition: all var(--transition-fast); outline: none;
+    }
+    .form-group select:focus, .form-group input:focus, .form-group textarea:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group select option { background: #14141f; }
+
+    /* Chips for tool selection */
+    .tool-chips {
+      display: flex; flex-wrap: wrap; gap: var(--space-2);
+      max-height: 200px; overflow-y: auto; padding: var(--space-2) 0;
+    }
+    .tool-chip {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--bg-card); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius-pill); cursor: pointer;
+      font-size: 0.75rem; color: var(--text-secondary);
+      transition: all var(--transition-fast); user-select: none;
+    }
+    .tool-chip:hover { border-color: rgba(255,255,255,0.12); }
+    .tool-chip.selected { background: rgba(99,102,241,0.15); border-color: var(--accent); color: var(--accent); }
+    .tool-chip .grade {
+      font-size: 0.62rem; font-weight: 700; padding: 0.1rem 0.35rem;
+      border-radius: 3px; line-height: 1;
+    }
+
+    .btn-generate {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-3) var(--space-6);
+      background: linear-gradient(135deg, var(--accent), #6366f1); color: white;
+      border: none; border-radius: var(--radius-sm); cursor: pointer;
+      font-size: 0.88rem; font-weight: 700; font-family: inherit;
+      box-shadow: 0 2px 12px var(--accent-glow);
+      transition: all var(--transition-fast);
+    }
+    .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* RFP Output */
+    .rfp-output {
+      display: none; margin-top: var(--space-7);
+      background: var(--bg-card); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card); position: relative; overflow: hidden;
+    }
+    .rfp-output.visible { display: block; animation: slideUp 0.4s ease-out; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .rfp-output::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent-secondary), var(--accent), var(--accent-secondary));
+    }
+
+    .rfp-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: var(--space-5) var(--space-6); border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .rfp-header h3 { font-size: 1.1rem; font-weight: 700; }
+    .rfp-header .actions { display: flex; gap: var(--space-3); }
+    .btn-sm {
+      padding: var(--space-2) var(--space-3);
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-sm); color: var(--text-secondary);
+      font-size: 0.75rem; font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: all var(--transition-fast);
+    }
+    .btn-sm:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
+
+    .rfp-body { padding: var(--space-6); }
+    .rfp-section {
+      margin-bottom: var(--space-6); padding-bottom: var(--space-5);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .rfp-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .rfp-section h4 {
+      font-size: 0.88rem; font-weight: 700; color: var(--accent);
+      margin-bottom: var(--space-3); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .rfp-section p, .rfp-section li {
+      font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7;
+    }
+    .rfp-section ul { list-style: none; padding-left: var(--space-5); }
+    .rfp-section ul li::before {
+      content: '▸'; color: var(--accent); display: inline-block; width: 1rem; margin-left: -1rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav-bar { gap: var(--space-4); font-size: 0.75rem; overflow-x: auto; justify-content: flex-start; padding-left: var(--space-4); }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
+    ::selection { background: rgba(99,102,241,0.3); color: white; }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="noise"></div>
+
+  <nav class="nav-bar">
+    <a href="/" class="nav-logo">Praxis</a>
+    <a href="/">Search</a>
+    <a href="/static/journey.html">Journey</a>
+    <a href="/static/tools.html">All Tools</a>
+    <a href="/static/tuesday-test.html">ROI Calculator</a>
+    <a href="/static/rfp.html" class="active">RFP Builder</a>
+    <a href="/static/manifesto.html">Methodology</a>
+  </nav>
+
+  <div class="content">
+    <h2>Neutral Vendor RFP Generator</h2>
+    <p class="subtitle">
+      Generate a professional, vendor-neutral Request for Proposal for your AI tool procurement.
+      No sales pitch — just structured requirements your team can send to any vendor.
+    </p>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="bizName">Business Name</label>
+        <input type="text" id="bizName" placeholder="Acme Manufacturing" />
+      </div>
+
+      <div class="form-group">
+        <label for="industry">Industry</label>
+        <select id="industry">
+          <option value="manufacturing">Manufacturing</option>
+          <option value="healthcare">Healthcare</option>
+          <option value="financial_services">Financial Services</option>
+          <option value="retail">Retail / E-commerce</option>
+          <option value="professional_services">Professional Services</option>
+          <option value="construction">Construction</option>
+          <option value="logistics">Logistics / Transportation</option>
+          <option value="technology">Technology</option>
+          <option value="education">Education</option>
+          <option value="nonprofit">Nonprofit</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="teamSize">Team Size</label>
+        <input type="number" id="teamSize" value="25" min="1" max="10000" />
+      </div>
+
+      <div class="form-group">
+        <label for="budget">Monthly Budget ($)</label>
+        <input type="number" id="budget" value="500" min="0" step="50" />
+      </div>
+
+      <div class="form-group full">
+        <label for="workflow">Primary Workflow to Automate</label>
+        <textarea id="workflow" placeholder="e.g. We need to automate invoice processing from receipt to payment across 3 departments, with approval routing and QuickBooks integration…"></textarea>
+      </div>
+
+      <div class="form-group full">
+        <label for="pain">Key Pain Points (comma-separated)</label>
+        <input type="text" id="pain" placeholder="e.g. manual data entry, missed deadlines, no audit trail" />
+      </div>
+
+      <div class="form-group full">
+        <label>Select Tools to Evaluate (optional — shows resilience grades)</label>
+        <div class="tool-chips" id="toolChips">
+          <span style="color:var(--text-dim);font-size:0.75rem;">Loading tools…</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-generate" id="genBtn" onclick="generateRFP()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Generate RFP Document
+    </button>
+
+    <div class="rfp-output" id="rfpOutput">
+      <div class="rfp-header">
+        <h3 id="rfpTitle">RFP Document</h3>
+        <div class="actions">
+          <button class="btn-sm" onclick="copyRFP()">Copy to Clipboard</button>
+        </div>
+      </div>
+      <div class="rfp-body" id="rfpBody"></div>
+    </div>
+  </div>
+
+  <script>
+    /* Load tool chips with resilience grades */
+    (async function loadChips() {
+      try {
+        var res = await fetch('/tools/resilience');
+        if (!res.ok) throw new Error('Failed');
+        var data = await res.json();
+        var tools = data.tools || [];
+        var container = document.getElementById('toolChips');
+        container.innerHTML = '';
+
+        var tierColors = {sovereign:'#50e3c2',durable:'#6366f1',moderate:'#f5a623',fragile:'#ef4444',wrapper:'#ef4444'};
+
+        /* Show top 40 by score for manageable list */
+        tools.slice(0, 60).forEach(function(t) {
+          var chip = document.createElement('span');
+          chip.className = 'tool-chip';
+          chip.dataset.tool = t.tool_name;
+          var c = tierColors[t.tier] || '#999';
+          chip.innerHTML = '<span class="grade" style="background:' + c + '18;color:' + c + ';">' + t.grade + '</span>' + t.tool_name;
+          chip.onclick = function() { this.classList.toggle('selected'); };
+          container.appendChild(chip);
+        });
+      } catch(e) {
+        document.getElementById('toolChips').innerHTML = '<span style="color:var(--text-dim);font-size:0.75rem;">Could not load tools</span>';
+      }
+    })();
+
+    async function generateRFP() {
+      var btn = document.getElementById('genBtn');
+      btn.disabled = true;
+      btn.textContent = 'Generating…';
+
+      var selected = [];
+      document.querySelectorAll('.tool-chip.selected').forEach(function(c) {
+        selected.push(c.dataset.tool);
+      });
+
+      var body = {
+        business_name: document.getElementById('bizName').value || 'Your Company',
+        industry: document.getElementById('industry').value,
+        team_size: parseInt(document.getElementById('teamSize').value) || 25,
+        monthly_budget: parseFloat(document.getElementById('budget').value) || 500,
+        workflow_description: document.getElementById('workflow').value || 'General workflow automation',
+        pain_points: (document.getElementById('pain').value || '').split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+        tools_to_evaluate: selected
+      };
+
+      try {
+        var res = await fetch('/rfp/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        var rfp = await res.json();
+        renderRFP(rfp);
+      } catch(e) {
+        alert('Generation failed: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Generate RFP Document';
+      }
+    }
+
+    function renderRFP(rfp) {
+      var panel = document.getElementById('rfpOutput');
+      panel.classList.add('visible');
+
+      document.getElementById('rfpTitle').textContent = rfp.document_type || rfp.title || 'RFP Document';
+
+      var body = document.getElementById('rfpBody');
+      body.innerHTML = '';
+
+      /* sections may be a dict (keyed by "1_business_overview", etc.) or an array */
+      var sections = rfp.sections || {};
+      var secList = Array.isArray(sections) ? sections : Object.keys(sections).sort().map(function(k) { return sections[k]; });
+
+      secList.forEach(function(sec) {
+        var div = document.createElement('div');
+        div.className = 'rfp-section';
+
+        var h4 = document.createElement('h4');
+        h4.textContent = sec.title || sec.heading || '';
+        div.appendChild(h4);
+
+        /* Render all string/number fields as paragraphs */
+        var skip = new Set(['title','heading']);
+        Object.keys(sec).forEach(function(key) {
+          if (skip.has(key)) return;
+          var val = sec[key];
+          if (typeof val === 'string' || typeof val === 'number') {
+            var p = document.createElement('p');
+            p.innerHTML = '<strong>' + key.replace(/_/g, ' ') + ':</strong> ' + val;
+            div.appendChild(p);
+          } else if (Array.isArray(val)) {
+            /* Array of strings or objects */
+            var ul = document.createElement('ul');
+            val.forEach(function(item) {
+              var li = document.createElement('li');
+              if (typeof item === 'string') {
+                li.textContent = item;
+              } else if (typeof item === 'object') {
+                /* e.g. evaluation criteria: {criterion, weight, note} */
+                var parts = [];
+                Object.keys(item).forEach(function(k2) { parts.push(item[k2]); });
+                li.textContent = parts.join(' — ');
+              }
+              ul.appendChild(li);
+            });
+            var lbl = document.createElement('p');
+            lbl.innerHTML = '<strong>' + key.replace(/_/g, ' ') + ':</strong>';
+            div.appendChild(lbl);
+            div.appendChild(ul);
+          }
+        });
+
+        body.appendChild(div);
+      });
+
+      /* Praxis note */
+      if (rfp.praxis_note) {
+        var note = document.createElement('div');
+        note.style.cssText = 'padding:var(--space-4) var(--space-6);font-size:0.75rem;color:var(--text-dim);line-height:1.6;font-style:italic;border-top:1px solid rgba(255,255,255,0.04);';
+        note.textContent = rfp.praxis_note;
+        panel.appendChild(note);
+      }
+
+      /* Metadata footer */
+      var meta = document.createElement('div');
+      meta.style.cssText = 'padding:var(--space-3) var(--space-6);font-size:0.68rem;color:var(--text-dim);border-top:1px solid rgba(255,255,255,0.04);';
+      meta.textContent = 'Generated by ' + (rfp.generated_by || 'Praxis AI') + ' · v' + (rfp.version || '1.0');
+      panel.appendChild(meta);
+
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function copyRFP() {
+      var body = document.getElementById('rfpBody');
+      var text = document.getElementById('rfpTitle').textContent + '\n' + '='.repeat(40) + '\n';
+      body.querySelectorAll('.rfp-section').forEach(function(sec) {
+        var h = sec.querySelector('h4');
+        if (h) text += '\n' + h.textContent.toUpperCase() + '\n' + '-'.repeat(h.textContent.length) + '\n\n';
+        sec.querySelectorAll('p').forEach(function(p) {
+          text += p.textContent + '\n';
+        });
+        sec.querySelectorAll('li').forEach(function(li) {
+          text += '  - ' + li.textContent + '\n';
+        });
+        text += '\n';
+      });
+      navigator.clipboard.writeText(text.trim()).then(function() {
+        var btn = document.querySelector('.btn-sm');
+        var orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.color = 'var(--accent-secondary)';
+        setTimeout(function() { btn.textContent = orig; btn.style.color = ''; }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

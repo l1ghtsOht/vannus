@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Praxis — AI Decision Engine</title>
+  <style>
+    /* ══════════════════════════════════════════════
+       PRAXIS 2026 — Liquid Glass Search Engine UI
+       ══════════════════════════════════════════════ */
+
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-glass: rgba(255,255,255,0.06);
+      --bg-glass-hover: rgba(255,255,255,0.10);
+      --bg-glass-strong: rgba(255,255,255,0.12);
+      --border-glass: rgba(255,255,255,0.08);
+      --border-glass-hover: rgba(255,255,255,0.18);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-dim: rgba(255,255,255,0.35);
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.35);
+      --accent-secondary: #50e3c2;
+      --accent-warm: #f5a623;
+      --accent-danger: #ef4444;
+      --glass-blur: 24px;
+      --radius-pill: 999px;
+      --radius-card: 20px;
+      --radius-sm: 12px;
+      --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-spring: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* ── Aurora Background ── */
+    .aurora {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .aurora::before,
+    .aurora::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.35;
+      animation: auroraFloat 18s ease-in-out infinite alternate;
+    }
+    .aurora::before {
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+      top: -15%; left: -10%;
+    }
+    .aurora::after {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, #50e3c2 0%, transparent 70%);
+      bottom: -20%; right: -10%;
+      animation-delay: -8s;
+      animation-duration: 22s;
+    }
+    .aurora-third {
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.2;
+      background: radial-gradient(circle, #f5a623 0%, transparent 70%);
+      top: 40%; left: 50%;
+      transform: translateX(-50%);
+      animation: auroraFloat 25s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes auroraFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, -30px) scale(1.1); }
+      66% { transform: translate(-30px, 20px) scale(0.95); }
+      100% { transform: translate(20px, -10px) scale(1.05); }
+    }
+
+    /* ── Noise Texture Overlay ── */
+    .noise {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
+    }
+
+    /* ══════════════════════════════════════════════
+       STICKY NAV — Glass bar (visible after search)
+       ══════════════════════════════════════════════ */
+    .nav-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0.65rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      background: rgba(6,6,14,0.70);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-bottom: 1px solid var(--border-glass);
+      transform: translateY(-100%);
+      opacity: 0;
+      transition: transform var(--transition-smooth), opacity var(--transition-smooth);
+    }
+    .nav-bar.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .nav-bar a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      transition: color var(--transition-fast);
+    }
+    .nav-bar a:hover { color: var(--text-primary); }
+    .nav-bar a.active { color: var(--accent); }
+    .nav-logo {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary) !important;
+      letter-spacing: -0.5px;
+    }
+
+    /* ══════════════════════════════════════════════
+       HERO — Immersive Entry Point
+       ══════════════════════════════════════════════ */
+    .hero {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      text-align: center;
+      transition: min-height var(--transition-smooth), padding var(--transition-smooth);
+    }
+    body.has-results .hero {
+      min-height: auto;
+      padding: 6rem 1rem 1.5rem;
+    }
+
+    .hero-brand {
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+    .hero-title {
+      font-size: 3.2rem;
+      font-weight: 700;
+      letter-spacing: -2px;
+      background: linear-gradient(135deg, #f0f0f5 0%, #6366f1 50%, #50e3c2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      transition: font-size var(--transition-smooth);
+    }
+    body.has-results .hero-title { font-size: 1.8rem; }
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+      max-width: 500px;
+      margin: 0.5rem auto 0;
+      transition: opacity var(--transition-smooth), max-height var(--transition-smooth);
+      overflow: hidden;
+    }
+    body.has-results .hero-subtitle { opacity: 0; max-height: 0; margin: 0; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══════════════════════════════════════════════
+       LIQUID GLASS SEARCH BAR
+       ══════════════════════════════════════════════ */
+    .search-container {
+      width: 100%;
+      max-width: 720px;
+      margin: 2rem auto 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+      transition: margin var(--transition-smooth);
+      position: relative;
+      z-index: 50;
+    }
+    body.has-results .search-container { margin-top: 1rem; }
+
+    .search-glass {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: var(--radius-pill);
+      padding: 0.35rem;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+      box-shadow: 0 0 0 0 var(--accent-glow), 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .search-glass:focus-within {
+      border-color: rgba(99,102,241,0.5);
+      box-shadow: 0 0 30px 0 var(--accent-glow), 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.08);
+    }
+    .search-glass::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), transparent 40%, rgba(80,227,194,0.15));
+      z-index: -1;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+    .search-glass:focus-within::before { opacity: 1; }
+
+    .search-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--text-primary);
+      background: transparent;
+      border: none;
+      outline: none;
+      caret-color: var(--accent);
+      letter-spacing: -0.2px;
+    }
+    .search-input::placeholder { color: transparent; }
+
+    /* Kinetic placeholder */
+    .kinetic-placeholder {
+      position: absolute;
+      top: 50%; left: 1.5rem;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      font-weight: 400;
+      letter-spacing: -0.2px;
+      transition: opacity 0.3s ease;
+    }
+    .kinetic-placeholder.hidden { opacity: 0; }
+
+    .search-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding-right: 0.25rem;
+    }
+
+    .search-micro-btn {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .search-micro-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-secondary);
+      transform: scale(1.08);
+    }
+
+    .search-submit {
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      color: white;
+      font-size: 1.15rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+    .search-submit:hover {
+      background: #6366f1;
+      transform: scale(1.06);
+      box-shadow: 0 6px 24px var(--accent-glow);
+    }
+    .search-submit:active { transform: scale(0.96); }
+
+    /* ── Autocomplete Dropdown — Bento Grid (Glass) ── */
+    .ac-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: -0.35rem; right: -0.35rem;
+      background: rgba(16,16,28,0.94);
+      backdrop-filter: blur(36px);
+      -webkit-backdrop-filter: blur(36px);
+      border: 1px solid var(--border-glass-hover);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 20px 72px rgba(0,0,0,0.55), 0 0 0 1px rgba(99,102,241,0.08);
+      max-height: 480px;
+      overflow-y: auto;
+      z-index: 200;
+      display: none;
+      animation: acReveal 0.22s ease;
+      padding: 0.6rem;
+    }
+    .ac-dropdown.open { display: block; }
+    @keyframes acReveal {
+      from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .ac-dropdown::-webkit-scrollbar { width: 5px; }
+    .ac-dropdown::-webkit-scrollbar-track { background: transparent; }
+    .ac-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+    /* Bento Grid Layout */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 0.5rem;
+    }
+    .bento-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 0.6rem 0.7rem;
+      transition: all 0.18s ease;
+    }
+    .bento-card:hover {
+      background: rgba(99,102,241,0.07);
+      border-color: rgba(99,102,241,0.18);
+    }
+    .bento-primary {
+      grid-column: 1 / 2;
+      grid-row: 1 / 3;
+    }
+    .bento-tools {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+    }
+    .bento-workflows {
+      grid-column: 2 / 3;
+      grid-row: 2 / 3;
+    }
+    /* Responsive: collapse to single column on small screens */
+    @media (max-width: 520px) {
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+      .bento-primary,
+      .bento-tools,
+      .bento-workflows {
+        grid-column: 1;
+        grid-row: auto;
+      }
+    }
+
+    .bento-card-header {
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .bento-card-header .intent-badge {
+      background: rgba(99,102,241,0.18);
+      color: var(--accent);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-size: 0.58rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* Items inside Bento cards */
+    .ac-item {
+      padding: 0.5rem 0.55rem;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s ease;
+      border-radius: 8px;
+      margin: 1px 0;
+    }
+    .ac-item:hover, .ac-item.active {
+      background: rgba(99,102,241,0.14);
+      color: var(--text-primary);
+    }
+    .ac-icon { font-size: 0.75rem; width: 18px; text-align: center; opacity: 0.65; flex-shrink: 0; }
+    .ac-label { flex: 1; line-height: 1.3; }
+    .ac-hint { font-size: 0.65rem; color: var(--text-dim); flex-shrink: 0; }
+    .ac-desc { font-size: 0.68rem; color: var(--text-dim); line-height: 1.25; margin-top: 0.1rem; }
+
+    /* Did-you-mean strip above the grid */
+    .ac-correction-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.45rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .ac-correction-chip {
+      padding: 0.22rem 0.6rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .ac-correction-chip:hover {
+      background: rgba(99,102,241,0.12);
+      border-color: rgba(99,102,241,0.22);
+      color: var(--text-primary);
+    }
+
+    /* Trending bar at bottom */
+    .ac-trending-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.45rem;
+      padding-top: 0.45rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .ac-trending-pill {
+      padding: 0.2rem 0.55rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .ac-trending-pill:hover {
+      background: rgba(99,102,241,0.1);
+      color: var(--text-secondary);
+    }
+    .ac-trending-pill::before { content: '↗'; font-size: 0.6rem; }
+
+    /* ══════════════════════════════════════════════
+       FILTER CHIPS — Glass pills
+       ══════════════════════════════════════════════ */
+    .filter-strip {
+      max-width: 720px;
+      margin: 1.25rem auto 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+    body.has-results .filter-strip { margin-top: 0.75rem; }
+
+    .chip {
+      padding: 0.4rem 0.9rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-pill);
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+    }
+    .chip:hover {
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(255,255,255,0.15);
+      color: var(--text-primary);
+    }
+    .chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+
+    /* ── Journey CTA ── */
+    .journey-cta {
+      margin: 1.5rem auto 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.7s;
+    }
+    body.has-results .journey-cta { display: none; }
+    .journey-cta a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-pill);
+      transition: all var(--transition-fast);
+    }
+    .journey-cta a:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-secondary);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    /* ── Ambient footer (homepage only) ── */
+    .ambient-footer {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 2rem;
+      z-index: 2;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1s;
+      transition: opacity var(--transition-smooth);
+    }
+    body.has-results .ambient-footer { opacity: 0 !important; pointer-events: none; }
+    .ambient-tag {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 0.5px;
+      animation: slowDrift 8s ease-in-out infinite alternate;
+    }
+    @keyframes slowDrift {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
+    }
+
+    /* ══════════════════════════════════════════════
+       INTELLIGENCE BANNER — Fluid glass pills
+       ══════════════════════════════════════════════ */
+    .intel-banner {
+      position: relative;
+      z-index: 2;
+      max-width: 1080px;
+      margin: 0.5rem auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .intel-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition-fast);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-family: inherit;
+    }
+    .intel-correction {
+      background: rgba(245,166,35,0.12);
+      color: #f5a623;
+      border: 1px solid rgba(245,166,35,0.2);
+    }
+    .intel-correction:hover { background: rgba(245,166,35,0.2); }
+    .intel-expansion {
+      background: rgba(99,102,241,0.12);
+      color: #a99bf5;
+      border: 1px solid rgba(99,102,241,0.2);
+    }
+    .intel-negative {
+      background: rgba(255,107,107,0.12);
+      color: #ef4444;
+      border: 1px solid rgba(255,107,107,0.2);
+    }
+    .intel-multi {
+      background: rgba(80,227,194,0.12);
+      color: #50e3c2;
+      border: 1px solid rgba(80,227,194,0.2);
+    }
+
+    /* ══════════════════════════════════════════════
+       RESULTS SECTION — Bento Glass Grid
+       ══════════════════════════════════════════════ */
+    .results-section {
+      position: relative;
+      z-index: 2;
+      max-width: 1080px;
+      margin: 1rem auto 4rem;
+      padding: 0 1rem;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .results-header h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+    .results-count {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+
+    /* ══════════════════════════════════════════════
+       TOOL CARD — Liquid Glass Bento Tile
+       ══════════════════════════════════════════════ */
+    .tool-card {
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-card);
+      padding: 1.4rem;
+      transition: all var(--transition-smooth);
+      opacity: 0;
+      animation: cardBreathe 0.5s ease forwards;
+      position: relative;
+      overflow: hidden;
+    }
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    }
+    .tool-card:hover {
+      background: var(--bg-glass-hover);
+      border-color: var(--border-glass-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 0 1px rgba(99,102,241,0.1);
+    }
+
+    @keyframes cardBreathe {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tool-top {
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      margin-bottom: 0.7rem;
+    }
+    .tool-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent) 0%, #50e3c2 100%);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+    .tool-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+    .tool-meta {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-top: 0.25rem;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.18rem 0.55rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .badge-fit {
+      background: rgba(80,227,194,0.12);
+      color: #50e3c2;
+      border: 1px solid rgba(80,227,194,0.2);
+    }
+    .badge-price {
+      background: rgba(99,102,241,0.12);
+      color: #a99bf5;
+      border: 1px solid rgba(99,102,241,0.2);
+    }
+    .badge-skill {
+      background: rgba(255,107,107,0.12);
+      color: #ef4444;
+      border: 1px solid rgba(255,107,107,0.2);
+    }
+
+    /* Vendor Intelligence Badges */
+    .seeing-badges {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.7rem;
+    }
+    .badge-transparency, .badge-freedom {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .badge-transparency {
+      background: rgba(99,102,241,0.10);
+      color: #a99bf5;
+    }
+    .badge-freedom {
+      background: rgba(80,227,194,0.10);
+      color: #50e3c2;
+    }
+    .grade-A { border: 1px solid rgba(80,227,194,0.5); }
+    .grade-B { border: 1px solid rgba(139,195,74,0.5); }
+    .grade-C { border: 1px solid rgba(245,166,35,0.5); }
+    .grade-D { border: 1px solid rgba(255,107,107,0.5); }
+    .grade-F { border: 1px solid rgba(183,28,28,0.5); }
+
+    .tool-desc {
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      margin-bottom: 0.7rem;
+    }
+
+    .tool-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 0.8rem;
+    }
+    .tool-tag {
+      padding: 0.2rem 0.55rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .tool-reasons {
+      background: rgba(99,102,241,0.06);
+      border-left: 2px solid var(--accent);
+      padding: 0.6rem 0.8rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 0.8rem;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+    .tool-reasons strong { color: var(--text-primary); }
+
+    /* Caveats / Advisory */
+    .tool-advisory {
+      background: rgba(245,166,35,0.06);
+      border-left: 2px solid rgba(245,166,35,0.5);
+      padding: 0.5rem 0.8rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 0.8rem;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+    .tool-advisory strong { color: var(--accent-warm); }
+
+    /* ── Vendor Intelligence Panel ── */
+    .seeing-toggle {
+      width: 100%;
+      text-align: left;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.85rem;
+      font-size: 0.78rem;
+      color: var(--accent);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-family: inherit;
+    }
+    .seeing-toggle:hover {
+      background: rgba(99,102,241,0.08);
+      border-color: rgba(99,102,241,0.25);
+    }
+
+    .seeing-panel {
+      display: none;
+      background: rgba(99,102,241,0.04);
+      border: 1px solid rgba(99,102,241,0.12);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      animation: panelSlide 0.3s ease;
+    }
+    .seeing-panel.open { display: block; }
+    @keyframes panelSlide {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .seeing-panel h4 {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin: 0.75rem 0 0.35rem;
+      font-weight: 600;
+    }
+    .seeing-panel h4:first-child { margin-top: 0; }
+    .seeing-summary {
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 0.6rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .seeing-item { color: var(--text-secondary); padding: 0.15rem 0; }
+    .seeing-item-bad { color: var(--accent-danger); padding: 0.15rem 0; }
+    .seeing-question { color: var(--accent); font-weight: 500; padding: 0.2rem 0; }
+    .mask-item { color: var(--accent-warm); font-size: 0.8rem; padding: 0.15rem 0; }
+
+    /* ── Card Actions ── */
+    .tool-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .tool-actions a, .tool-actions button {
+      flex: 1;
+      text-align: center;
+      padding: 0.55rem 0.8rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: none;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+    .btn-primary:hover {
+      background: #6366f1;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,0.04);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255,255,255,0.08) !important;
+    }
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.15) !important;
+      color: var(--text-primary);
+    }
+
+    .feedback-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.7rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .feedback-row span { font-size: 0.72rem; color: var(--text-dim); }
+    .feedback-row button {
+      background: none; border: none;
+      font-size: 1rem; cursor: pointer;
+      transition: all var(--transition-fast);
+      filter: grayscale(0.5);
+      opacity: 0.6;
+    }
+    .feedback-row button:hover { transform: scale(1.25); filter: none; opacity: 1; }
+
+    /* ── Empty / Loading ── */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-dim);
+    }
+    .empty-state .emoji { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .empty-state p { margin-bottom: 0.5rem; }
+    .empty-state a { color: var(--accent); text-decoration: none; }
+    .empty-state a:hover { text-decoration: underline; }
+    .empty-state em { color: var(--text-secondary); }
+
+    .pulse { animation: pulse 1.8s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* ── Prompt Assistance ── */
+    .prompt-section {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+      margin: 2rem auto 0;
+      padding: 0 1rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.9s;
+    }
+    body.has-results .prompt-section { display: none; }
+    .prompt-section h3 { text-align: center; margin-bottom: .8rem; font-size: 1rem; font-weight: 600; color: var(--text-secondary); }
+    .prompt-input-row {
+      display: flex; gap: .5rem; margin: 0 auto .75rem;
+    }
+    .prompt-input {
+      flex: 1; padding: .65rem 1rem; border-radius: var(--radius-pill); font-size: .9rem;
+      border: 1px solid var(--border-glass); background: var(--bg-glass);
+      color: var(--text-primary); font-family: inherit;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    }
+    .prompt-input:focus { outline: none; border-color: rgba(99,102,241,0.5); box-shadow: 0 0 20px var(--accent-glow); }
+    .prompt-btn {
+      padding: .65rem 1.3rem; border-radius: var(--radius-pill); border: none;
+      background: var(--accent); color: #fff; cursor: pointer; font-weight: 600;
+      font-family: inherit; font-size: .85rem;
+      box-shadow: 0 2px 12px var(--accent-glow);
+      transition: all var(--transition-fast);
+    }
+    .prompt-btn:hover { background: #6366f1; transform: translateY(-1px); }
+    .prompt-result {
+      max-width: 100%; margin: 0 auto;
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: 12px; padding: 1rem;
+      font-family: 'Fira Code', 'Cascadia Code', monospace; font-size: .82rem;
+      white-space: pre-wrap; display: none; color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ══════════════════════════════════════════════
+       EXECUTIVE BENTO HUB — Strategic Command Center
+       ══════════════════════════════════════════════ */
+    .exec-hub {
+      position: relative;
+      z-index: 2;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 1rem 2rem;
+      transition: opacity var(--transition-smooth), max-height var(--transition-smooth);
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.8s;
+    }
+    body.has-results .exec-hub { display: none; }
+
+    .exec-bento {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto auto auto;
+      gap: 0.75rem;
+    }
+
+    .eb-cell {
+      background: rgba(255,255,255,0.035);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 1.4rem;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-smooth);
+    }
+    .eb-cell::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    }
+    .eb-cell:hover {
+      background: rgba(255,255,255,0.055);
+      border-color: rgba(255,255,255,0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    }
+
+    /* Hero Cell (2x2) */
+    .eb-hero {
+      grid-column: 1 / 3;
+      grid-row: 1 / 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(80,227,194,0.04));
+      border-color: rgba(99,102,241,0.12);
+    }
+    .eb-hero-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+    .eb-hero-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.25;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+    .eb-accent-num {
+      background: linear-gradient(135deg, var(--accent-secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+    }
+    .eb-hero-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 1rem;
+    }
+    .eb-link {
+      font-size: 0.78rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color var(--transition-fast);
+    }
+    .eb-link:hover { color: var(--accent-secondary); }
+
+    /* Sovereign Showcase (2x1 wide) */
+    .eb-showcase {
+      grid-column: 3 / 5;
+      grid-row: 1 / 3;
+    }
+    .eb-cell-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .eb-cell-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-dim);
+    }
+    .eb-tier-badge {
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .eb-tier-sovereign {
+      background: rgba(80,227,194,0.15);
+      color: #50e3c2;
+      border: 1px solid rgba(80,227,194,0.3);
+    }
+    .eb-showcase-scroll {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 260px;
+      overflow-y: auto;
+      margin-bottom: 0.75rem;
+      padding-right: 0.25rem;
+    }
+    .eb-showcase-scroll::-webkit-scrollbar { width: 4px; }
+    .eb-showcase-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 2px; }
+    .eb-showcase-loading {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      padding: 1rem 0;
+    }
+
+    .eb-sov-card {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.6rem 0.7rem;
+      background: rgba(80,227,194,0.04);
+      border: 1px solid rgba(80,227,194,0.08);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .eb-sov-card:hover {
+      background: rgba(80,227,194,0.08);
+      border-color: rgba(80,227,194,0.18);
+      transform: translateX(2px);
+    }
+    .eb-sov-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #50e3c2, #6366f1);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .eb-sov-info { flex: 1; min-width: 0; }
+    .eb-sov-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .eb-sov-meta {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .eb-sov-score {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #50e3c2;
+      flex-shrink: 0;
+    }
+
+    /* Action Cells */
+    .eb-action {
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background: rgba(99,102,241,0.04);
+      border-color: rgba(99,102,241,0.08);
+    }
+    .eb-action:hover {
+      background: rgba(99,102,241,0.10);
+      border-color: rgba(99,102,241,0.22);
+      box-shadow: 0 8px 32px var(--accent-glow);
+    }
+    .eb-action-icon { font-size: 1.6rem; margin-bottom: 0.1rem; }
+    .eb-action-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+    .eb-action-desc {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+      max-width: 180px;
+    }
+
+    /* Category Portals */
+    .eb-portal {
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      padding: 1rem;
+    }
+    .eb-portal:hover {
+      box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+    }
+    .eb-portal-icon { font-size: 1.4rem; }
+    .eb-portal-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+    .eb-portal-count {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+    }
+
+    @media (max-width: 768px) {
+      .exec-bento {
+        grid-template-columns: 1fr 1fr;
+      }
+      .eb-hero { grid-column: 1 / -1; grid-row: auto; }
+      .eb-showcase { grid-column: 1 / -1; grid-row: auto; }
+      .eb-hero-title { font-size: 1.25rem; }
+    }
+    @media (max-width: 480px) {
+      .exec-bento {
+        grid-template-columns: 1fr;
+      }
+      .eb-portal { grid-column: 1; }
+    }
+
+    /* ══════════════════════════════════════════════
+       RESPONSIVE
+       ══════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2.2rem; }
+      body.has-results .hero-title { font-size: 1.5rem; }
+      .search-input { font-size: 1rem; padding: 0.85rem 1.1rem; }
+      .kinetic-placeholder { font-size: 1rem; left: 1.1rem; }
+      .results-grid { grid-template-columns: 1fr; }
+      .nav-bar {
+        gap: 1rem; font-size: 0.75rem;
+        overflow-x: auto; justify-content: flex-start;
+        padding-left: 1rem;
+        -webkit-overflow-scrolling: touch;
+      }
+      .aurora::before { width: 400px; height: 400px; }
+      .aurora::after { width: 350px; height: 350px; }
+      .ambient-footer { gap: 1rem; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title { font-size: 1.8rem; }
+      .filter-strip { gap: 0.3rem; }
+      .chip { font-size: 0.72rem; padding: 0.35rem 0.7rem; }
+      .tool-card { padding: 1.1rem; border-radius: 16px; }
+    }
+
+    /* ── Custom Scrollbar ── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+    /* ── Selection ── */
+    ::selection { background: rgba(99,102,241,0.3); color: white; }
+  </style>
+</head>
+<body>
+
+  <!-- Aurora Background -->
+  <div class="aurora">
+    <div class="aurora-third"></div>
+  </div>
+  <div class="noise"></div>
+
+  <!-- Sticky Glass Nav (appears on results) -->
+  <nav class="nav-bar" id="nav-bar">
+    <a href="/" class="nav-logo">Praxis</a>
+    <a href="/" class="active">Search</a>
+    <a href="/static/differential.html">Diagnosis</a>
+    <a href="/static/trust_badges.html">Trust Badges</a>
+    <a href="/static/tools.html">All Tools</a>
+    <a href="/static/tuesday-test.html">ROI Calculator</a>
+    <a href="/static/rfp.html">RFP Builder</a>
+    <a href="/room">Room</a>
+    <a href="/static/manifesto.html">Methodology</a>
+  </nav>
+
+  <!-- Hero + Search -->
+  <section class="hero" id="hero">
+    <div class="hero-brand">
+      <h1 class="hero-title">Praxis</h1>
+      <p class="hero-subtitle">The translation layer from human intention to machine action.</p>
+    </div>
+
+    <div class="search-container">
+      <div class="search-glass" id="search-glass">
+        <div class="search-input-wrap">
+          <input
+            id="query"
+            class="search-input"
+            type="text"
+            autocomplete="off"
+            autofocus
+          />
+          <div class="kinetic-placeholder" id="kinetic-placeholder">
+            <span id="kinetic-word">Ask anything...</span>
+          </div>
+          <div class="ac-dropdown" id="ac-dropdown"></div>
+        </div>
+        <div class="search-actions">
+          <button class="search-micro-btn" title="Voice search">🎤</button>
+          <button class="search-submit" id="searchBtn" onclick="doSearch()">→</button>
+        </div>
+      </div>
+
+      <div class="filter-strip" id="filter-bar"></div>
+    </div>
+
+    <div class="journey-cta">
+      <a href="/static/journey.html">Not sure what you need? Take the guided quiz →</a>
+    </div>
+  </section>
+
+  <!-- Prompt Assistance -->
+  <section class="prompt-section" id="prompt-section">
+    <h3>🧠 Prompt Assistance</h3>
+    <div class="prompt-input-row">
+      <input class="prompt-input" id="prompt-input" placeholder="Describe what you need help with…" />
+      <select class="prompt-input" id="model-select" style="flex:.35"><option value="">Model…</option></select>
+      <button class="prompt-btn" onclick="generatePrompt()">Generate</button>
+    </div>
+    <pre class="prompt-result" id="prompt-result"></pre>
+  </section>
+
+  <!-- Intelligence Banners -->
+  <div class="intel-banner" id="intel-banner"></div>
+
+  <!-- Results -->
+  <div class="results-section">
+    <div class="results-header" id="results-header" style="display:none;">
+      <h2 id="results-title">Results</h2>
+      <span class="results-count" id="results-count"></span>
+    </div>
+    <div class="results-grid" id="results"></div>
+
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <div class="emoji">✦</div>
+      <p>Search for any task, role, or tool name</p>
+      <p style="font-size:0.82rem;">Try: <em>"write marketing copy"</em> · <em>"data visualization"</em> · <em>"automate workflows"</em></p>
+    </div>
+  </div>
+
+  <!-- Ambient footer (homepage only) -->
+  <div class="ambient-footer" id="ambient-footer">
+    <span class="ambient-tag">246 tools indexed</span>
+    <span class="ambient-tag" style="animation-delay:-3s;">82 categories</span>
+    <span class="ambient-tag" style="animation-delay:-6s;">Updated 2026</span>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       EXECUTIVE BENTO HUB — Below Hero, Above Results
+       ══════════════════════════════════════════════ -->
+  <section class="exec-hub" id="exec-hub">
+    <div class="exec-bento">
+
+      <!-- Hero Cell (2x2) -->
+      <div class="eb-cell eb-hero">
+        <div class="eb-hero-eyebrow">Praxis Methodology</div>
+        <h2 class="eb-hero-title">Only <span class="eb-accent-num" id="hub-sov-count">20</span> of 246 tools meet Sovereign-grade resilience.</h2>
+        <p class="eb-hero-desc">Every tool is scored across 6 architectural dimensions. We surface the ones built to last — not just built to ship.</p>
+        <a href="/static/manifesto.html" class="eb-link">Read our methodology →</a>
+      </div>
+
+      <!-- Sovereign Showcase (2x1) -->
+      <div class="eb-cell eb-showcase">
+        <div class="eb-cell-header">
+          <span class="eb-cell-label">Sovereign Collection</span>
+          <span class="eb-tier-badge eb-tier-sovereign">A+ Rated</span>
+        </div>
+        <div class="eb-showcase-scroll" id="sovereign-scroll">
+          <div class="eb-showcase-loading">Loading top-tier tools…</div>
+        </div>
+        <a href="/static/tools.html" class="eb-link">View all rated tools →</a>
+      </div>
+
+      <!-- Action Cell: ROI Calculator -->
+      <div class="eb-cell eb-action" onclick="location.href='/static/tuesday-test.html'">
+        <div class="eb-action-icon">📊</div>
+        <div class="eb-action-label">ROI Calculator</div>
+        <div class="eb-action-desc">Run the Tuesday Test — see if a tool pays for a new hire by next week</div>
+      </div>
+
+      <!-- Action Cell: RFP Builder -->
+      <div class="eb-cell eb-action" onclick="location.href='/static/rfp.html'">
+        <div class="eb-action-icon">📋</div>
+        <div class="eb-action-label">RFP Builder</div>
+        <div class="eb-action-desc">Generate vendor-neutral procurement documents in seconds</div>
+      </div>
+
+      <!-- Category Portals (4x1) -->
+      <div class="eb-cell eb-portal" onclick="location.href='/static/category.html?cat=automation'">
+        <div class="eb-portal-icon">⚡</div>
+        <div class="eb-portal-label">Workflow Automation</div>
+        <div class="eb-portal-count" data-cat="automation"></div>
+      </div>
+      <div class="eb-cell eb-portal" onclick="location.href='/static/category.html?cat=analytics'">
+        <div class="eb-portal-icon">📈</div>
+        <div class="eb-portal-label">Analytics & BI</div>
+        <div class="eb-portal-count" data-cat="analytics"></div>
+      </div>
+      <div class="eb-cell eb-portal" onclick="location.href='/static/category.html?cat=coding'">
+        <div class="eb-portal-icon">💻</div>
+        <div class="eb-portal-label">Dev Copilots</div>
+        <div class="eb-portal-count" data-cat="coding"></div>
+      </div>
+      <div class="eb-cell eb-portal" onclick="location.href='/static/category.html?cat=marketing'">
+        <div class="eb-portal-icon">🎯</div>
+        <div class="eb-portal-label">Marketing AI</div>
+        <div class="eb-portal-count" data-cat="marketing"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+    /* ══════════════════════════════════════════════
+       PRAXIS — Core Application Logic
+       ══════════════════════════════════════════════ */
+
+    /* ── State ── */
+    let activeFilters = [];
+    let lastQuery = '';
+    let acTimer = null;
+    let acIndex = -1;
+
+    const queryInput = document.getElementById('query');
+    const acDropdown = document.getElementById('ac-dropdown');
+    const navBar = document.getElementById('nav-bar');
+    const kineticEl = document.getElementById('kinetic-placeholder');
+    const kineticWord = document.getElementById('kinetic-word');
+
+    /* ── Kinetic Placeholder ── */
+    const placeholderPhrases = [
+      'Ask anything...',
+      'Find the right AI tool...',
+      'Automate your workflow...',
+      'Research deeper...',
+      'Compare vendors...',
+      'Discover alternatives...',
+    ];
+    let phraseIndex = 0;
+
+    function cyclePlaceholder() {
+      kineticWord.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      kineticWord.style.opacity = '0';
+      kineticWord.style.transform = 'translateY(-6px)';
+      setTimeout(() => {
+        phraseIndex = (phraseIndex + 1) % placeholderPhrases.length;
+        kineticWord.textContent = placeholderPhrases[phraseIndex];
+        kineticWord.style.transform = 'translateY(6px)';
+        requestAnimationFrame(() => {
+          kineticWord.style.opacity = '1';
+          kineticWord.style.transform = 'translateY(0)';
+        });
+      }, 400);
+    }
+    setInterval(cyclePlaceholder, 3500);
+
+    queryInput.addEventListener('input', () => {
+      kineticEl.classList.toggle('hidden', queryInput.value.length > 0);
+    });
+    queryInput.addEventListener('focus', () => {
+      if (queryInput.value.length > 0) kineticEl.classList.add('hidden');
+    });
+    queryInput.addEventListener('blur', () => {
+      if (queryInput.value.length === 0) kineticEl.classList.remove('hidden');
+    });
+
+    /* ── Nav visibility ── */
+    function updateNav() {
+      if (document.body.classList.contains('has-results')) {
+        navBar.classList.add('visible');
+      } else {
+        navBar.classList.remove('visible');
+      }
+    }
+
+    /* ── Load category chips ── */
+    (async function loadChips() {
+      try {
+        const res = await fetch('/categories');
+        if (!res.ok) return;
+        const cats = await res.json();
+        const bar = document.getElementById('filter-bar');
+        const featured = ['coding','writing','design','marketing','automation','analytics','sales','support','productivity','no-code','video','audio'];
+        const show = featured.filter(f => cats.includes(f));
+        show.forEach(cat => {
+          const c = document.createElement('span');
+          c.className = 'chip';
+          c.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+          c.dataset.cat = cat;
+          c.addEventListener('click', () => {
+            c.classList.toggle('active');
+            if (activeFilters.includes(cat)) {
+              activeFilters = activeFilters.filter(x => x !== cat);
+            } else {
+              activeFilters.push(cat);
+            }
+            if (lastQuery || activeFilters.length) doSearch();
+          });
+          bar.appendChild(c);
+        });
+      } catch (e) { console.warn('chips', e); }
+    })();
+
+    /* ── Autocomplete (Bento Grid Engine) ── */
+    queryInput.addEventListener('input', () => {
+      clearTimeout(acTimer);
+      const q = queryInput.value.trim();
+      if (q.length < 2) { closeAC(); return; }
+      acTimer = setTimeout(() => fetchSuggestions(q), 280);
+    });
+
+    queryInput.addEventListener('keydown', e => {
+      const items = acDropdown.querySelectorAll('.ac-item');
+      if (!items.length) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        acIndex = Math.min(acIndex + 1, items.length - 1);
+        highlightAC(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        acIndex = Math.max(acIndex - 1, -1);
+        highlightAC(items);
+      } else if (e.key === 'Tab' && acIndex >= 0 && items[acIndex]) {
+        e.preventDefault();
+        queryInput.value = items[acIndex].dataset.value;
+        closeAC();
+      } else if (e.key === 'Enter') {
+        if (acIndex >= 0 && items[acIndex]) {
+          queryInput.value = items[acIndex].dataset.value;
+          closeAC();
+        }
+        doSearch();
+      } else if (e.key === 'Escape') {
+        closeAC();
+      }
+    });
+
+    queryInput.addEventListener('focus', () => {
+      if (queryInput.value.trim().length >= 2 && acDropdown.children.length > 0) {
+        acDropdown.classList.add('open');
+      } else if (queryInput.value.trim().length < 2) {
+        fetchFocusSuggestions();
+      }
+    });
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.search-input-wrap')) closeAC();
+    });
+
+    async function fetchFocusSuggestions() {
+      try {
+        const res = await fetch('/suggest?q=');
+        if (!res.ok) return;
+        const data = await res.json();
+        renderBentoAC(data);
+      } catch (e) { console.warn('focus-suggest', e); }
+    }
+
+    async function fetchSuggestions(q) {
+      try {
+        const res = await fetch('/suggest?q=' + encodeURIComponent(q));
+        if (!res.ok) return;
+        const data = await res.json();
+        renderBentoAC(data);
+      } catch (e) { console.warn('suggest', e); }
+    }
+
+    function renderBentoAC(data) {
+      acDropdown.innerHTML = '';
+      acIndex = -1;
+      let hasContent = false;
+
+      // ── Did-you-mean correction strip ──
+      if (data.did_you_mean && data.did_you_mean.length) {
+        hasContent = true;
+        const strip = document.createElement('div');
+        strip.className = 'ac-correction-strip';
+        strip.innerHTML = '<span style="font-size:0.62rem;color:var(--text-dim);margin-right:0.2rem;">Did you mean:</span>';
+        data.did_you_mean.forEach(w => {
+          const chip = document.createElement('span');
+          chip.className = 'ac-correction-chip';
+          chip.textContent = w;
+          chip.addEventListener('click', () => { queryInput.value = w; closeAC(); doSearch(); });
+          strip.appendChild(chip);
+        });
+        acDropdown.appendChild(strip);
+      }
+
+      // ── Intent badge (shown when intent is detected) ──
+      const intentTag = data.intent_detected
+        ? `<span class="intent-badge">${data.intent_detected}</span>` : '';
+
+      // ── Bento Grid container ──
+      const hasPrimary = data.primary_completions && data.primary_completions.length;
+      const hasTools = data.tool_matches && data.tool_matches.length;
+      const hasWorkflows = data.workflow_templates && data.workflow_templates.length;
+
+      if (hasPrimary || hasTools || hasWorkflows) {
+        hasContent = true;
+        const grid = document.createElement('div');
+        grid.className = 'bento-grid';
+
+        // PRIMARY CARD (left, tall)
+        if (hasPrimary) {
+          const card = document.createElement('div');
+          card.className = 'bento-card bento-primary';
+          card.innerHTML = `<div class="bento-card-header">Completions ${intentTag}</div>`;
+          data.primary_completions.forEach(c => {
+            card.innerHTML += `<div class="ac-item" data-value="${escAC(c.text)}" onclick="pickAC(this)">
+              <span class="ac-icon">${c.icon || '✦'}</span>
+              <span class="ac-label">${escAC(c.text)}</span>
+            </div>`;
+          });
+          grid.appendChild(card);
+        }
+
+        // TOOLS CARD (top-right)
+        if (hasTools) {
+          const card = document.createElement('div');
+          card.className = 'bento-card bento-tools';
+          card.innerHTML = '<div class="bento-card-header">Tools</div>';
+          data.tool_matches.slice(0, 5).forEach(t => {
+            const name = typeof t === 'string' ? t : t.name;
+            const desc = (typeof t === 'object' && t.description) ? t.description : '';
+            card.innerHTML += `<div class="ac-item" data-value="${escAC(name)}" onclick="pickAC(this)">
+              <span class="ac-icon">◆</span>
+              <span class="ac-label">${escAC(name)}${desc ? '<div class="ac-desc">' + escAC(desc) + '</div>' : ''}</span>
+              <span class="ac-hint">tool</span>
+            </div>`;
+          });
+          grid.appendChild(card);
+        }
+
+        // WORKFLOWS CARD (bottom-right)
+        if (hasWorkflows) {
+          const card = document.createElement('div');
+          card.className = 'bento-card bento-workflows';
+          card.innerHTML = '<div class="bento-card-header">Workflows</div>';
+          data.workflow_templates.slice(0, 4).forEach(w => {
+            card.innerHTML += `<div class="ac-item" data-value="${escAC(w.title)}" onclick="pickAC(this)">
+              <span class="ac-icon">${w.icon || '⚡'}</span>
+              <span class="ac-label">${escAC(w.title)}<div class="ac-desc">${escAC(w.desc || '')}</div></span>
+            </div>`;
+          });
+          grid.appendChild(card);
+        }
+
+        acDropdown.appendChild(grid);
+      }
+
+      // ── Category matches (flat list below grid) ──
+      if (data.category_matches && data.category_matches.length) {
+        hasContent = true;
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'margin-top:0.35rem;';
+        wrap.innerHTML = '<div class="bento-card-header" style="padding:0.3rem 0.2rem 0.15rem;">Categories</div>';
+        data.category_matches.slice(0, 4).forEach(c => {
+          wrap.innerHTML += `<div class="ac-item" data-value="${escAC(c)} tools" onclick="pickAC(this)">
+            <span class="ac-icon">▣</span><span class="ac-label">${escAC(c)}</span><span class="ac-hint">category</span>
+          </div>`;
+        });
+        acDropdown.appendChild(wrap);
+      }
+
+      // ── Trending strip at bottom ──
+      if (data.trending && data.trending.length) {
+        hasContent = true;
+        const strip = document.createElement('div');
+        strip.className = 'ac-trending-strip';
+        data.trending.slice(0, 5).forEach(t => {
+          const text = typeof t === 'string' ? t : t.text;
+          const pill = document.createElement('span');
+          pill.className = 'ac-trending-pill';
+          pill.textContent = text;
+          pill.addEventListener('click', () => { queryInput.value = text; closeAC(); doSearch(); });
+          strip.appendChild(pill);
+        });
+        acDropdown.appendChild(strip);
+      }
+
+      if (hasContent) acDropdown.classList.add('open');
+      else closeAC();
+    }
+
+    function escAC(s) { return s ? s.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+
+    function pickAC(el) {
+      const val = el.dataset.value;
+      queryInput.value = val;
+      kineticEl.classList.add('hidden');
+      closeAC();
+      // Record click for popularity tracking
+      fetch('/suggest/click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: val }),
+      }).catch(() => {});
+      doSearch();
+    }
+
+    function highlightAC(items) {
+      items.forEach((it, i) => it.classList.toggle('active', i === acIndex));
+      if (acIndex >= 0 && items[acIndex]) {
+        items[acIndex].scrollIntoView({ block: 'nearest' });
+      }
+    }
+
+    function closeAC() {
+      acDropdown.classList.remove('open');
+      acIndex = -1;
+    }
+
+    /* ══════════════════════════════════════════════
+       SEARCH
+       ══════════════════════════════════════════════ */
+    async function doSearch() {
+      closeAC();
+      const q = document.getElementById('query').value.trim();
+      if (!q && activeFilters.length === 0) return;
+      lastQuery = q || activeFilters.join(' ');
+
+      // Transition to results state
+      document.body.classList.add('has-results');
+      updateNav();
+
+      // Loading state
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('intel-banner').innerHTML = '';
+      document.getElementById('results-header').style.display = 'flex';
+      document.getElementById('results-title').textContent = 'Searching…';
+      document.getElementById('results-count').textContent = '';
+      document.getElementById('results').innerHTML = '<div class="empty-state pulse" style="padding:2rem;"><div class="emoji">◌</div><p>Finding the best tools…</p></div>';
+
+      const body = { query: q || activeFilters.join(' '), profile_id: 'journey' };
+      if (activeFilters.length) body.filters = activeFilters;
+
+      try {
+        const res = await fetch('/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+
+        const tools = Array.isArray(data) ? data : (data.results || []);
+        const meta = Array.isArray(data) ? {} : (data.meta || {});
+
+        renderIntelBanner(meta, q);
+        renderResults(tools, q);
+      } catch (e) {
+        console.error('search error', e);
+        document.getElementById('results').innerHTML = '<div class="empty-state"><div class="emoji">⚠</div><p>Something went wrong. Make sure the API is running.</p></div>';
+      }
+    }
+
+    /* ── Intelligence Banner ── */
+    function renderIntelBanner(meta, query) {
+      const banner = document.getElementById('intel-banner');
+      banner.innerHTML = '';
+      if (!meta || Object.keys(meta).length === 0) return;
+
+      if (meta.corrections && Object.keys(meta.corrections).length > 0) {
+        for (const [typo, fix] of Object.entries(meta.corrections)) {
+          const pill = document.createElement('button');
+          pill.className = 'intel-pill intel-correction';
+          pill.innerHTML = `✦ Did you mean <strong>${fix}</strong>?`;
+          pill.onclick = () => {
+            document.getElementById('query').value = query.replace(typo, fix);
+            doSearch();
+          };
+          banner.appendChild(pill);
+        }
+      }
+
+      if (meta.expanded_keywords && meta.expanded_keywords.length > 0) {
+        const extra = meta.expanded_keywords.filter(k => !query.toLowerCase().includes(k.toLowerCase()));
+        if (extra.length > 0) {
+          const pill = document.createElement('span');
+          pill.className = 'intel-pill intel-expansion';
+          pill.innerHTML = `Also searching: ${extra.slice(0, 5).join(', ')}`;
+          banner.appendChild(pill);
+        }
+      }
+
+      if (meta.negatives && meta.negatives.length > 0) {
+        const pill = document.createElement('span');
+        pill.className = 'intel-pill intel-negative';
+        pill.innerHTML = `Excluding: ${meta.negatives.join(', ')}`;
+        banner.appendChild(pill);
+      }
+
+      if (meta.multi_intents && meta.multi_intents.length > 1) {
+        const pill = document.createElement('span');
+        pill.className = 'intel-pill intel-multi';
+        pill.innerHTML = `${meta.multi_intents.length} intents: ${meta.multi_intents.join(' + ')}`;
+        banner.appendChild(pill);
+      }
+    }
+
+    /* ══════════════════════════════════════════════
+       RENDER RESULTS — Bento Glass Cards
+       ══════════════════════════════════════════════ */
+    function renderResults(tools, query) {
+      const grid = document.getElementById('results');
+      const header = document.getElementById('results-header');
+      grid.innerHTML = '';
+
+      if (!tools || tools.length === 0) {
+        header.style.display = 'none';
+        document.body.classList.remove('has-results');
+        updateNav();
+        grid.innerHTML = '<div class="empty-state"><div class="emoji">✦</div><p>No tools matched. Try different keywords or <a href="/static/journey.html">take the guided quiz</a>.</p></div>';
+        return;
+      }
+
+      header.style.display = 'flex';
+      document.getElementById('results-title').textContent = 'Recommended Tools';
+      document.getElementById('results-count').textContent = tools.length + ' results';
+
+      tools.forEach((tool, idx) => {
+        const card = document.createElement('div');
+        card.className = 'tool-card';
+        card.style.animationDelay = `${0.06 * idx}s`;
+        const uid = 'seeing-' + idx;
+        const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+
+        let html = `<div class="tool-top">
+          <div class="tool-icon">${tool.name.charAt(0).toUpperCase()}</div>
+          <div>
+            <div class="tool-name">${tool.name}</div>
+            <div class="tool-meta">`;
+        if (tool.fit_score) html += `<span class="badge badge-fit">${tool.fit_score}% fit</span>`;
+        const pricing = tool.pricing || {};
+        if (pricing.free_tier) html += `<span class="badge badge-price">Free tier</span>`;
+        else if (pricing.starter) html += `<span class="badge badge-price">From $${pricing.starter}/mo</span>`;
+        if (tool.skill_level) html += `<span class="badge badge-skill">${cap(tool.skill_level)}</span>`;
+        html += `</div></div></div>`;
+
+        if (tool.transparency_grade || tool.flexibility_grade) {
+          html += `<div class="seeing-badges">`;
+          if (tool.transparency_grade) {
+            html += `<span class="badge-transparency grade-${tool.transparency_grade}">Transparency ${tool.transparency_grade}</span>`;
+          }
+          if (tool.flexibility_grade) {
+            html += `<span class="badge-freedom grade-${tool.flexibility_grade}">Flexibility ${tool.flexibility_grade}</span>`;
+          }
+          html += `</div>`;
+        }
+
+        html += `<div class="tool-desc">${tool.description || 'A powerful AI tool for your workflow.'}</div>`;
+
+        const tags = [...(tool.categories || []), ...(tool.tags || [])].slice(0, 5);
+        if (tags.length) {
+          html += `<div class="tool-tags">`;
+          tags.forEach(t => { html += `<span class="tool-tag">${cap(t)}</span>`; });
+          html += `</div>`;
+        }
+
+        if (tool.match_reasons && tool.match_reasons.length) {
+          html += `<div class="tool-reasons"><strong>Why:</strong> ${tool.match_reasons.join(' · ')}</div>`;
+        }
+
+        if (tool.caveats && tool.caveats.length) {
+          html += `<div class="tool-advisory"><strong>⚠ Advisory:</strong> `;
+          html += tool.caveats.map(c => c.length > 120 ? c.slice(0,117)+'…' : c).join(' · ');
+          html += `</div>`;
+        }
+
+        html += `<button class="seeing-toggle" onclick="toggleSeeing('${uid}','${tool.name.replace(/'/g,"\\'")}',this)">◆ Vendor Intelligence Report</button>`;
+        html += `<div class="seeing-panel" id="${uid}"><div class="empty-state pulse" style="padding:0.5rem;font-size:0.8rem;"><p>Loading…</p></div></div>`;
+
+        html += `<div class="tool-actions">`;
+        if (tool.url) html += `<a class="btn-primary" href="${tool.url}" target="_blank">Try ${tool.name}</a>`;
+        html += `<button class="btn-ghost" onclick="saveTool('${tool.name.replace(/'/g,"\\'")}')">☆ Save</button>`;
+        html += `</div>`;
+
+        html += `<div class="feedback-row">
+          <span>Helpful?</span>
+          <div>
+            <button onclick="sendFeedback('${tool.name.replace(/'/g,"\\'")}',true,this)">👍</button>
+            <button onclick="sendFeedback('${tool.name.replace(/'/g,"\\'")}',false,this)">👎</button>
+          </div>
+        </div>`;
+
+        card.innerHTML = html;
+        grid.appendChild(card);
+      });
+    }
+
+    /* ── Vendor Intelligence Panel ── */
+    const seeingCache = {};
+    async function toggleSeeing(uid, toolName, btn) {
+      const panel = document.getElementById(uid);
+      if (panel.classList.contains('open')) {
+        panel.classList.remove('open');
+        btn.textContent = '◆ Vendor Intelligence Report';
+        return;
+      }
+      panel.classList.add('open');
+      btn.textContent = '◆ Hide Report';
+
+      if (seeingCache[toolName]) {
+        renderSeeingPanel(panel, seeingCache[toolName]);
+        return;
+      }
+
+      try {
+        const res = await fetch('/intelligence/' + encodeURIComponent(toolName));
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        seeingCache[toolName] = data;
+        renderSeeingPanel(panel, data);
+      } catch (e) {
+        panel.innerHTML = '<p style="font-size:0.82rem;color:var(--text-dim);">Could not load vendor intelligence data.</p>';
+      }
+    }
+
+    function renderSeeingPanel(panel, data) {
+      let html = '';
+
+      if (data.executive_summary) {
+        html += `<div class="seeing-summary">${data.executive_summary}</div>`;
+      }
+
+      if (data.dependency_profile) {
+        const d = data.dependency_profile;
+        html += `<h4>Dependency Profile</h4>`;
+        html += `<div class="seeing-item"><strong>Vendor:</strong> ${d.who_benefits}</div>`;
+        html += `<div class="seeing-item"><strong>Data Exposure:</strong> ${d.data_exposure}</div>`;
+        html += `<div class="seeing-item"><strong>Vendor Value Capture:</strong> ${d.vendor_value_capture}</div>`;
+        html += `<div class="seeing-item"><strong>Dependency Level:</strong> ${d.dependency_level}</div>`;
+      }
+
+      if (data.transparency) {
+        const t = data.transparency;
+        html += `<h4>Transparency Assessment · ${t.grade} — ${t.score}/100</h4>`;
+        t.signals.forEach(s => { html += `<div class="seeing-item">✓ ${s}</div>`; });
+        t.concerns.forEach(c => { html += `<div class="seeing-item-bad">✗ ${c}</div>`; });
+      }
+
+      if (data.flexibility) {
+        const f = data.flexibility;
+        html += `<h4>Strategic Flexibility · ${f.grade} — ${f.score}/100</h4>`;
+        (f.advantages || []).forEach(l => { html += `<div class="seeing-item">✓ ${l}</div>`; });
+        (f.risk_factors || []).forEach(b => { html += `<div class="seeing-item-bad">✗ ${b}</div>`; });
+      }
+
+      if (data.risk_indicators && data.risk_indicators.length > 0) {
+        html += `<h4>Due Diligence Flags</h4>`;
+        data.risk_indicators.forEach(m => { html += `<div class="mask-item">⚠ ${m}</div>`; });
+      }
+
+      if (data.key_question) {
+        html += `<h4>Key Procurement Question</h4>`;
+        html += `<div class="seeing-question">${data.key_question}</div>`;
+      }
+
+      if (data.dependency_profile && data.dependency_profile.diligence_questions && data.dependency_profile.diligence_questions.length > 0) {
+        html += `<h4>Recommended Due Diligence</h4>`;
+        data.dependency_profile.diligence_questions.forEach(q => { html += `<div class="seeing-question">→ ${q}</div>`; });
+      }
+
+      panel.innerHTML = html;
+    }
+
+    /* ── Save Tool ── */
+    function saveTool(name) {
+      let saved = JSON.parse(localStorage.getItem('praxis_saved_tools') || '[]');
+      const idx = saved.findIndex(t => t.name === name);
+      if (idx >= 0) { saved.splice(idx, 1); }
+      else { saved.push({ name, savedAt: new Date().toISOString() }); }
+      localStorage.setItem('praxis_saved_tools', JSON.stringify(saved));
+    }
+
+    /* ── Feedback ── */
+    function sendFeedback(toolName, helpful, btn) {
+      fetch('/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: lastQuery,
+          tool: toolName,
+          accepted: helpful,
+          rating: helpful ? 8 : 3,
+          details: { source: 'home_search', feedback_type: 'result' },
+        }),
+      }).catch(e => console.error('feedback error', e));
+
+      const orig = btn.textContent;
+      btn.textContent = '✓';
+      btn.disabled = true;
+      setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2000);
+    }
+
+    /* ── Prompt Assistance ── */
+    (async function loadModels() {
+      try {
+        const res = await fetch('/prompt-assist/models');
+        if (!res.ok) return;
+        const data = await res.json();
+        const sel = document.getElementById('model-select');
+        (data.models || []).forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.textContent = m.name;
+          sel.appendChild(opt);
+        });
+      } catch (e) { /* silent */ }
+    })();
+
+    async function generatePrompt() {
+      const query = document.getElementById('prompt-input').value.trim();
+      if (!query) return;
+      const model = document.getElementById('model-select').value;
+      const result = document.getElementById('prompt-result');
+      result.style.display = 'block';
+      result.textContent = 'Generating…';
+      try {
+        const res = await fetch('/prompt-assist/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, target_model: model || null }),
+        });
+        const data = await res.json();
+        result.textContent = data.optimized_prompt || JSON.stringify(data, null, 2);
+      } catch (e) {
+        result.textContent = `Error: ${e.message}`;
+      }
+    }
+
+    /* ── Subtle mouse parallax on aurora ── */
+    document.addEventListener('mousemove', e => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 20;
+      const y = (e.clientY / window.innerHeight - 0.5) * 20;
+      document.querySelector('.aurora').style.transform = `translate(${x}px, ${y}px)`;
+    });
+
+    /* ══════════════════════════════════════════════
+       EXECUTIVE BENTO HUB — Load live data
+       ══════════════════════════════════════════════ */
+    (async function loadExecHub() {
+      try {
+        const res = await fetch('/tools/tiered');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Update sovereign count in hero
+        const sovCount = document.getElementById('hub-sov-count');
+        if (sovCount && data.counts) sovCount.textContent = data.counts.sovereign || 20;
+
+        // Populate Sovereign Showcase
+        const scroll = document.getElementById('sovereign-scroll');
+        if (scroll && data.tiers && data.tiers.sovereign) {
+          scroll.innerHTML = '';
+          data.tiers.sovereign.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'eb-sov-card';
+            card.onclick = () => { window.open(t.url, '_blank'); };
+            const cats = (t.categories || []).slice(0, 2).join(', ');
+            card.innerHTML = `
+              <div class="eb-sov-icon">${t.name.charAt(0)}</div>
+              <div class="eb-sov-info">
+                <div class="eb-sov-name">${t.name}</div>
+                <div class="eb-sov-meta">${cats}${t.compliance && t.compliance.length ? ' · ' + t.compliance.slice(0,2).join(', ') : ''}</div>
+              </div>
+              <div class="eb-sov-score">${t.grade} · ${t.resilience_score}</div>
+            `;
+            scroll.appendChild(card);
+          });
+        }
+
+        // Populate category portal counts
+        const catCounts = {};
+        for (const [tier, tools] of Object.entries(data.tiers || {})) {
+          tools.forEach(t => {
+            (t.categories || []).forEach(c => {
+              catCounts[c.toLowerCase()] = (catCounts[c.toLowerCase()] || 0) + 1;
+            });
+          });
+        }
+        document.querySelectorAll('.eb-portal-count').forEach(el => {
+          const cat = el.dataset.cat;
+          if (cat && catCounts[cat]) el.textContent = catCounts[cat] + ' tools';
+        });
+      } catch(e) { console.warn('exec-hub load failed', e); }
+    })();
+  </script>
+</body>
+</html>

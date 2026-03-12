@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Praxis — CODES Resonance</title>
+<style>
+:root{--bg:#0a0a0f;--surface:rgba(255,255,255,0.035);--surface-hover:rgba(255,255,255,0.055);--border:rgba(255,255,255,0.06);--text:#f0f0f5;--muted:rgba(255,255,255,0.50);--dim:rgba(255,255,255,0.30);--accent:#6366f1;--accent-glow:rgba(99,102,241,0.30);--secondary:#50e3c2;--warn:#fb923c;--danger:#ef4444;--success:#34d399;--info:#38bdf8;--shadow-card:0 2px 20px rgba(0,0,0,0.28),0 0 0 1px rgba(255,255,255,0.04);--radius:12px;--radius-lg:16px;--radius-pill:999px;--ease:cubic-bezier(0.16,1,0.3,1);--fast:0.2s cubic-bezier(0.4,0,0.2,1);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(140px);opacity:0.18;animation:af 20s ease-in-out infinite alternate;}
+.aurora::before{width:500px;height:500px;background:radial-gradient(circle,#6366f1 0%,transparent 70%);top:-12%;left:-6%;}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#50e3c2 0%,transparent 70%);bottom:-15%;right:-6%;animation-delay:-9s;}
+@keyframes af{0%{transform:translate(0,0) scale(1);}50%{transform:translate(25px,-18px) scale(1.06);}100%{transform:translate(-18px,10px) scale(0.96);}}
+.container{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:2;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#f0f0f5 30%,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.page-header .subtitle{color:var(--muted);font-size:0.9rem;}
+.nav{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.nav a{padding:0.4rem 1rem;background:var(--surface);color:var(--muted);text-decoration:none;border-radius:var(--radius-pill);font-size:0.8rem;font-weight:500;transition:all var(--fast);backdrop-filter:blur(12px);}
+.nav a:hover,.nav a.active{background:var(--surface-hover);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.nav a.active{border:1px solid var(--accent);color:var(--accent);}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:1024px){.grid-3,.grid-2{grid-template-columns:1fr;}}
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);transition:all var(--fast);}
+.card:hover{box-shadow:0 8px 40px rgba(99,102,241,0.14),0 0 0 1px rgba(255,255,255,0.08);}
+.card-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+.big-num{font-size:3rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.bar-track{height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;margin-top:0.5rem;}
+.bar-fill{height:100%;border-radius:4px;transition:width 1s var(--ease);}
+.domain-row{display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border);}
+.domain-row:last-child{border-bottom:none;}
+.domain-name{font-size:0.88rem;font-weight:600;flex:1;}
+.domain-score{font-size:0.8rem;color:var(--muted);font-variant-numeric:tabular-nums;min-width:60px;text-align:right;}
+.tag{display:inline-block;padding:0.15rem 0.5rem;border-radius:var(--radius-pill);font-size:0.72rem;font-weight:600;margin:0.15rem;}
+.tag-ok{background:rgba(52,211,153,0.15);color:var(--success);}
+.tag-warn{background:rgba(251,146,60,0.15);color:var(--warn);}
+.tag-err{background:rgba(251,113,133,0.15);color:var(--danger);}
+.loading{text-align:center;padding:3rem;color:var(--dim);}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:0.5rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1>CODES Resonance Framework</h1>
+      <span class="subtitle">Chirality · Prime Resonance · SCNT² · 7P-MCST · Autopoiesis · Coherence</span>
+    </div>
+    <nav class="nav">
+      <a href="/static/cognitive-dashboard.html">Cognitive</a>
+      <a href="/static/reasoning-router.html">Router</a>
+      <a href="/static/dsrp-ontology.html">DSRP</a>
+      <a href="/static/codes-resonance.html" class="active">CODES</a>
+      <a href="/static/coala-memory.html">CoALA</a>
+      <a href="/static/repe-transparency.html">RepE</a>
+      <a href="/static/mesias-governance.html">MESIAS</a>
+    </nav>
+  </div>
+
+  <!-- Summary -->
+  <div id="summary-cards" class="grid-3">
+    <div class="card"><div class="card-title"><span class="dot"></span>CODES Summary</div><div id="codes-info" class="loading"><div class="spinner"></div></div></div>
+    <div class="card"><div class="card-title"><span class="dot"></span>7P Domains</div><div id="seven-p-list"><div class="loading"><div class="spinner"></div></div></div></div>
+    <div class="card"><div class="card-title"><span class="dot"></span>Autopoiesis</div><div id="auto-info"><div class="loading"><div class="spinner"></div></div></div></div>
+  </div>
+
+  <!-- 7P Evaluation -->
+  <div class="card" style="margin-bottom:2rem;">
+    <div class="card-title"><span class="dot"></span>7P Multi-Criteria Evaluation</div>
+    <div style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;">Score each domain (0.0 – 1.0)</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;" id="seven-p-inputs"></div>
+    <button class="btn btn-primary" style="margin-top:1rem;" onclick="evaluate7P()">Evaluate 7P</button>
+    <div id="seven-p-result" style="margin-top:1rem;"></div>
+  </div>
+
+  <!-- Coherence & Autopoiesis -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Coherence Gradient</div>
+      <div id="coherence-panel">
+        <div style="font-size:0.85rem;color:var(--muted);margin-bottom:0.75rem;">Enter subsystem alignment scores (name:score)</div>
+        <textarea id="coherence-input" rows="3" placeholder="e.g. frontend:0.9, backend:0.7, database:0.8" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.6rem;width:100%;font-family:inherit;font-size:0.85rem;"></textarea>
+        <button class="btn btn-primary" style="margin-top:0.75rem;" onclick="calcCoherence()">Compute</button>
+        <div id="coherence-result" style="margin-top:1rem;"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Network Topology (SCNT²)</div>
+      <div id="network-panel">
+        <div style="font-size:0.85rem;color:var(--muted);margin-bottom:0.75rem;">Enter adjacency (JSON)</div>
+        <textarea id="network-input" rows="3" placeholder='{"A":["B","C"],"B":["A","C"],"C":["A","B"]}' style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.6rem;width:100%;font-family:inherit;font-size:0.85rem;"></textarea>
+        <button class="btn btn-primary" style="margin-top:0.75rem;" onclick="calcNetwork()">Analyze</button>
+        <div id="network-result" style="margin-top:1rem;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API=window.location.origin;
+const DOMAINS=['people','process','product','platform','performance','protection','perspective'];
+function init(){
+  const c=document.getElementById('seven-p-inputs');
+  DOMAINS.forEach(d=>{c.innerHTML+=`<div><label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:0.25rem;">${d}</label><input type="number" id="sp-${d}" min="0" max="1" step="0.1" value="0.7" style="background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:0.4rem 0.6rem;font-size:0.85rem;width:100%;"/></div>`;});
+}
+async function loadSummary(){
+  try{
+    const r=await fetch(API+'/v22/codes/summary');
+    const d=await r.json();
+    document.getElementById('codes-info').innerHTML=`
+      <div style="font-size:0.85rem;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--text)">Chirality:</strong> ${(d.chirality||{}).description||''}<br/>
+        <strong style="color:var(--text)">Resonance:</strong> ${(d.resonance||{}).method||''}<br/>
+        <strong style="color:var(--text)">SCNT²:</strong> ${(d.scnt_squared||{}).description||''}
+      </div>`;
+    const sp=d.seven_p||{};
+    let h='';(sp.domains||[]).forEach(d=>{h+=`<div class="domain-row"><span class="domain-name">${d}</span></div>`;});
+    document.getElementById('seven-p-list').innerHTML=h||'N/A';
+    const ap=d.autopoiesis||{};
+    document.getElementById('auto-info').innerHTML=`<div style="font-size:0.85rem;color:var(--muted);">Viability: ${ap.viability_condition||'N/A'}</div>`;
+  }catch(e){console.error(e);}
+}
+async function evaluate7P(){
+  const scores={};
+  DOMAINS.forEach(d=>{scores[d]=parseFloat(document.getElementById('sp-'+d).value)||0;});
+  try{
+    const r=await fetch(API+'/v22/codes/seven-p',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scores})});
+    const d=await r.json();
+    document.getElementById('seven-p-result').innerHTML=`
+      <div style="font-size:1.2rem;font-weight:700;color:var(--accent);">${((d.overall||0)*100).toFixed(1)}%</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-top:0.3rem;">Strongest: <strong style="color:var(--success)">${d.strongest||'—'}</strong> · Weakest: <strong style="color:var(--danger)">${d.weakest||'—'}</strong></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(d.overall||0)*100}%;background:linear-gradient(90deg,var(--accent),var(--secondary))"></div></div>`;
+  }catch(e){document.getElementById('seven-p-result').textContent='Error: '+e.message;}
+}
+async function calcCoherence(){
+  const raw=document.getElementById('coherence-input').value.trim();
+  const pairs=raw.split(',').map(s=>s.trim().split(':'));
+  const alignments={};pairs.forEach(([k,v])=>{if(k&&v)alignments[k.trim()]=parseFloat(v);});
+  try{
+    const r=await fetch(API+'/v22/codes/coherence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subsystem_alignments:alignments})});
+    const d=await r.json();
+    document.getElementById('coherence-result').innerHTML=`
+      <div style="font-size:0.85rem;color:var(--muted);">Overall: <strong style="color:var(--text)">${((d.overall_coherence||0)*100).toFixed(1)}%</strong></div>
+      <div style="font-size:0.85rem;color:var(--muted);">Steepness: ${(d.gradient_steepness||0).toFixed(3)} · Weakest: <strong style="color:var(--danger)">${d.weakest_link||'—'}</strong></div>
+      <div style="font-size:0.82rem;margin-top:0.3rem;"><span class="tag ${d.fully_coherent?'tag-ok':'tag-warn'}">${d.fully_coherent?'Fully Coherent':'Partial'}</span></div>`;
+  }catch(e){document.getElementById('coherence-result').textContent='Error: '+e.message;}
+}
+async function calcNetwork(){
+  try{
+    const adj=JSON.parse(document.getElementById('network-input').value);
+    const r=await fetch(API+'/v22/codes/network',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adjacency:adj})});
+    const d=await r.json();
+    document.getElementById('network-result').innerHTML=`
+      <div style="font-size:0.85rem;color:var(--muted);line-height:1.8;">
+        Nodes: <strong>${d.nodes}</strong> · Edges: <strong>${d.edges}</strong><br/>
+        Density: <strong>${(d.density||0).toFixed(3)}</strong> · Clustering: <strong>${(d.clustering_coefficient||0).toFixed(3)}</strong><br/>
+        Bottleneck Risk: <strong style="color:${(d.bottleneck_risk||0)>0.5?'var(--danger)':'var(--success)'}">${((d.bottleneck_risk||0)*100).toFixed(1)}%</strong>
+        ${(d.hub_nodes||[]).length?`<br/>Hubs: ${d.hub_nodes.join(', ')}`:''}
+      </div>`;
+  }catch(e){document.getElementById('network-result').textContent='Error: '+e.message;}
+}
+init();loadSummary();
+</script>
+</body>
+</html>

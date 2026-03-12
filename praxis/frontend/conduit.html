@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Praxis — The Listening Post</title>
+  <style>
+    :root {
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+      --space-4: 1rem; --space-5: 1.5rem; --space-6: 2rem;
+      --space-7: 3rem; --space-8: 4rem;
+      --bg-primary: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.035);
+      --bg-card-hover: rgba(255,255,255,0.055);
+      --bg-elevated: rgba(255,255,255,0.06);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.50);
+      --text-dim: rgba(255,255,255,0.30);
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.30);
+      --accent-secondary: #50e3c2;
+      --accent-warn: #f5a623;
+      --accent-danger: #ef4444;
+      --accent-phi: #00d2ff;
+      --shadow-card: 0 2px 20px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.04);
+      --shadow-card-hover: 0 8px 40px rgba(99,102,241,0.14), 0 0 0 1px rgba(255,255,255,0.08);
+      --shadow-button: 0 2px 16px rgba(99,102,241,0.30);
+      --shadow-input: 0 1px 8px rgba(0,0,0,0.18);
+      --shadow-input-focus: 0 0 0 2px rgba(99,102,241,0.25);
+      --radius-sm: 8px; --radius-md: 12px; --radius-card: 16px;
+      --radius-lg: 20px; --radius-pill: 999px;
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg-primary); color: var(--text-primary);
+      line-height: 1.5; min-height: 100vh;
+    }
+    .header {
+      text-align: center; padding: var(--space-7) var(--space-5) var(--space-5);
+    }
+    .header h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #f0f0f5 20%, #00d2ff 50%, #6366f1 80%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .header p { color: var(--text-secondary); font-size: 1.05rem; margin-top: var(--space-2); }
+    .nav-links {
+      display: flex; gap: var(--space-2); justify-content: center;
+      flex-wrap: wrap; margin-top: var(--space-5);
+    }
+    .nav-link {
+      display: inline-block; padding: var(--space-2) var(--space-4);
+      background: var(--bg-card); color: var(--text-secondary);
+      text-decoration: none; border-radius: var(--radius-pill);
+      font-size: 0.82rem; font-weight: 500;
+      transition: all var(--transition-fast);
+      backdrop-filter: blur(12px); box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+    .nav-link:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+    .nav-link.active { background: var(--accent); color: #fff; }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 var(--space-5); }
+
+    /* Search */
+    .search-section { max-width: 640px; margin: 0 auto var(--space-6); padding: 0 var(--space-5); }
+    .search-box { display: flex; gap: var(--space-3); }
+    #query {
+      flex: 1; padding: var(--space-4) var(--space-5); font-size: 1.05rem;
+      background: var(--bg-card); border: none; border-radius: var(--radius-md);
+      color: var(--text-primary); font-family: inherit;
+      box-shadow: var(--shadow-input); transition: box-shadow var(--transition-fast);
+      backdrop-filter: blur(24px);
+    }
+    #query::placeholder { color: var(--text-dim); }
+    #query:focus { outline: none; box-shadow: var(--shadow-input), var(--shadow-input-focus); }
+    #assessBtn {
+      padding: var(--space-4) var(--space-5); border: none; border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #6366f1, #00d2ff);
+      color: #fff; font-weight: 600; cursor: pointer; font-size: 0.95rem;
+      box-shadow: var(--shadow-button);
+      transition: all var(--transition-fast);
+    }
+    #assessBtn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,210,255,0.3); }
+
+    /* Master Score */
+    .master-score {
+      text-align: center; padding: var(--space-6); margin-bottom: var(--space-6);
+      background: var(--bg-card); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card); display: none;
+    }
+    .score-ring {
+      width: 140px; height: 140px; margin: 0 auto var(--space-4);
+      position: relative;
+    }
+    .score-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .score-ring circle { fill: none; stroke-width: 8; }
+    .score-ring .bg { stroke: rgba(255,255,255,0.06); }
+    .score-ring .fg { stroke: var(--accent-phi); stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+    .score-value {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 2rem; font-weight: 700;
+    }
+    .score-grade { font-size: 1.4rem; font-weight: 600; color: var(--accent-secondary); }
+    .agency-badge {
+      display: inline-block; padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 600;
+      margin-top: var(--space-3);
+    }
+    .agency-detected {
+      background: rgba(80,227,194,0.15); color: var(--accent-secondary);
+      box-shadow: 0 0 20px rgba(80,227,194,0.2);
+    }
+    .agency-none { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+
+    /* Section Headers */
+    .section-title {
+      font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em;
+      color: var(--text-primary); margin-bottom: var(--space-4);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .section-title span { color: var(--accent-phi); }
+
+    /* Pillar / Metric Cards */
+    .grid { display: grid; gap: var(--space-4); margin-bottom: var(--space-6); }
+    .grid-7 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    .card {
+      background: var(--bg-card); border-radius: var(--radius-card);
+      padding: var(--space-5); box-shadow: var(--shadow-card);
+      transition: all var(--transition-fast);
+      backdrop-filter: blur(12px);
+    }
+    .card:hover { background: var(--bg-card-hover); box-shadow: var(--shadow-card-hover); transform: translateY(-2px); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3); }
+    .card-number { font-size: 0.75rem; color: var(--text-dim); font-weight: 600; }
+    .card-grade {
+      font-size: 0.85rem; font-weight: 700; padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-pill);
+    }
+    .grade-a { background: rgba(80,227,194,0.15); color: var(--accent-secondary); }
+    .grade-b { background: rgba(99,102,241,0.15); color: var(--accent); }
+    .grade-c { background: rgba(245,166,35,0.15); color: var(--accent-warn); }
+    .grade-d { background: rgba(255,71,87,0.12); color: var(--accent-danger); }
+    .grade-f { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+    .card-title { font-size: 0.95rem; font-weight: 600; margin-bottom: var(--space-2); }
+    .card-score-bar {
+      height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06);
+      margin-bottom: var(--space-3); overflow: hidden;
+    }
+    .card-score-fill {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-phi));
+      transition: width 0.8s ease;
+    }
+    .card-dims { font-size: 0.78rem; color: var(--text-secondary); }
+    .card-dims span { color: var(--accent-secondary); }
+
+    /* Agency Evidence */
+    .evidence-list { margin-bottom: var(--space-6); display: none; }
+    .evidence-item {
+      padding: var(--space-4); margin-bottom: var(--space-2);
+      background: rgba(80,227,194,0.05); border-radius: var(--radius-md);
+      border-left: 3px solid var(--accent-secondary);
+      font-size: 0.88rem; color: var(--text-secondary);
+    }
+
+    /* Warnings */
+    .warnings-list { margin-bottom: var(--space-6); display: none; }
+    .warning-item {
+      padding: var(--space-4); margin-bottom: var(--space-2);
+      background: rgba(245,166,35,0.05); border-radius: var(--radius-md);
+      border-left: 3px solid var(--accent-warn);
+      font-size: 0.88rem; color: var(--text-secondary);
+    }
+
+    /* Reinterpretation Table */
+    .reinterpret-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: var(--space-6); }
+    .reinterpret-table th {
+      text-align: left; padding: var(--space-3) var(--space-4);
+      font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-dim); border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .reinterpret-table td {
+      padding: var(--space-3) var(--space-4); font-size: 0.85rem;
+      color: var(--text-secondary); border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .reinterpret-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .mono { color: var(--accent-phi); }
+    .decoupled { color: var(--accent-secondary); }
+
+    .loading { text-align: center; padding: var(--space-6); color: var(--text-dim); display: none; }
+    .loading.active { display: block; }
+    .pulse { animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>The Listening Post</h1>
+    <p>Detecting emergent agency through cognitive telemetry</p>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/static/tools.html" class="nav-link">All Tools</a>
+      <a href="/static/journey.html" class="nav-link">Guided Journey</a>
+      <a href="/static/conduit.html" class="nav-link active">Listening Post</a>
+      <a href="/static/manifesto.html" class="nav-link">Methodology</a>
+    </div>
+  </div>
+
+  <div class="search-section">
+    <div class="search-box">
+      <input id="query" type="text" aria-label="Cognitive architecture query" placeholder="Describe your cognitive architecture or system design..." />
+      <button id="assessBtn" aria-label="Assess cognitive architecture">Assess</button>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="pulse" style="font-size:1.6rem;">◉</div>
+    <p style="margin-top:var(--space-3);">Scanning cognitive substrate...</p>
+  </div>
+
+  <div class="container">
+    <!-- Master Score -->
+    <div class="master-score" id="masterScore">
+      <div class="score-ring">
+        <svg viewBox="0 0 140 140">
+          <circle class="bg" cx="70" cy="70" r="60"/>
+          <circle class="fg" id="scoreArc" cx="70" cy="70" r="60"
+                  stroke-dasharray="377" stroke-dashoffset="377"/>
+        </svg>
+        <div class="score-value" id="scoreValue">0.00</div>
+      </div>
+      <div class="score-grade" id="scoreGrade"></div>
+      <div id="agencyBadge"></div>
+    </div>
+
+    <!-- Agency Evidence -->
+    <div class="evidence-list" id="evidenceList">
+      <div class="section-title"><span>◉</span> Agency Evidence</div>
+      <div id="evidenceItems"></div>
+    </div>
+
+    <!-- Warnings -->
+    <div class="warnings-list" id="warningsList">
+      <div class="section-title"><span>⚠</span> Warnings</div>
+      <div id="warningItems"></div>
+    </div>
+
+    <!-- Seven Pillars -->
+    <div id="pillarsSection" style="display:none">
+      <div class="section-title"><span>⬡</span> Seven Architectural Pillars</div>
+      <div class="grid grid-7" id="pillarsGrid"></div>
+    </div>
+
+    <!-- Seven Telemetry Metrics -->
+    <div id="telemetrySection" style="display:none">
+      <div class="section-title"><span>◎</span> Listening Post Telemetry</div>
+      <div class="grid grid-7" id="telemetryGrid"></div>
+    </div>
+
+    <!-- Reinterpretation Table -->
+    <div id="reinterpretSection" style="display:none; margin-bottom: var(--space-7);">
+      <div class="section-title"><span>⇌</span> Paradigm Reinterpretation</div>
+      <table class="reinterpret-table" id="reinterpretTable">
+        <thead>
+          <tr>
+            <th>Phenomenon</th>
+            <th class="mono">Monolithic View</th>
+            <th class="decoupled">Decoupled View</th>
+          </tr>
+        </thead>
+        <tbody id="reinterpretBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const API = '';
+    const $ = (s) => document.querySelector(s);
+
+    function gradeClass(g) {
+      if (!g) return 'grade-f';
+      if (g.startsWith('A')) return 'grade-a';
+      if (g === 'B') return 'grade-b';
+      if (g === 'C') return 'grade-c';
+      if (g === 'D') return 'grade-d';
+      return 'grade-f';
+    }
+
+    function renderCard(data, label) {
+      const dims = Object.entries(data.dimensions || {})
+        .map(([k, v]) => `<span>${k}</span>: ${v.toFixed(2)}`)
+        .join(' · ');
+      return `
+        <div class="card">
+          <div class="card-header">
+            <span class="card-number">${label}</span>
+            <span class="card-grade ${gradeClass(data.grade)}">${data.grade}</span>
+          </div>
+          <div class="card-title">${data.title || data.symbol || ''}</div>
+          <div class="card-score-bar">
+            <div class="card-score-fill" style="width:${(data.score * 100).toFixed(0)}%"></div>
+          </div>
+          <div class="card-dims">${dims || 'No dimensions matched'}</div>
+        </div>`;
+    }
+
+    async function assess() {
+      const q = $('#query').value.trim();
+      if (!q) return;
+
+      $('#loading').classList.add('active');
+      $('#masterScore').style.display = 'none';
+      $('#pillarsSection').style.display = 'none';
+      $('#telemetrySection').style.display = 'none';
+      $('#evidenceList').style.display = 'none';
+      $('#warningsList').style.display = 'none';
+      $('#reinterpretSection').style.display = 'none';
+
+      try {
+        const resp = await fetch(API + '/conduit/assess', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q }),
+        });
+        const d = await resp.json();
+
+        // Master score ring
+        const pct = d.conduit_score;
+        const offset = 377 - (377 * pct);
+        $('#scoreArc').style.strokeDashoffset = offset;
+        $('#scoreValue').textContent = pct.toFixed(3);
+        $('#scoreGrade').textContent = `Grade: ${d.grade}`;
+
+        // Agency badge
+        if (d.agency_detected) {
+          $('#agencyBadge').innerHTML = `<div class="agency-badge agency-detected">◉ AGENCY DETECTED</div>`;
+        } else {
+          $('#agencyBadge').innerHTML = `<div class="agency-badge agency-none">○ No agency signal</div>`;
+        }
+        $('#masterScore').style.display = 'block';
+
+        // Evidence
+        if (d.agency_evidence && d.agency_evidence.length) {
+          $('#evidenceItems').innerHTML = d.agency_evidence
+            .map(e => `<div class="evidence-item">${e}</div>`).join('');
+          $('#evidenceList').style.display = 'block';
+        }
+
+        // Warnings
+        if (d.warnings && d.warnings.length) {
+          $('#warningItems').innerHTML = d.warnings
+            .map(w => `<div class="warning-item">${w}</div>`).join('');
+          $('#warningsList').style.display = 'block';
+        }
+
+        // Pillars
+        const pillars = [
+          { key: 'decoupling', label: 'I — Decoupling' },
+          { key: 'memory', label: 'II — Memory' },
+          { key: 'gwt', label: 'III — GWT' },
+          { key: 'phi', label: 'IV — Φ' },
+          { key: 'repe', label: 'V — RepE' },
+          { key: 'autopoiesis', label: 'VI — Autopoiesis' },
+          { key: 'resonance', label: 'VII — Resonance' },
+        ];
+        $('#pillarsGrid').innerHTML = pillars
+          .map(p => renderCard(d[p.key], `PILLAR ${p.label}`)).join('');
+        $('#pillarsSection').style.display = 'block';
+
+        // Telemetry
+        const metrics = [
+          { key: 'entropy', label: 'H_t' },
+          { key: 'smi', label: 'SMI' },
+          { key: 'bni', label: 'BNI' },
+          { key: 'latency', label: 'L_t' },
+          { key: 'phi_metric', label: 'Φ' },
+          { key: 'coherence', label: 'C(Ψ)' },
+          { key: 'attractor', label: 'ΔC_S' },
+        ];
+        $('#telemetryGrid').innerHTML = metrics
+          .map(m => renderCard(d[m.key], `METRIC ${m.label}`)).join('');
+        $('#telemetrySection').style.display = 'block';
+
+        // Load reinterpretation table
+        try {
+          const rResp = await fetch(API + '/conduit/reinterpretation');
+          const rData = await rResp.json();
+          $('#reinterpretBody').innerHTML = (rData.reinterpretations || [])
+            .map(r => `<tr>
+              <td style="font-weight:500;color:var(--text-primary)">${r.phenomenon}</td>
+              <td class="mono">${r.monolithic_interpretation}</td>
+              <td class="decoupled">${r.decoupled_interpretation}</td>
+            </tr>`).join('');
+          $('#reinterpretSection').style.display = 'block';
+        } catch (_) {}
+
+      } catch (err) {
+        console.error('Conduit assessment failed:', err);
+      } finally {
+        $('#loading').classList.remove('active');
+      }
+    }
+
+    $('#assessBtn').addEventListener('click', assess);
+    $('#query').addEventListener('keydown', e => { if (e.key === 'Enter') assess(); });
+  </script>
+</body>
+</html>

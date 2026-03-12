@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Praxis — DSRP Ontology</title>
+<style>
+:root{--bg:#0a0a0f;--surface:rgba(255,255,255,0.035);--surface-hover:rgba(255,255,255,0.055);--border:rgba(255,255,255,0.06);--text:#f0f0f5;--muted:rgba(255,255,255,0.50);--dim:rgba(255,255,255,0.30);--accent:#6366f1;--accent-glow:rgba(99,102,241,0.30);--secondary:#50e3c2;--warn:#fb923c;--danger:#ef4444;--success:#34d399;--info:#38bdf8;--shadow-card:0 2px 20px rgba(0,0,0,0.28),0 0 0 1px rgba(255,255,255,0.04);--radius:12px;--radius-lg:16px;--radius-pill:999px;--ease:cubic-bezier(0.16,1,0.3,1);--fast:0.2s cubic-bezier(0.4,0,0.2,1);}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(140px);opacity:0.18;animation:af 20s ease-in-out infinite alternate;}
+.aurora::before{width:500px;height:500px;background:radial-gradient(circle,#6366f1 0%,transparent 70%);top:-12%;left:-6%;}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#50e3c2 0%,transparent 70%);bottom:-15%;right:-6%;animation-delay:-9s;}
+@keyframes af{0%{transform:translate(0,0) scale(1);}50%{transform:translate(25px,-18px) scale(1.06);}100%{transform:translate(-18px,10px) scale(0.96);}}
+.container{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:2;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#f0f0f5 30%,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.page-header .subtitle{color:var(--muted);font-size:0.9rem;}
+.nav{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.nav a{padding:0.4rem 1rem;background:var(--surface);color:var(--muted);text-decoration:none;border-radius:var(--radius-pill);font-size:0.8rem;font-weight:500;transition:all var(--fast);backdrop-filter:blur(12px);}
+.nav a:hover,.nav a.active{background:var(--surface-hover);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.nav a.active{border:1px solid var(--accent);color:var(--accent);}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-bottom:2rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:1024px){.grid-4,.grid-2{grid-template-columns:1fr;}}
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);transition:all var(--fast);}
+.card:hover{box-shadow:0 8px 40px rgba(99,102,241,0.14),0 0 0 1px rgba(255,255,255,0.08);}
+.card-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+.dsrp-icon{font-size:2rem;margin-bottom:0.5rem;}
+.dsrp-label{font-size:1.1rem;font-weight:700;margin-bottom:0.3rem;}
+.dsrp-elements{font-size:0.8rem;color:var(--muted);}
+.big-num{font-size:3rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.bar-track{height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;margin-top:0.5rem;}
+.bar-fill{height:100%;border-radius:4px;transition:width 1s var(--ease);}
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;border:none;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all var(--fast);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#818cf8);color:#fff;box-shadow:0 2px 16px var(--accent-glow);}
+.btn-primary:hover{box-shadow:0 6px 24px rgba(99,102,241,0.40);transform:translateY(-1px);}
+input,textarea{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.6rem 1rem;font-size:0.88rem;width:100%;font-family:inherit;transition:border var(--fast);}
+input:focus,textarea:focus{outline:none;border-color:var(--accent);}
+.tag{display:inline-block;padding:0.15rem 0.5rem;border-radius:var(--radius-pill);font-size:0.72rem;font-weight:600;margin:0.15rem;}
+.tag-ok{background:rgba(52,211,153,0.15);color:var(--success);}
+.tag-warn{background:rgba(251,146,60,0.15);color:var(--warn);}
+.tag-err{background:rgba(251,113,133,0.15);color:var(--danger);}
+.loading{text-align:center;padding:3rem;color:var(--dim);}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:0.5rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1>DSRP Ontology Engine</h1>
+      <span class="subtitle">Distinctions · Systems · Relationships · Perspectives · O-Theory</span>
+    </div>
+    <nav class="nav">
+      <a href="/static/cognitive-dashboard.html">Cognitive</a>
+      <a href="/static/reasoning-router.html">Router</a>
+      <a href="/static/dsrp-ontology.html" class="active">DSRP</a>
+      <a href="/static/codes-resonance.html">CODES</a>
+      <a href="/static/coala-memory.html">CoALA</a>
+      <a href="/static/repe-transparency.html">RepE</a>
+      <a href="/static/mesias-governance.html">MESIAS</a>
+    </nav>
+  </div>
+
+  <!-- 4 DSRP Pattern Cards -->
+  <div class="grid-4" id="dsrp-patterns">
+    <div class="card" style="text-align:center;"><div class="dsrp-icon">🔲</div><div class="dsrp-label">Distinctions</div><div class="dsrp-elements">Identity (i) / Other (o)</div><div style="color:var(--dim);font-size:0.78rem;margin-top:0.5rem;">Define boundaries</div></div>
+    <div class="card" style="text-align:center;"><div class="dsrp-icon">🧩</div><div class="dsrp-label">Systems</div><div class="dsrp-elements">Part (p) / Whole (w)</div><div style="color:var(--dim);font-size:0.78rem;margin-top:0.5rem;">Part-whole decomposition</div></div>
+    <div class="card" style="text-align:center;"><div class="dsrp-icon">🔗</div><div class="dsrp-label">Relationships</div><div class="dsrp-elements">Action (a) / Reaction (r)</div><div style="color:var(--dim);font-size:0.78rem;margin-top:0.5rem;">Causal links</div></div>
+    <div class="card" style="text-align:center;"><div class="dsrp-icon">👁</div><div class="dsrp-label">Perspectives</div><div class="dsrp-elements">Point (ρ) / View (v)</div><div style="color:var(--dim);font-size:0.78rem;margin-top:0.5rem;">Observational frames</div></div>
+  </div>
+
+  <!-- Build Matrix -->
+  <div class="card" style="margin-bottom:2rem;">
+    <div class="card-title"><span class="dot"></span>Build DSRP Matrix</div>
+    <textarea id="task-input" rows="3" placeholder="Describe a task to process through the DSRP structural filter..."></textarea>
+    <div style="display:flex;gap:0.75rem;margin-top:1rem;align-items:center;">
+      <button class="btn btn-primary" onclick="buildMatrix()">Build Matrix</button>
+      <span id="build-status" style="font-size:0.82rem;color:var(--muted);"></span>
+    </div>
+  </div>
+
+  <!-- Matrix Result -->
+  <div id="matrix-result" style="display:none;">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Matrix Validation</div>
+        <div id="matrix-validation"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>O-Theory Analysis</div>
+        <div id="o-theory"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:2rem;">
+      <div class="card-title"><span class="dot"></span>Matrix Detail</div>
+      <div id="matrix-detail"></div>
+    </div>
+  </div>
+
+  <!-- O-Theory Summary -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>O-Theory: M = I × O</div>
+      <div style="font-size:0.88rem;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--text);">Law of Structural Cognition</strong><br/>
+        Cognitive Complexity (M) = Information (I) × Organization (O)<br/><br/>
+        <strong style="color:var(--text);">Love Reality Loop</strong><br/>
+        lim(t→∞) Mₜ/ℝ = 1 — mental models converge to reality through recursive refinement.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>DSRP Engine Summary</div>
+      <div id="summary-content"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API=window.location.origin;
+async function loadSummary(){
+  try{
+    const r=await fetch(API+'/v22/dsrp/summary');
+    const d=await r.json();
+    const pats=d.patterns||{};
+    let h='';
+    for(const[name,info] of Object.entries(pats)){
+      h+=`<div style="margin-bottom:0.75rem;"><strong style="font-size:0.88rem;">${name}</strong><br/><span style="font-size:0.78rem;color:var(--muted);">Elements: ${(info.elements||[]).join(', ')} — ${info.function||''}</span></div>`;
+    }
+    if(d.standard_perspectives){h+=`<div style="margin-top:1rem;font-size:0.8rem;color:var(--dim);">Standard perspectives: ${d.standard_perspectives.join(', ')}</div>`;}
+    document.getElementById('summary-content').innerHTML=h||'No data';
+  }catch(e){console.error(e);}
+}
+async function buildMatrix(){
+  const task=document.getElementById('task-input').value.trim();
+  if(!task){document.getElementById('build-status').textContent='Enter a task';return;}
+  document.getElementById('build-status').textContent='Building...';
+  try{
+    const r=await fetch(API+'/v22/dsrp/matrix',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task_description:task})});
+    const d=await r.json();
+    document.getElementById('matrix-result').style.display='block';
+    const cs=d.completeness_score||0;
+    const vp=d.validation_passed;
+    document.getElementById('matrix-validation').innerHTML=`
+      <div style="margin-bottom:1rem;"><span class="tag ${vp?'tag-ok':'tag-err'}">${vp?'PASSED':'FAILED'}</span></div>
+      <div style="font-size:0.85rem;color:var(--muted);margin-bottom:0.5rem;">Completeness: <strong style="color:var(--text)">${(cs*100).toFixed(0)}%</strong></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${cs*100}%;background:${cs>=0.75?'var(--success)':cs>=0.5?'var(--warn)':'var(--danger)'}"></div></div>
+      ${(d.validation_errors||[]).map(e=>`<div style="font-size:0.78rem;color:var(--danger);margin-top:0.4rem;">• ${e}</div>`).join('')}
+    `;
+    document.getElementById('o-theory').innerHTML=`
+      <div style="font-size:0.85rem;color:var(--muted);line-height:1.7;">
+        Distinctions: <strong>${(d.distinctions||[]).length}</strong> |
+        Systems: <strong>${(d.systems||[]).length}</strong> |
+        Relationships: <strong>${(d.relationships||[]).length}</strong> |
+        Perspectives: <strong>${(d.perspectives||[]).length}</strong>
+      </div>
+    `;
+    let det='';
+    for(const sec of ['distinctions','systems','relationships','perspectives']){
+      const items=d[sec]||[];
+      if(items.length){det+=`<div style="margin-bottom:1rem;"><strong style="text-transform:capitalize;">${sec}</strong>`;
+        items.forEach(it=>{det+=`<div style="font-size:0.8rem;color:var(--muted);padding:0.3rem 0;border-bottom:1px solid var(--border);">${JSON.stringify(it)}</div>`;});
+        det+=`</div>`;}
+    }
+    document.getElementById('matrix-detail').innerHTML=det||'Empty matrix';
+    document.getElementById('build-status').textContent='';
+  }catch(e){document.getElementById('build-status').textContent='Error: '+e.message;}
+}
+loadSummary();
+</script>
+</body>
+</html>

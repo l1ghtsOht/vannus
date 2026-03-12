@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Praxis — Knowledge Graph Explorer</title>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:rgba(255,255,255,0.035);--surface-hover:rgba(255,255,255,0.055);
+  --border:rgba(255,255,255,0.06);--text:#f0f0f5;--muted:rgba(255,255,255,0.50);--dim:rgba(255,255,255,0.30);
+  --accent:#6366f1;--accent-glow:rgba(99,102,241,0.30);--secondary:#50e3c2;
+  --warn:#fb923c;--danger:#ef4444;--success:#34d399;--info:#38bdf8;
+  --shadow-card:0 2px 20px rgba(0,0,0,0.28),0 0 0 1px rgba(255,255,255,0.04);
+  --radius:12px;--radius-lg:16px;--radius-pill:999px;
+  --fast:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(140px);opacity:0.18;animation:af 20s ease-in-out infinite alternate;}
+.aurora::before{width:500px;height:500px;background:radial-gradient(circle,#6366f1 0%,transparent 70%);top:-12%;left:-6%;}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#50e3c2 0%,transparent 70%);bottom:-15%;right:-6%;animation-delay:-9s;}
+@keyframes af{0%{transform:translate(0,0) scale(1);}50%{transform:translate(25px,-18px) scale(1.06);}100%{transform:translate(-18px,10px) scale(0.96);}}
+
+.container{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:2;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#f0f0f5 30%,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.subtitle{color:var(--muted);font-size:0.9rem;}
+.nav{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.nav a{padding:0.4rem 1rem;background:var(--surface);color:var(--muted);text-decoration:none;border-radius:var(--radius-pill);font-size:0.8rem;font-weight:500;transition:all var(--fast);backdrop-filter:blur(12px);}
+.nav a:hover,.nav a.active{background:var(--surface-hover);color:var(--text);}
+.nav a.active{border:1px solid var(--accent);color:var(--accent);}
+
+.grid-main{display:grid;grid-template-columns:1fr 320px;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:900px){.grid-main{grid-template-columns:1fr;}}
+
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);}
+.card-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+
+#graphCanvas{width:100%;height:550px;border-radius:var(--radius);background:rgba(0,0,0,0.3);cursor:grab;}
+#graphCanvas:active{cursor:grabbing;}
+
+.input-area{width:100%;min-height:120px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;color:var(--text);font-size:0.88rem;font-family:inherit;resize:vertical;margin-bottom:1rem;}
+.input-area:focus{outline:none;border-color:var(--accent);}
+
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all var(--fast);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#818cf8);color:#fff;box-shadow:0 2px 12px var(--accent-glow);}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-ghost{background:var(--surface);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.5rem;}
+.stat-card{text-align:center;padding:0.75rem;background:rgba(255,255,255,0.02);border-radius:var(--radius);border:1px solid var(--border);}
+.stat-val{font-size:1.6rem;font-weight:700;color:var(--accent);}
+.stat-label{font-size:0.7rem;color:var(--muted);margin-top:0.2rem;}
+
+/* Entity/Community lists */
+.entity-list{max-height:300px;overflow-y:auto;}
+.entity-row{display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;cursor:pointer;transition:all var(--fast);}
+.entity-row:hover{background:rgba(99,102,241,0.05);}
+.entity-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.entity-name{flex:1;font-weight:500;}
+.entity-meta{color:var(--dim);font-size:0.72rem;}
+
+.community-chip{display:inline-block;padding:0.25rem 0.6rem;border-radius:var(--radius-pill);font-size:0.72rem;font-weight:600;margin:0.2rem;border:1px solid var(--border);cursor:pointer;transition:all var(--fast);}
+.community-chip:hover{border-color:var(--accent);background:rgba(99,102,241,0.1);}
+.community-chip.active{background:rgba(99,102,241,0.15);border-color:var(--accent);color:var(--accent);}
+
+.stat-badge{display:inline-flex;padding:0.2rem 0.5rem;border-radius:var(--radius-pill);font-size:0.72rem;font-weight:600;}
+.stat-badge.green{background:rgba(52,211,153,0.12);color:var(--success);}
+.stat-badge.blue{background:rgba(56,189,248,0.12);color:var(--info);}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1>Knowledge Graph Explorer</h1>
+      <span class="subtitle">GraphRAG · Entity Extraction · Community Detection · Interactive Visualization</span>
+    </div>
+    <nav class="nav">
+      <a href="/static/home.html">Home</a>
+      <a href="/static/cognitive-dashboard.html">Cognitive</a>
+      <a href="/static/agent-orchestration.html">Agents</a>
+      <a href="/static/knowledge-explorer.html" class="active">Knowledge</a>
+      <a href="/static/observability-console.html">Observability</a>
+      <a href="/static/governance-center.html">Governance</a>
+      <a href="/static/economics-hub.html">Economics</a>
+      <a href="/static/fort-knox.html">Fort Knox</a>
+      <a href="/static/pipeline.html">Pipeline</a>
+    </nav>
+  </div>
+
+  <!-- Text input -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <div class="card-title"><span class="dot"></span>Build Knowledge Graph from Text</div>
+    <textarea class="input-area" id="textInput" placeholder="Paste or type text here. Praxis will extract entities, relationships, compute centrality, and detect communities…">Praxis AI uses a GraphRAG architecture combining Neo4j knowledge graphs with Weaviate vector databases. The multi-agent supervisor delegates tasks to Intent Extraction, Vendor Intelligence, and Architecture Orchestration sub-agents via LangGraph. MCP integration connects the Agentic Service Bus for JSON-RPC inter-agent communication. The system uses a Medallion Architecture with Bronze, Silver, and Gold tiers for data quality management. SOC 2 Type II compliance and NIST AI RMF governance ensure enterprise security. OpenTelemetry provides distributed tracing across all agent interactions.</textarea>
+    <div style="display:flex;gap:0.5rem;">
+      <button class="btn btn-primary" onclick="buildGraph()">Build Graph</button>
+      <button class="btn btn-ghost" onclick="loadExisting()">Load Existing</button>
+      <button class="btn btn-ghost" onclick="clearGraph()">Clear</button>
+    </div>
+  </div>
+
+  <div class="grid-main">
+    <!-- Graph visualization -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--secondary);"></span>Interactive Knowledge Graph</div>
+      <canvas id="graphCanvas" width="800" height="550"></canvas>
+    </div>
+
+    <!-- Sidebar -->
+    <div>
+      <!-- Stats -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title"><span class="dot" style="background:var(--info);"></span>Graph Stats</div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-val" id="nodeCount">0</div><div class="stat-label">Nodes</div></div>
+          <div class="stat-card"><div class="stat-val" id="edgeCount">0</div><div class="stat-label">Edges</div></div>
+          <div class="stat-card"><div class="stat-val" id="communityCount">0</div><div class="stat-label">Communities</div></div>
+          <div class="stat-card"><div class="stat-val" id="density">0</div><div class="stat-label">Density</div></div>
+        </div>
+      </div>
+
+      <!-- Communities -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title"><span class="dot" style="background:var(--warn);"></span>Communities</div>
+        <div id="communityList"><div style="color:var(--dim);font-size:0.82rem;">Build a graph to detect communities.</div></div>
+      </div>
+
+      <!-- Entities -->
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--success);"></span>Entities</div>
+        <div id="entityList" class="entity-list"><div style="color:var(--dim);font-size:0.82rem;">No entities yet.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API=window.location.origin;
+let graphData={nodes:[],edges:[],communities:[]};
+let nodePos={};
+let selectedNode=null;
+let highlightCommunity=null;
+const COLORS=['#6366f1','#50e3c2','#fb923c','#ef4444','#38bdf8','#34d399','#fbbf24','#818cf8','#f472b6','#22d3ee'];
+
+async function fetchJSON(url,opts){
+  try{const r=await fetch(API+url,opts);if(!r.ok)throw new Error(r.status);return await r.json();}
+  catch(e){console.warn('fetch:',url,e);return null;}
+}
+
+async function buildGraph(){
+  const text=document.getElementById('textInput').value.trim();
+  if(!text){alert('Enter some text first.');return;}
+  const d=await fetchJSON('/v21/knowledge/build',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({text:text})});
+  if(d){graphData={nodes:d.nodes||[],edges:d.edges||[],communities:d.communities||[]};render();}
+}
+
+async function loadExisting(){
+  const d=await fetchJSON('/v21/knowledge/graph');
+  if(d){graphData={nodes:d.nodes||[],edges:d.edges||[],communities:d.communities||[]};render();}
+}
+
+function clearGraph(){graphData={nodes:[],edges:[],communities:[]};nodePos={};selectedNode=null;highlightCommunity=null;render();}
+
+function render(){
+  updateStats();renderCommunities();renderEntities();initPositions();drawGraph();
+}
+
+function updateStats(){
+  document.getElementById('nodeCount').textContent=graphData.nodes.length;
+  document.getElementById('edgeCount').textContent=graphData.edges.length;
+  document.getElementById('communityCount').textContent=graphData.communities.length;
+  const n=graphData.nodes.length;
+  const maxEdges=n*(n-1)/2;
+  const dens=maxEdges>0?(graphData.edges.length/maxEdges).toFixed(3):'0';
+  document.getElementById('density').textContent=dens;
+}
+
+function renderCommunities(){
+  const el=document.getElementById('communityList');
+  if(!graphData.communities.length){el.innerHTML='<div style="color:var(--dim);font-size:0.82rem;">No communities detected.</div>';return;}
+  el.innerHTML=graphData.communities.map((c,i)=>`
+    <span class="community-chip ${highlightCommunity===c.community_id?'active':''}"
+          onclick="toggleCommunity(${c.community_id})"
+          style="border-color:${COLORS[i%COLORS.length]}40;color:${COLORS[i%COLORS.length]};">
+      C${c.community_id} (${(c.node_ids||[]).length})
+    </span>`).join('');
+}
+
+function renderEntities(){
+  const el=document.getElementById('entityList');
+  if(!graphData.nodes.length){el.innerHTML='<div style="color:var(--dim);font-size:0.82rem;">No entities.</div>';return;}
+  const sorted=[...graphData.nodes].sort((a,b)=>(b.centrality||0)-(a.centrality||0));
+  el.innerHTML=sorted.map(n=>{
+    const ci=n.community_id!==undefined?n.community_id%COLORS.length:0;
+    return`<div class="entity-row" onclick="focusNode('${n.node_id}')">
+      <div class="entity-dot" style="background:${COLORS[ci]};"></div>
+      <div class="entity-name">${n.label||n.node_id}</div>
+      <div class="entity-meta">${(n.centrality||0).toFixed(2)}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCommunity(id){highlightCommunity=highlightCommunity===id?null:id;renderCommunities();drawGraph();}
+function focusNode(id){selectedNode=id;drawGraph();}
+
+/* Canvas graph */
+const canvas=document.getElementById('graphCanvas');
+const ctx=canvas.getContext('2d');
+let dpr=window.devicePixelRatio||1;
+function resizeCanvas(){const r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx.scale(dpr,dpr);}
+resizeCanvas();
+window.addEventListener('resize',()=>{resizeCanvas();drawGraph();});
+
+function initPositions(){
+  const w=canvas.getBoundingClientRect().width;
+  const h=canvas.getBoundingClientRect().height;
+  const cx=w/2,cy=h/2;
+  graphData.nodes.forEach((n,i)=>{
+    if(!nodePos[n.node_id]){
+      const angle=(2*Math.PI*i)/Math.max(graphData.nodes.length,1);
+      const spread=Math.min(w,h)*0.35;
+      const jitter=(Math.random()-0.5)*40;
+      nodePos[n.node_id]={x:cx+spread*Math.cos(angle)+jitter,y:cy+spread*Math.sin(angle)+jitter};
+    }
+  });
+  // Force-directed relaxation (simple)
+  for(let iter=0;iter<60;iter++){
+    const forces={};
+    graphData.nodes.forEach(n=>{forces[n.node_id]={fx:0,fy:0};});
+    // Repulsion
+    for(let i=0;i<graphData.nodes.length;i++){
+      for(let j=i+1;j<graphData.nodes.length;j++){
+        const a=nodePos[graphData.nodes[i].node_id],b=nodePos[graphData.nodes[j].node_id];
+        if(!a||!b)continue;
+        let dx=a.x-b.x,dy=a.y-b.y;
+        let dist=Math.max(Math.hypot(dx,dy),1);
+        let f=800/(dist*dist);
+        forces[graphData.nodes[i].node_id].fx+=dx/dist*f;
+        forces[graphData.nodes[i].node_id].fy+=dy/dist*f;
+        forces[graphData.nodes[j].node_id].fx-=dx/dist*f;
+        forces[graphData.nodes[j].node_id].fy-=dy/dist*f;
+      }
+    }
+    // Attraction
+    graphData.edges.forEach(e=>{
+      const a=nodePos[e.source],b=nodePos[e.target];
+      if(!a||!b)return;
+      let dx=b.x-a.x,dy=b.y-a.y;
+      let dist=Math.max(Math.hypot(dx,dy),1);
+      let f=dist*0.01;
+      forces[e.source].fx+=dx/dist*f;forces[e.source].fy+=dy/dist*f;
+      forces[e.target].fx-=dx/dist*f;forces[e.target].fy-=dy/dist*f;
+    });
+    // Center gravity
+    graphData.nodes.forEach(n=>{
+      const p=nodePos[n.node_id];
+      if(!p)return;
+      forces[n.node_id].fx+=(cx-p.x)*0.005;
+      forces[n.node_id].fy+=(cy-p.y)*0.005;
+    });
+    // Apply
+    graphData.nodes.forEach(n=>{
+      const p=nodePos[n.node_id];
+      const f=forces[n.node_id];
+      if(!p||!f)return;
+      p.x+=Math.max(-5,Math.min(5,f.fx));
+      p.y+=Math.max(-5,Math.min(5,f.fy));
+      p.x=Math.max(30,Math.min(w-30,p.x));
+      p.y=Math.max(30,Math.min(h-30,p.y));
+    });
+  }
+}
+
+function drawGraph(){
+  const w=canvas.getBoundingClientRect().width;
+  const h=canvas.getBoundingClientRect().height;
+  ctx.clearRect(0,0,w,h);
+
+  // Edges
+  graphData.edges.forEach(e=>{
+    const a=nodePos[e.source],b=nodePos[e.target];
+    if(!a||!b)return;
+    const dimmed=highlightCommunity!==null;
+    const sNode=graphData.nodes.find(n=>n.node_id===e.source);
+    const tNode=graphData.nodes.find(n=>n.node_id===e.target);
+    const inComm=!dimmed||(sNode&&sNode.community_id===highlightCommunity)||(tNode&&tNode.community_id===highlightCommunity);
+    ctx.strokeStyle=inComm?'rgba(99,102,241,0.2)':'rgba(255,255,255,0.03)';
+    ctx.lineWidth=inComm?1.5:0.5;
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+    // Edge label
+    if(e.relation&&inComm){
+      const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+      ctx.fillStyle='rgba(255,255,255,0.2)';ctx.font='8px sans-serif';ctx.textAlign='center';
+      ctx.fillText(e.relation,mx,my-4);
+    }
+  });
+
+  // Nodes
+  graphData.nodes.forEach(n=>{
+    const p=nodePos[n.node_id];if(!p)return;
+    const ci=n.community_id!==undefined?n.community_id%COLORS.length:0;
+    const col=COLORS[ci];
+    const isSel=selectedNode===n.node_id;
+    const dimmed=highlightCommunity!==null&&n.community_id!==highlightCommunity;
+    const r=8+(n.centrality||0)*20;
+
+    if(dimmed){
+      ctx.globalAlpha=0.15;
+    }
+
+    // Glow
+    if(isSel||(!dimmed&&(n.centrality||0)>0.3)){
+      ctx.beginPath();ctx.arc(p.x,p.y,r+10,0,Math.PI*2);
+      const grad=ctx.createRadialGradient(p.x,p.y,r,p.x,p.y,r+12);
+      grad.addColorStop(0,col+'30');grad.addColorStop(1,'transparent');
+      ctx.fillStyle=grad;ctx.fill();
+    }
+
+    ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);
+    ctx.fillStyle=col+'40';ctx.strokeStyle=isSel?'#fff':col;ctx.lineWidth=isSel?2.5:1.5;
+    ctx.fill();ctx.stroke();
+
+    ctx.fillStyle=dimmed?'rgba(255,255,255,0.2)':'rgba(255,255,255,0.8)';
+    ctx.font=(isSel?'bold ':'')+`${Math.max(9,r*0.8)}px -apple-system, sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText(n.label||n.node_id,p.x,p.y+r+4);
+
+    ctx.globalAlpha=1;
+  });
+}
+
+// Drag
+let dragging=null;
+canvas.addEventListener('mousedown',e=>{
+  const rect=canvas.getBoundingClientRect();
+  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  for(const n of graphData.nodes){
+    const p=nodePos[n.node_id];
+    if(p&&Math.hypot(p.x-mx,p.y-my)<20){dragging=n.node_id;selectedNode=n.node_id;drawGraph();return;}
+  }
+});
+canvas.addEventListener('mousemove',e=>{
+  if(!dragging)return;
+  const rect=canvas.getBoundingClientRect();
+  nodePos[dragging]={x:e.clientX-rect.left,y:e.clientY-rect.top};
+  drawGraph();
+});
+canvas.addEventListener('mouseup',()=>{dragging=null;});
+canvas.addEventListener('mouseleave',()=>{dragging=null;});
+
+loadExisting();
+</script>
+</body>
+</html>

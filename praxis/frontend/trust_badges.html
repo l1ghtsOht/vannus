@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Praxis — Trust Badge Architecture</title>
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-glass: rgba(255,255,255,0.06);
+      --bg-glass-hover: rgba(255,255,255,0.10);
+      --bg-glass-strong: rgba(255,255,255,0.12);
+      --border-glass: rgba(255,255,255,0.08);
+      --border-glass-hover: rgba(255,255,255,0.18);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-dim: rgba(255,255,255,0.35);
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.35);
+      --accent-secondary: #50e3c2;
+      --accent-warm: #f5a623;
+      --accent-danger: #ef4444;
+      /* Badge category colors */
+      --badge-navy: #1B2A4A;
+      --badge-indigo: #4B0082;
+      --badge-emerald: #10B981;
+      --badge-amber: #F59E0B;
+      --badge-gold: #D4A017;
+      --badge-slate: #64748B;
+      --badge-purple: #7C3AED;
+      --badge-teal: #14B8A6;
+      --badge-crimson: #DC2626;
+      /* Trust grades */
+      --grade-a: #10B981;
+      --grade-b: #3B82F6;
+      --grade-c: #F59E0B;
+      --grade-d: #F97316;
+      --grade-f: #DC2626;
+      /* Tier colors */
+      --tier-us: #50e3c2;
+      --tier-allied: #6366f1;
+      --tier-high-risk: #ef4444;
+      --tier-unknown: #888;
+      --glass-blur: 24px;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-pill: 999px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+    a { color: var(--accent-secondary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Nav ── */
+    .nav {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 2rem;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(var(--glass-blur));
+      border-bottom: 1px solid var(--border-glass);
+      overflow-x: auto;
+    }
+    .nav-brand { font-weight: 700; font-size: 1.2rem; color: var(--accent-secondary); white-space: nowrap; }
+    .nav a { color: var(--text-secondary); font-size: .85rem; white-space: nowrap; padding: .3rem .6rem; border-radius: 8px; }
+    .nav a:hover, .nav a.active { color: var(--text-primary); background: var(--bg-glass); text-decoration: none; }
+    .nav a.active { color: var(--accent-secondary); }
+
+    /* ── Layout ── */
+    .main { flex: 1; padding: 2rem; max-width: 1500px; margin: 0 auto; width: 100%; }
+    .header { text-align: center; margin-bottom: 2rem; }
+    .header h1 { font-size: 2rem; font-weight: 700; }
+    .header h1 span { color: var(--accent-secondary); }
+    .header p { color: var(--text-secondary); margin-top: .5rem; font-size: .95rem; }
+
+    /* ── Grade Distribution Row ── */
+    .grade-row {
+      display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .grade-card {
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius); padding: 1rem 1.5rem; text-align: center;
+      min-width: 110px; transition: all .2s;
+    }
+    .grade-card:hover { background: var(--bg-glass-hover); border-color: var(--border-glass-hover); }
+    .grade-card .grade-letter { font-size: 2rem; font-weight: 800; }
+    .grade-card .grade-count { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); }
+    .grade-card .grade-label { font-size: .75rem; color: var(--text-secondary); margin-top: .2rem; }
+    .grade-a { color: var(--grade-a); border-color: rgba(16,185,129,.25); }
+    .grade-b { color: var(--grade-b); border-color: rgba(59,130,246,.25); }
+    .grade-c { color: var(--grade-c); border-color: rgba(245,158,11,.25); }
+    .grade-d { color: var(--grade-d); border-color: rgba(249,115,22,.25); }
+    .grade-f { color: var(--grade-f); border-color: rgba(220,38,38,.25); }
+
+    /* ── Stat Bar ── */
+    .stat-bar {
+      background: var(--bg-glass-strong); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm); padding: .75rem 1.2rem;
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.5rem; font-size: .85rem;
+      flex-wrap: wrap;
+    }
+    .stat-bar .stat-text { color: var(--text-secondary); flex: 1; min-width: 200px; }
+    .stat-bar .stat-text strong { color: var(--text-primary); }
+    .stat-bar .segment-pills { display: flex; gap: .4rem; flex-wrap: wrap; }
+    .stat-bar .seg-pill {
+      padding: .25rem .65rem; border-radius: var(--radius-pill);
+      font-size: .75rem; font-weight: 600; border: 1px solid transparent;
+    }
+    .seg-sovereign { background: rgba(80,227,194,.12); color: var(--tier-us); border-color: rgba(80,227,194,.25); }
+    .seg-allied { background: rgba(99,102,241,.12); color: var(--tier-allied); border-color: rgba(99,102,241,.25); }
+    .seg-high-risk { background: rgba(255,107,107,.12); color: var(--tier-high-risk); border-color: rgba(255,107,107,.25); }
+
+    /* ── Filter Pills ── */
+    .filter-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.5rem; justify-content: center; }
+    .pill {
+      padding: .4rem 1rem; border-radius: var(--radius-pill); border: 1px solid var(--border-glass);
+      background: var(--bg-glass); cursor: pointer; font-size: .85rem; color: var(--text-secondary);
+      transition: all .2s;
+    }
+    .pill:hover { background: var(--bg-glass-hover); color: var(--text-primary); border-color: var(--border-glass-hover); }
+    .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* ── Tool Grid ── */
+    .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1rem; }
+
+    /* ── Tool Card ── */
+    .tool-card {
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius); padding: 1.2rem;
+      transition: all .25s; cursor: pointer; position: relative;
+    }
+    .tool-card:hover { background: var(--bg-glass-hover); border-color: var(--border-glass-hover); transform: translateY(-2px); }
+    .tool-card.has-risk { border-left: 3px solid var(--badge-crimson); }
+
+    .tool-card .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: .6rem; }
+    .tool-card .tool-name { font-weight: 600; font-size: 1.05rem; flex: 1; }
+    .tool-card .trust-grade {
+      font-weight: 800; font-size: 1.1rem; padding: .15rem .5rem;
+      border-radius: 6px; line-height: 1;
+    }
+    .trust-grade-a { background: rgba(16,185,129,.15); color: var(--grade-a); }
+    .trust-grade-b { background: rgba(59,130,246,.15); color: var(--grade-b); }
+    .trust-grade-c { background: rgba(245,158,11,.15); color: var(--grade-c); }
+    .trust-grade-d { background: rgba(249,115,22,.15); color: var(--grade-d); }
+    .trust-grade-f { background: rgba(220,38,38,.15); color: var(--grade-f); }
+
+    .tool-card .trust-score-bar { margin-bottom: .6rem; }
+    .trust-bar-track { height: 5px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; position: relative; }
+    .trust-bar-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+    .trust-bar-label { display: flex; justify-content: space-between; font-size: .7rem; color: var(--text-dim); margin-top: .2rem; }
+
+    /* ── Badge Row ── */
+    .badge-row { display: flex; gap: .35rem; flex-wrap: wrap; margin-bottom: .5rem; }
+    .badge-chip {
+      display: inline-flex; align-items: center; gap: .25rem;
+      padding: .2rem .55rem; border-radius: var(--radius-pill);
+      font-size: .7rem; font-weight: 600; border: 1px solid transparent;
+      position: relative; cursor: default;
+    }
+    .badge-chip .badge-icon { font-size: .85rem; }
+    .badge-chip .badge-label { white-space: nowrap; }
+
+    /* Badge tooltip */
+    .badge-chip .badge-tip {
+      display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
+      transform: translateX(-50%); background: #1a1a2e; border: 1px solid var(--border-glass-hover);
+      border-radius: 8px; padding: .5rem .7rem; font-size: .72rem; font-weight: 400;
+      color: var(--text-primary); white-space: nowrap; z-index: 500;
+      pointer-events: none; box-shadow: 0 4px 20px rgba(0,0,0,.5);
+    }
+    .badge-chip .badge-tip::after {
+      content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+      border: 5px solid transparent; border-top-color: #1a1a2e;
+    }
+    .badge-chip:hover .badge-tip { display: block; }
+
+    /* Badge colors by category */
+    .badge-sovereignty { background: rgba(27,42,74,.35); color: #7ea8e0; border-color: rgba(27,42,74,.6); }
+    .badge-allied { background: rgba(75,0,130,.25); color: #b48aff; border-color: rgba(75,0,130,.5); }
+    .badge-training { background: rgba(16,185,129,.15); color: var(--badge-emerald); border-color: rgba(16,185,129,.3); }
+    .badge-conditional { background: rgba(245,158,11,.15); color: var(--badge-amber); border-color: rgba(245,158,11,.3); }
+    .badge-compliance { background: rgba(212,160,23,.15); color: var(--badge-gold); border-color: rgba(212,160,23,.3); }
+    .badge-resilience { background: rgba(100,116,139,.2); color: #8888aa; border-color: rgba(100,116,139,.35); }
+    .badge-portability { background: rgba(124,58,237,.15); color: #818cf8; border-color: rgba(124,58,237,.3); }
+    .badge-psr { background: rgba(20,184,166,.15); color: var(--badge-teal); border-color: rgba(20,184,166,.3); }
+    .badge-risk { background: rgba(220,38,38,.2); color: #f87171; border-color: rgba(220,38,38,.4); animation: pulse-risk 2s infinite; }
+    @keyframes pulse-risk { 0%,100% { opacity: 1; } 50% { opacity: .7; } }
+
+    .tool-card .card-summary { font-size: .8rem; color: var(--text-secondary); line-height: 1.4; }
+    .tool-card .card-summary .risk-text { color: #f87171; font-weight: 600; }
+
+    /* ── Badge Detail Panel (slide-in) ── */
+    .detail-panel {
+      position: fixed; right: -480px; top: 0; bottom: 0; width: 460px;
+      background: var(--bg-primary); border-left: 1px solid var(--border-glass);
+      padding: 0; overflow-y: auto; transition: right .3s ease; z-index: 200;
+      display: flex; flex-direction: column;
+    }
+    .detail-panel.open { right: 0; }
+    .detail-header {
+      padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border-glass);
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(0,0,0,0.3); backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .detail-header h2 { font-size: 1.15rem; font-weight: 700; }
+    .detail-header .trust-pill { font-size: .85rem; font-weight: 700; padding: .3rem .7rem; border-radius: 8px; }
+    .close-btn {
+      background: var(--bg-glass); border: 1px solid var(--border-glass); color: var(--text-primary);
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .close-btn:hover { background: var(--bg-glass-hover); }
+
+    .detail-body { padding: 1.2rem 1.5rem; flex: 1; }
+
+    /* Detail sections */
+    .detail-section { margin-bottom: 1.2rem; }
+    .detail-section h3 {
+      font-size: .85rem; font-weight: 600; color: var(--accent-secondary);
+      margin-bottom: .5rem; display: flex; align-items: center; gap: .4rem;
+    }
+    .detail-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .35rem 0; border-bottom: 1px solid var(--border-glass); font-size: .82rem;
+    }
+    .detail-row .label { color: var(--text-secondary); }
+    .detail-row .value { font-weight: 500; text-align: right; max-width: 55%; }
+    .detail-row .value.good { color: var(--badge-emerald); }
+    .detail-row .value.warn { color: var(--badge-amber); }
+    .detail-row .value.bad { color: var(--badge-crimson); }
+
+    /* Portability bar */
+    .port-bar-wrap { margin-top: .4rem; }
+    .port-bar-track { height: 8px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; }
+    .port-bar-fill { height: 100%; border-radius: 4px; transition: width .5s; }
+
+    /* Risk flags in panel */
+    .risk-flags { display: flex; flex-direction: column; gap: .4rem; }
+    .risk-flag-item {
+      display: flex; align-items: flex-start; gap: .5rem;
+      background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.2);
+      border-radius: var(--radius-sm); padding: .6rem .8rem; font-size: .8rem;
+    }
+    .risk-flag-item .flag-icon { font-size: 1rem; flex-shrink: 0; }
+    .risk-flag-item .flag-text { color: #fca5a5; line-height: 1.4; }
+
+    /* ── Badge Category Legend ── */
+    .legend-section { margin-top: 2rem; margin-bottom: 1.5rem; }
+    .legend-section h2 { text-align: center; margin-bottom: 1rem; font-size: 1.1rem; }
+    .legend-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: .6rem;
+    }
+    .legend-item {
+      display: flex; align-items: flex-start; gap: .7rem;
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm); padding: .7rem .9rem;
+    }
+    .legend-item .legend-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .legend-item .legend-text .legend-name { font-weight: 600; font-size: .85rem; }
+    .legend-item .legend-text .legend-desc { font-size: .75rem; color: var(--text-secondary); margin-top: .15rem; line-height: 1.35; }
+
+    /* ── Self-Label ── */
+    .self-label {
+      margin-top: 2rem; text-align: center; padding: 1.5rem;
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius);
+    }
+    .self-label .banner { font-size: 1.1rem; font-weight: 600; color: var(--accent-secondary); }
+    .self-label p { color: var(--text-secondary); font-size: .85rem; margin-top: .5rem; }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 3rem; color: var(--text-dim); }
+    .loading .spinner {
+      display: inline-block; width: 28px; height: 28px;
+      border: 2px solid var(--border-glass); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .grade-row { gap: .4rem; }
+      .grade-card { min-width: 80px; padding: .7rem; }
+      .grade-card .grade-letter { font-size: 1.4rem; }
+      .tool-grid { grid-template-columns: 1fr; }
+      .detail-panel { width: 100%; right: -100%; }
+      .legend-grid { grid-template-columns: 1fr; }
+      .stat-bar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav class="nav">
+  <span class="nav-brand">⚡ Praxis</span>
+  <a href="/static/home.html">Home</a>
+  <a href="/static/tools.html">Tools</a>
+  <a href="/static/differential.html">Diagnosis</a>
+  <a href="/static/trust_badges.html" class="active">Trust Badges</a>
+  <a href="/static/manifesto.html">Manifesto</a>
+</nav>
+
+<!-- ── Main Content ── -->
+<div class="main">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>🏅 <span>Trust Badge</span> Architecture</h1>
+    <p>9-category evaluation system — Elimination-first honesty for SMB AI tool selection</p>
+  </div>
+
+  <!-- Trust Grade Distribution -->
+  <div class="grade-row" id="grade-row">
+    <div class="grade-card grade-a">
+      <div class="grade-letter">A</div>
+      <div class="grade-count" id="grade-a-count">—</div>
+      <div class="grade-label">Excellent Trust</div>
+    </div>
+    <div class="grade-card grade-b">
+      <div class="grade-letter">B</div>
+      <div class="grade-count" id="grade-b-count">—</div>
+      <div class="grade-label">Good Trust</div>
+    </div>
+    <div class="grade-card grade-c">
+      <div class="grade-letter">C</div>
+      <div class="grade-count" id="grade-c-count">—</div>
+      <div class="grade-label">Moderate</div>
+    </div>
+    <div class="grade-card grade-d">
+      <div class="grade-letter">D</div>
+      <div class="grade-count" id="grade-d-count">—</div>
+      <div class="grade-label">Below Avg</div>
+    </div>
+    <div class="grade-card grade-f">
+      <div class="grade-letter">F</div>
+      <div class="grade-count" id="grade-f-count">—</div>
+      <div class="grade-label">Failing</div>
+    </div>
+  </div>
+
+  <!-- Dynamic Results Stat Bar -->
+  <div class="stat-bar" id="stat-bar">
+    <div class="stat-text">Loading trust badge data…</div>
+  </div>
+
+  <!-- Segment / Tier Filter -->
+  <div class="filter-row" id="tier-filters">
+    <button class="pill active" data-tier="all">All Tools</button>
+    <button class="pill" data-tier="sovereign">✓ US-Controlled</button>
+    <button class="pill" data-tier="allied">🛡 Allied</button>
+    <button class="pill" data-tier="high_risk">🚩 High-Risk</button>
+    <button class="pill" data-tier="risk_flagged">⛔ Elimination Flagged</button>
+  </div>
+
+  <!-- Tool Grid -->
+  <div class="tool-grid" id="tool-grid">
+    <div class="loading"><div class="spinner"></div><br>Computing trust badges…</div>
+  </div>
+
+  <!-- Badge Category Legend -->
+  <div class="legend-section">
+    <h2>📋 Badge Category Reference</h2>
+    <div class="legend-grid" id="legend-grid">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- Praxis Self-Label -->
+  <div class="self-label" id="self-label">
+    <div class="banner">🏷 Praxis practices what it preaches</div>
+    <p>Praxis self-evaluates using the same 9-category trust badge system it applies to every tool.</p>
+    <p style="margin-top:.5rem;color:var(--tier-us)">Zero training on user data · Ephemeral retention · Open-weight architecture</p>
+  </div>
+
+</div>
+
+<!-- ── Badge Detail Panel ── -->
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-header">
+    <div>
+      <h2 id="detail-tool-name">Tool Name</h2>
+    </div>
+    <div style="display:flex;align-items:center;gap:.6rem;">
+      <span class="trust-pill" id="detail-trust-pill">—</span>
+      <button class="close-btn" onclick="closeDetail()">×</button>
+    </div>
+  </div>
+  <div class="detail-body" id="detail-body">
+    <div class="loading"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<script>
+const API = '';
+
+// ── State ──
+let allTools = [];
+let categories = {};
+let currentFilter = 'all';
+
+// ── Color mappings ──
+const GRADE_COLORS = { A: '#10B981', B: '#3B82F6', C: '#F59E0B', D: '#F97316', F: '#DC2626' };
+const BADGE_CSS = {
+  sovereignty_tier: 'badge-sovereignty',
+  safe_harbor_origin: 'badge-allied',
+  training_privacy: 'badge-training',
+  training_lock: 'badge-training',
+  training_opt_out: 'badge-conditional',
+  compliance_verif: 'badge-compliance',
+  uptime_resilience: 'badge-resilience',
+  portability_score: 'badge-portability',
+  psr_metric: 'badge-psr',
+  risk_flag: 'badge-risk',
+};
+const BADGE_ICONS = {
+  sovereignty_tier: '🛡️',
+  safe_harbor_origin: '🤝',
+  training_privacy: '🔒',
+  training_lock: '🔒',
+  training_opt_out: '⚠️',
+  compliance_verif: '🏆',
+  uptime_resilience: '⚡',
+  portability_score: '📦',
+  psr_metric: '🎯',
+  risk_flag: '🚩',
+};
+
+// ── Utility ──
+function gradeClass(g) { return `trust-grade-${g.toLowerCase()}`; }
+function trustBarColor(score) {
+  if (score >= 80) return 'var(--grade-a)';
+  if (score >= 65) return 'var(--grade-b)';
+  if (score >= 50) return 'var(--grade-c)';
+  if (score >= 35) return 'var(--grade-d)';
+  return 'var(--grade-f)';
+}
+function portBarColor(score) {
+  if (score >= 7) return 'var(--badge-emerald)';
+  if (score >= 4) return 'var(--badge-amber)';
+  return 'var(--badge-crimson)';
+}
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// ── Load Everything ──
+async function init() {
+  await Promise.all([loadCategories(), loadDashboard(), loadStatBar()]);
+}
+
+// ── Load Badge Categories ──
+async function loadCategories() {
+  try {
+    const resp = await fetch(`${API}/trust-badges/categories`);
+    const data = await resp.json();
+    categories = data.categories || {};
+    renderLegend();
+  } catch (e) { console.error('Categories load failed:', e); }
+}
+
+function renderLegend() {
+  const grid = document.getElementById('legend-grid');
+  const cats = Object.entries(categories);
+  if (!cats.length) { grid.innerHTML = '<p style="color:var(--text-dim)">No categories loaded.</p>'; return; }
+  grid.innerHTML = cats.map(([key, cat]) => `
+    <div class="legend-item">
+      <span class="legend-icon">${cat.icon || '?'}</span>
+      <div class="legend-text">
+        <div class="legend-name">${escHtml(cat.label)}</div>
+        <div class="legend-desc">${escHtml(cat.description || '')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Load Dashboard ──
+async function loadDashboard() {
+  try {
+    const resp = await fetch(`${API}/trust-badges/dashboard`);
+    const data = await resp.json();
+
+    // Grade distribution
+    const dist = data.summary?.grade_distribution || data.summary?.trust_distribution || {};
+    document.getElementById('grade-a-count').textContent = dist.A || 0;
+    document.getElementById('grade-b-count').textContent = dist.B || 0;
+    document.getElementById('grade-c-count').textContent = dist.C || 0;
+    document.getElementById('grade-d-count').textContent = dist.D || 0;
+    document.getElementById('grade-f-count').textContent = dist.F || 0;
+
+    allTools = data.tools || [];
+    renderGrid();
+  } catch (e) {
+    document.getElementById('tool-grid').innerHTML =
+      `<p style="color:var(--accent-danger)">Failed to load dashboard: ${escHtml(e.message)}</p>`;
+  }
+}
+
+// ── Load Stat Bar ──
+async function loadStatBar() {
+  try {
+    const resp = await fetch(`${API}/trust-badges/stat-bar`);
+    const data = await resp.json();
+    const bar = document.getElementById('stat-bar');
+    const segs = data.segment_counts || {};
+    bar.innerHTML = `
+      <div class="stat-text">
+        <strong>${data.visible_count ?? data.total_results}</strong> of <strong>${data.total_results}</strong> tools shown.
+        ${data.hidden_count ? `<span style="color:var(--accent-warm)">${data.hidden_count} hidden (${(data.hidden_reasons || []).join(', ')})</span>` : ''}
+      </div>
+      <div class="segment-pills">
+        <span class="seg-pill seg-sovereign">✓ ${segs.us_controlled || 0} Sovereign</span>
+        <span class="seg-pill seg-allied">🛡 ${segs.allied || 0} Allied</span>
+        <span class="seg-pill seg-high-risk">🚩 ${segs.high_risk || 0} High-Risk</span>
+      </div>
+    `;
+  } catch (e) {
+    document.getElementById('stat-bar').innerHTML =
+      `<div class="stat-text" style="color:var(--accent-danger)">Stat bar error: ${escHtml(e.message)}</div>`;
+  }
+}
+
+// ── Render Tool Grid ──
+function renderGrid() {
+  const grid = document.getElementById('tool-grid');
+  let filtered = allTools;
+
+  if (currentFilter === 'sovereign') {
+    filtered = allTools.filter(t => {
+      const badges = t.primary_badges || [];
+      return badges.some(b => b.key === 'sovereignty_tier' && b.detail?.includes?.('sovereign'));
+    });
+    // Fallback: filter by grade
+    if (!filtered.length) filtered = allTools.filter(t => t.trust_grade === 'A');
+  } else if (currentFilter === 'allied') {
+    filtered = allTools.filter(t => {
+      const badges = t.primary_badges || [];
+      return badges.some(b => b.key === 'safe_harbor_origin');
+    });
+  } else if (currentFilter === 'high_risk') {
+    filtered = allTools.filter(t => t.has_risk_flag);
+  } else if (currentFilter === 'risk_flagged') {
+    filtered = allTools.filter(t => t.risk_flag_count > 0);
+  }
+
+  if (!filtered.length) {
+    grid.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:2rem">No tools match this filter.</p>';
+    return;
+  }
+
+  // Sort: A→F, then score desc
+  const gradeOrder = { A: 0, B: 1, C: 2, D: 3, F: 4 };
+  filtered.sort((a, b) => {
+    const gd = (gradeOrder[a.trust_grade] ?? 5) - (gradeOrder[b.trust_grade] ?? 5);
+    if (gd !== 0) return gd;
+    return (b.trust_score || 0) - (a.trust_score || 0);
+  });
+
+  grid.innerHTML = filtered.map(t => {
+    const grade = t.trust_grade || 'F';
+    const score = t.trust_score || 0;
+    const badges = t.primary_badges || [];
+    const hasRisk = t.has_risk_flag;
+    const riskCount = t.risk_flag_count || 0;
+
+    const badgeChips = badges.map(b => {
+      const cssClass = BADGE_CSS[b.key] || BADGE_CSS[b.category] || 'badge-sovereignty';
+      const icon = b.icon || BADGE_ICONS[b.key] || BADGE_ICONS[b.category] || '🏷';
+      const label = b.label || b.key;
+      const tip = b.detail || b.description || label;
+      return `<span class="badge-chip ${cssClass}">
+        <span class="badge-icon">${icon}</span>
+        <span class="badge-label">${escHtml(label)}</span>
+        <span class="badge-tip">${escHtml(tip)}</span>
+      </span>`;
+    }).join('');
+
+    const riskBadge = hasRisk
+      ? `<span class="badge-chip badge-risk"><span class="badge-icon">🚩</span><span class="badge-label">${riskCount} flag${riskCount !== 1 ? 's' : ''}</span></span>`
+      : '';
+
+    const summary = t.summary || '';
+    const summaryHtml = hasRisk
+      ? `<div class="card-summary"><span class="risk-text">${escHtml(summary)}</span></div>`
+      : `<div class="card-summary">${escHtml(summary)}</div>`;
+
+    return `
+      <div class="tool-card ${hasRisk ? 'has-risk' : ''}" onclick="showDetail('${escHtml(t.tool_name)}')">
+        <div class="card-top">
+          <span class="tool-name">${escHtml(t.tool_name)}</span>
+          <span class="trust-grade ${gradeClass(grade)}">${grade}</span>
+        </div>
+        <div class="trust-score-bar">
+          <div class="trust-bar-track">
+            <div class="trust-bar-fill" style="width:${score}%;background:${trustBarColor(score)}"></div>
+          </div>
+          <div class="trust-bar-label">
+            <span>Trust Score</span>
+            <span>${score}/100</span>
+          </div>
+        </div>
+        <div class="badge-row">${badgeChips}${riskBadge}</div>
+        ${summaryHtml}
+      </div>`;
+  }).join('');
+}
+
+// ── Tier Filtering ──
+document.getElementById('tier-filters').addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  document.querySelectorAll('#tier-filters .pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  currentFilter = pill.dataset.tier;
+  renderGrid();
+});
+
+// ── Detail Panel ──
+async function showDetail(toolName) {
+  const panel = document.getElementById('detail-panel');
+  const body = document.getElementById('detail-body');
+  const titleEl = document.getElementById('detail-tool-name');
+  const pillEl = document.getElementById('detail-trust-pill');
+
+  titleEl.textContent = toolName;
+  pillEl.textContent = '…';
+  pillEl.className = 'trust-pill';
+  body.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  panel.classList.add('open');
+
+  try {
+    // Fetch badge detail, portability, and risk assessment in parallel
+    const [badgeResp, portResp, riskResp] = await Promise.all([
+      fetch(`${API}/trust-badges/tool/${encodeURIComponent(toolName)}`),
+      fetch(`${API}/portability/tool/${encodeURIComponent(toolName)}`),
+      fetch(`${API}/risk/badge-assessment/${encodeURIComponent(toolName)}`),
+    ]);
+
+    const badge = await badgeResp.json();
+    const port = await portResp.json();
+    const risk = await riskResp.json();
+
+    if (badge.error) {
+      body.innerHTML = `<p style="color:var(--accent-danger)">${escHtml(badge.error)}</p>`;
+      return;
+    }
+
+    // Trust pill
+    const grade = badge.trust_grade || 'F';
+    const score = badge.trust_score || 0;
+    pillEl.textContent = `${grade} · ${score}`;
+    pillEl.className = `trust-pill ${gradeClass(grade)}`;
+
+    // Build detail sections
+    let html = '';
+
+    // ── Trust Score Section ──
+    html += `<div class="detail-section">
+      <h3>📊 Trust Score Breakdown</h3>
+      <div class="trust-score-bar" style="margin-bottom:.8rem">
+        <div class="trust-bar-track" style="height:8px">
+          <div class="trust-bar-fill" style="width:${score}%;background:${trustBarColor(score)}"></div>
+        </div>
+        <div class="trust-bar-label">
+          <span>Composite Trust</span>
+          <span style="font-weight:600;color:${GRADE_COLORS[grade]}">${score}/100 (${grade})</span>
+        </div>
+      </div>
+      <div class="detail-row"><span class="label">Badges Earned</span><span class="value">${badge.badge_count || 0}</span></div>
+      <div class="detail-row"><span class="label">Risk Flags</span><span class="value ${badge.risk_flag_count ? 'bad' : 'good'}">${badge.risk_flag_count || 0}</span></div>
+      <div class="detail-row"><span class="label">Computed</span><span class="value">${(badge.computed_at || '').replace('T', ' ').slice(0, 19)}</span></div>
+    </div>`;
+
+    // ── Individual Badges ──
+    const badges = badge.badges || {};
+    html += `<div class="detail-section"><h3>🏅 Badge Details</h3>`;
+    for (const [key, val] of Object.entries(badges)) {
+      if (!val) continue;
+      const icon = BADGE_ICONS[key] || '🏷';
+      const catLabel = categories[key]?.label || key.replace(/_/g, ' ');
+      const cssClass = BADGE_CSS[key] || '';
+
+      html += `<div style="background:var(--bg-glass);border:1px solid var(--border-glass);border-radius:var(--radius-sm);padding:.7rem;margin-bottom:.5rem">`;
+      html += `<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem">
+        <span class="badge-chip ${cssClass}" style="font-size:.75rem">${icon} ${escHtml(catLabel)}</span>
+      </div>`;
+
+      // Render badge-specific fields
+      if (val.tier) html += `<div class="detail-row"><span class="label">Tier</span><span class="value">${escHtml(val.tier)}</span></div>`;
+      if (val.jurisdiction) html += `<div class="detail-row"><span class="label">Jurisdiction</span><span class="value">${escHtml(val.jurisdiction)}</span></div>`;
+      if (val.hosting_verified !== undefined) html += `<div class="detail-row"><span class="label">Hosting Verified</span><span class="value ${val.hosting_verified ? 'good' : 'warn'}">${val.hosting_verified ? '✓ Yes' : '✗ No'}</span></div>`;
+      if (val.training_policy) html += `<div class="detail-row"><span class="label">Training Policy</span><span class="value ${val.training_policy === 'none' ? 'good' : val.training_policy === 'opt_out' ? 'warn' : 'bad'}">${escHtml(val.training_policy)}</span></div>`;
+      if (val.opt_out_verified !== undefined) html += `<div class="detail-row"><span class="label">Opt-Out Verified</span><span class="value ${val.opt_out_verified ? 'good' : 'warn'}">${val.opt_out_verified ? '✓ Yes' : '✗ No'}</span></div>`;
+      if (val.compliance_list) html += `<div class="detail-row"><span class="label">Certifications</span><span class="value">${escHtml((val.compliance_list || []).join(', '))}</span></div>`;
+      if (val.weighted_score !== undefined) html += `<div class="detail-row"><span class="label">Weighted Score</span><span class="value">${val.weighted_score}</span></div>`;
+      if (val.uptime_tier) html += `<div class="detail-row"><span class="label">Uptime Tier</span><span class="value">Tier ${val.uptime_tier}</span></div>`;
+      if (val.sla_percent) html += `<div class="detail-row"><span class="label">SLA</span><span class="value">${val.sla_percent}%</span></div>`;
+      if (val.score !== undefined && key === 'portability_score') html += `<div class="detail-row"><span class="label">Portability</span><span class="value" style="color:${portBarColor(val.score)}">${val.score}/10</span></div>`;
+      if (val.psr !== undefined) html += `<div class="detail-row"><span class="label">PSR</span><span class="value">${(val.psr * 100).toFixed(1)}%</span></div>`;
+      if (val.oqs !== undefined) html += `<div class="detail-row"><span class="label">OQS</span><span class="value">${(val.oqs * 100).toFixed(1)}%</span></div>`;
+      if (val.status) html += `<div class="detail-row"><span class="label">Status</span><span class="value">${escHtml(val.status)}</span></div>`;
+      if (val.flag_count) html += `<div class="detail-row"><span class="label">Flag Count</span><span class="value bad">${val.flag_count}</span></div>`;
+      if (val.reasons) html += `<div class="detail-row"><span class="label">Reasons</span><span class="value bad" style="font-size:.75rem">${escHtml((val.reasons || []).join('; '))}</span></div>`;
+      if (val.recommendation) html += `<div class="detail-row"><span class="label">Recommendation</span><span class="value" style="font-size:.75rem">${escHtml(val.recommendation)}</span></div>`;
+
+      html += `</div>`;
+    }
+    html += `</div>`;
+
+    // ── Portability Section ──
+    if (port && !port.error) {
+      const ps = port.score ?? port.portability_score ?? 0;
+      const maxScore = port.max_score || 10;
+      const pct = (ps / maxScore) * 100;
+      html += `<div class="detail-section">
+        <h3>📦 Exit Portability</h3>
+        <div class="port-bar-wrap">
+          <div class="port-bar-track">
+            <div class="port-bar-fill" style="width:${pct}%;background:${portBarColor(ps)}"></div>
+          </div>
+          <div class="trust-bar-label"><span>Score</span><span style="color:${portBarColor(ps)};font-weight:600">${ps}/${maxScore}</span></div>
+        </div>`;
+      if (port.eu_data_act_compliant !== undefined) html += `<div class="detail-row"><span class="label">EU Data Act</span><span class="value ${port.eu_data_act_compliant ? 'good' : 'bad'}">${port.eu_data_act_compliant ? '✓ Compliant' : '✗ Non-compliant'}</span></div>`;
+      if (port.export_format_score !== undefined) html += `<div class="detail-row"><span class="label">Export Formats</span><span class="value">${port.export_format_score}/4</span></div>`;
+      if (port.timeline_score !== undefined) html += `<div class="detail-row"><span class="label">Export Timeline</span><span class="value">${port.timeline_score}/3</span></div>`;
+      if (port.financial_score !== undefined) html += `<div class="detail-row"><span class="label">Exit Cost</span><span class="value">${port.financial_score}/3</span></div>`;
+      if (port.elimination_triggered) html += `<div style="margin-top:.5rem;padding:.5rem;background:rgba(220,38,38,.1);border-radius:6px;color:#f87171;font-size:.8rem;text-align:center">⛔ Elimination triggered — portability score ≤ 3</div>`;
+      html += `</div>`;
+    }
+
+    // ── Risk Assessment Section ──
+    if (risk && !risk.error) {
+      const flags = risk.risk_flags || risk.flags || [];
+      if (flags.length || risk.elimination_risk !== undefined) {
+        html += `<div class="detail-section"><h3>🚩 Risk Assessment</h3>`;
+        if (risk.elimination_risk !== undefined) {
+          const riskPct = ((risk.elimination_risk || 0) * 100).toFixed(0);
+          html += `<div class="detail-row"><span class="label">Elimination Risk</span><span class="value ${risk.elimination_risk > 0.5 ? 'bad' : risk.elimination_risk > 0.2 ? 'warn' : 'good'}">${riskPct}%</span></div>`;
+        }
+        if (risk.badge_summary) {
+          html += `<div class="detail-row"><span class="label">Badge Trust Score</span><span class="value">${risk.badge_summary.trust_score || '—'}</span></div>`;
+          html += `<div class="detail-row"><span class="label">Badge Trust Grade</span><span class="value">${risk.badge_summary.trust_grade || '—'}</span></div>`;
+        }
+        if (flags.length) {
+          html += `<div class="risk-flags" style="margin-top:.5rem">`;
+          flags.forEach(f => {
+            const text = typeof f === 'string' ? f : (f.description || f.reason || f.code || JSON.stringify(f));
+            html += `<div class="risk-flag-item"><span class="flag-icon">🚩</span><span class="flag-text">${escHtml(text)}</span></div>`;
+          });
+          html += `</div>`;
+        }
+        html += `</div>`;
+      }
+    }
+
+    // ── Summary ──
+    if (badge.summary) {
+      html += `<div class="detail-section">
+        <h3>📝 Summary</h3>
+        <p style="font-size:.82rem;color:var(--text-secondary);line-height:1.5">${escHtml(badge.summary)}</p>
+      </div>`;
+    }
+
+    body.innerHTML = html;
+  } catch (e) {
+    body.innerHTML = `<p style="color:var(--accent-danger);padding:1rem">Failed to load details: ${escHtml(e.message)}</p>`;
+  }
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+}
+
+// Close panel on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeDetail();
+});
+
+// Close panel on outside click
+document.addEventListener('click', e => {
+  const panel = document.getElementById('detail-panel');
+  if (panel.classList.contains('open') && !panel.contains(e.target) && !e.target.closest('.tool-card')) {
+    closeDetail();
+  }
+});
+
+// ── Tooltip 150ms delay ──
+document.addEventListener('mouseover', e => {
+  const chip = e.target.closest('.badge-chip');
+  if (!chip) return;
+  const tip = chip.querySelector('.badge-tip');
+  if (!tip) return;
+  chip._tipTimer = setTimeout(() => { tip.style.display = 'block'; }, 150);
+});
+document.addEventListener('mouseout', e => {
+  const chip = e.target.closest('.badge-chip');
+  if (!chip) return;
+  clearTimeout(chip._tipTimer);
+  const tip = chip.querySelector('.badge-tip');
+  if (tip) tip.style.display = 'none';
+});
+
+// ── Init ──
+init();
+</script>
+</body>
+</html>

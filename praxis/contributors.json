@@ -1,0 +1,76 @@
+{
+  "test_contributor": {
+    "contributor_id": "20498b9e49",
+    "display_name": "test_contributor",
+    "email": "",
+    "submissions_count": 40,
+    "approved_count": 0,
+    "badges": [],
+    "joined_at": 1771703108.2518916,
+    "reputation_score": 0.0
+  },
+  "contributor_y": {
+    "contributor_id": "de72c59804",
+    "display_name": "contributor_y",
+    "email": "",
+    "submissions_count": 40,
+    "approved_count": 0,
+    "badges": [],
+    "joined_at": 1771703108.294833,
+    "reputation_score": 0.0
+  },
+  "z_contributor": {
+    "contributor_id": "936007945c",
+    "display_name": "z_contributor",
+    "email": "",
+    "submissions_count": 40,
+    "approved_count": 0,
+    "badges": [],
+    "joined_at": 1771703108.3198497,
+    "reputation_score": 0.0
+  },
+  "good_contributor": {
+    "contributor_id": "9abe185569",
+    "display_name": "good_contributor",
+    "email": "",
+    "submissions_count": 40,
+    "approved_count": 40,
+    "badges": [
+      "first_contribution",
+      "prolific_contributor",
+      "trusted_expert"
+    ],
+    "joined_at": 1771703108.3486357,
+    "reputation_score": 400.0
+  },
+  "bad_contributor": {
+    "contributor_id": "14b43c6292",
+    "display_name": "bad_contributor",
+    "email": "",
+    "submissions_count": 40,
+    "approved_count": 0,
+    "badges": [],
+    "joined_at": 1771703108.3996372,
+    "reputation_score": 0.0
+  },
+  "change_contributor": {
+    "contributor_id": "6ad00a08f3",
+    "display_name": "change_contributor",
+    "email": "",
+    "submissions_count": 40,
+    "approved_count": 0,
+    "badges": [],
+    "joined_at": 1771703108.4413605,
+    "reputation_score": 0.0
+  },
+  "prof_test_user": {
+    "contributor_id": "9ceb66c816",
+    "display_name": "prof_test_user",
+    "email": "",
+    "submissions_count": 40,
+    "approved_count": 0,
+    "badges": [],
+    "joined_at": 1771703108.481622,
+    "reputation_score": 0.0
+  }
+}

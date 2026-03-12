@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Praxis — Cognitive Dashboard</title>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:rgba(255,255,255,0.035);--surface-hover:rgba(255,255,255,0.055);
+  --elevated:rgba(255,255,255,0.06);--border:rgba(255,255,255,0.06);
+  --text:#f0f0f5;--muted:rgba(255,255,255,0.50);--dim:rgba(255,255,255,0.30);
+  --accent:#6366f1;--accent-glow:rgba(99,102,241,0.30);--secondary:#50e3c2;
+  --warn:#fb923c;--danger:#ef4444;--success:#34d399;--info:#38bdf8;
+  --shadow-card:0 2px 20px rgba(0,0,0,0.28),0 0 0 1px rgba(255,255,255,0.04);
+  --radius:12px;--radius-lg:16px;--radius-pill:999px;
+  --ease:cubic-bezier(0.16,1,0.3,1);--fast:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+
+/* Aurora */
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(140px);opacity:0.18;animation:af 20s ease-in-out infinite alternate;}
+.aurora::before{width:500px;height:500px;background:radial-gradient(circle,#6366f1 0%,transparent 70%);top:-12%;left:-6%;}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#50e3c2 0%,transparent 70%);bottom:-15%;right:-6%;animation-delay:-9s;}
+@keyframes af{0%{transform:translate(0,0) scale(1);}50%{transform:translate(25px,-18px) scale(1.06);}100%{transform:translate(-18px,10px) scale(0.96);}}
+
+.container{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:2;}
+
+/* Header */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#f0f0f5 30%,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.page-header .subtitle{color:var(--muted);font-size:0.9rem;}
+
+/* Nav */
+.nav{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.nav a{padding:0.4rem 1rem;background:var(--surface);color:var(--muted);text-decoration:none;border-radius:var(--radius-pill);font-size:0.8rem;font-weight:500;transition:all var(--fast);backdrop-filter:blur(12px);}
+.nav a:hover,.nav a.active{background:var(--surface-hover);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.nav a.active{border:1px solid var(--accent);color:var(--accent);}
+
+/* Dashboard Grid */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:1024px){.grid-3{grid-template-columns:1fr;}.grid-2{grid-template-columns:1fr;}}
+
+/* Cards */
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);transition:all var(--fast);}
+.card:hover{box-shadow:0 8px 40px rgba(99,102,241,0.14),0 0 0 1px rgba(255,255,255,0.08);}
+.card-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+
+/* Phi Gauge */
+.phi-gauge{text-align:center;padding:2rem;}
+.phi-value{font-size:4rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.phi-label{font-size:0.85rem;color:var(--muted);margin-top:0.5rem;}
+.phi-bar{height:8px;background:rgba(255,255,255,0.06);border-radius:4px;margin-top:1rem;overflow:hidden;}
+.phi-bar-fill{height:100%;border-radius:4px;transition:width 1s var(--ease);}
+
+/* Agent List */
+.agent-row{display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border);}
+.agent-row:last-child{border-bottom:none;}
+.agent-status{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.agent-status.active{background:var(--success);box-shadow:0 0 8px rgba(52,211,153,0.4);}
+.agent-status.idle{background:var(--warn);}
+.agent-status.offline{background:var(--danger);}
+.agent-name{font-size:0.88rem;font-weight:600;flex:1;}
+.agent-role{font-size:0.75rem;color:var(--muted);flex:1;}
+.agent-tokens{font-size:0.8rem;color:var(--dim);font-variant-numeric:tabular-nums;}
+
+/* Spotlight */
+.spotlight-item{background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(80,227,194,0.05));border:1px solid rgba(99,102,241,0.15);border-radius:var(--radius);padding:1rem;margin-bottom:0.75rem;transition:all var(--fast);}
+.spotlight-item:hover{border-color:var(--accent);transform:translateY(-1px);}
+.spotlight-priority{display:inline-block;padding:0.15rem 0.5rem;border-radius:var(--radius-pill);font-size:0.7rem;font-weight:700;background:rgba(99,102,241,0.2);color:var(--accent);margin-bottom:0.4rem;}
+.spotlight-event{font-size:0.85rem;margin-bottom:0.3rem;}
+.spotlight-agent{font-size:0.75rem;color:var(--muted);}
+
+/* Entropy */
+.entropy-meter{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;}
+.entropy-label{font-size:0.85rem;color:var(--muted);min-width:80px;}
+.entropy-bar{flex:1;height:24px;background:rgba(255,255,255,0.04);border-radius:12px;overflow:hidden;position:relative;}
+.entropy-fill{height:100%;border-radius:12px;transition:width 1s var(--ease);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:0.7rem;font-weight:700;color:#000;}
+.entropy-threshold{position:absolute;top:0;bottom:0;width:2px;background:var(--warn);z-index:1;}
+
+/* Reduction Plan */
+.plan-item{display:flex;align-items:flex-start;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.85rem;}
+.plan-item:last-child{border-bottom:none;}
+.plan-icon{font-size:1rem;flex-shrink:0;margin-top:0.1rem;}
+.plan-text{color:var(--muted);}
+.plan-text strong{color:var(--text);}
+
+/* Broadcast Feed */
+.broadcast{padding:0.6rem 0.8rem;border-left:3px solid var(--accent);margin-bottom:0.5rem;background:rgba(99,102,241,0.04);border-radius:0 var(--radius) var(--radius) 0;font-size:0.82rem;}
+.broadcast .bc-time{font-size:0.7rem;color:var(--dim);font-variant-numeric:tabular-nums;}
+.broadcast .bc-type{color:var(--secondary);font-weight:600;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.2rem;border:none;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all var(--fast);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#818cf8);color:#fff;box-shadow:0 2px 16px var(--accent-glow);}
+.btn-primary:hover{box-shadow:0 6px 24px rgba(99,102,241,0.40);transform:translateY(-1px);}
+.btn-ghost{background:var(--surface);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.12);}
+
+/* Loading */
+.loading{text-align:center;padding:3rem;color:var(--dim);}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:0.5rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Stat badge */
+.stat-badge{display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.6rem;border-radius:var(--radius-pill);font-size:0.75rem;font-weight:600;}
+.stat-badge.green{background:rgba(52,211,153,0.12);color:var(--success);}
+.stat-badge.amber{background:rgba(251,146,60,0.12);color:var(--warn);}
+.stat-badge.red{background:rgba(251,113,133,0.12);color:var(--danger);}
+.stat-badge.blue{background:rgba(56,189,248,0.12);color:var(--info);}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1>Cognitive Dashboard</h1>
+      <span class="subtitle">Global Workspace Theory · Integrated Information (Φ) · Structural Entropy</span>
+    </div>
+    <nav class="nav">
+      <a href="/static/home.html">Home</a>
+      <a href="/static/cognitive-dashboard.html" class="active">Cognitive</a>
+      <a href="/static/agent-orchestration.html">Agents</a>
+      <a href="/static/knowledge-explorer.html">Knowledge</a>
+      <a href="/static/observability-console.html">Observability</a>
+      <a href="/static/governance-center.html">Governance</a>
+      <a href="/static/economics-hub.html">Economics</a>
+      <a href="/static/fort-knox.html">Fort Knox</a>
+      <a href="/static/pipeline.html">Pipeline</a>
+    </nav>
+  </div>
+
+  <!-- Top Stats Row -->
+  <div class="grid-3">
+    <!-- Phi Gauge -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Integrated Information (Φ)</div>
+      <div class="phi-gauge">
+        <div class="phi-value" id="phiValue">—</div>
+        <div class="phi-label" id="phiInterpretation">Loading…</div>
+        <div class="phi-bar"><div class="phi-bar-fill" id="phiBar" style="width:0%;background:var(--accent);"></div></div>
+      </div>
+      <div style="text-align:center;margin-top:0.5rem;">
+        <span class="stat-badge blue" id="phiRisk">—</span>
+      </div>
+    </div>
+
+    <!-- Workspace State -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--secondary);"></span>Workspace State</div>
+      <div id="workspaceStats" class="loading"><div class="spinner"></div><br>Connecting…</div>
+    </div>
+
+    <!-- Entropy Monitor -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--warn);"></span>Structural Entropy</div>
+      <div id="entropyPanel" class="loading"><div class="spinner"></div><br>Analyzing…</div>
+    </div>
+  </div>
+
+  <!-- Middle Row -->
+  <div class="grid-2">
+    <!-- Active Agents -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--success);"></span>Registered Agents</div>
+      <div id="agentList" class="loading"><div class="spinner"></div><br>Discovering…</div>
+    </div>
+
+    <!-- Spotlight Competition -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--info);"></span>Spotlight — Top Broadcasts</div>
+      <div id="spotlightList" class="loading"><div class="spinner"></div><br>Competing…</div>
+    </div>
+  </div>
+
+  <!-- Bottom Row -->
+  <div class="grid-2">
+    <!-- Broadcast Feed -->
+    <div class="card" style="max-height:400px;overflow-y:auto;">
+      <div class="card-title"><span class="dot"></span>Live Broadcast Feed</div>
+      <div id="broadcastFeed">
+        <div style="color:var(--dim);font-size:0.85rem;">No broadcasts yet. Agents will broadcast events here.</div>
+      </div>
+    </div>
+
+    <!-- Entropy Reduction Plan -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--secondary);"></span>Entropy Reduction Plan</div>
+      <div id="reductionPlan" class="loading"><div class="spinner"></div><br>Computing…</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div style="display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;">
+    <button class="btn btn-primary" onclick="refreshAll()">↻ Refresh All</button>
+    <button class="btn btn-ghost" onclick="registerDemoAgent()">+ Register Demo Agent</button>
+    <button class="btn btn-ghost" onclick="submitDemoBroadcast()">⚡ Submit Broadcast</button>
+  </div>
+</div>
+
+<script>
+const API=window.location.origin;
+let demoCounter=0;
+
+async function fetchJSON(url,opts){
+  try{const r=await fetch(API+url,opts);if(!r.ok)throw new Error(r.status);return await r.json();}
+  catch(e){console.warn('fetch error:',url,e);return null;}
+}
+
+function phiColor(v){
+  if(v>=1.0)return'var(--success)';if(v>=0.5)return'var(--info)';
+  if(v>=0.1)return'var(--warn)';return'var(--danger)';
+}
+
+async function loadCognitiveSummary(){
+  const d=await fetchJSON('/v21/cognitive/summary');
+  if(!d||d.error){
+    document.getElementById('phiValue').textContent='N/A';
+    document.getElementById('phiInterpretation').textContent='Service unavailable';
+    return;
+  }
+
+  // Phi
+  const ws=d.workspace||{};
+  const phi=ws.phi||{};
+  const phiVal=phi.phi!==undefined?phi.phi:0;
+  const pct=Math.min(phiVal/2*100,100);
+  document.getElementById('phiValue').textContent=phiVal.toFixed(3);
+  document.getElementById('phiBar').style.width=pct+'%';
+  document.getElementById('phiBar').style.background=phiColor(phiVal);
+  document.getElementById('phiInterpretation').textContent=phi.interpretation||'No data';
+  const riskEl=document.getElementById('phiRisk');
+  riskEl.textContent=phi.risk_level||'unknown';
+  riskEl.className='stat-badge '+(phi.risk_level==='minimal'?'green':phi.risk_level==='low'?'blue':phi.risk_level==='medium'?'amber':'red');
+
+  // Workspace stats
+  renderWorkspaceStats(ws);
+
+  // Entropy
+  const ent=d.entropy||{};
+  renderEntropy(ent);
+
+  // Reduction plan
+  const plan=d.reduction_plan||{};
+  renderReductionPlan(plan);
+
+  // Agents
+  const agents=ws.agents||[];
+  renderAgents(agents);
+
+  // Spotlight
+  const spotlight=ws.spotlight||[];
+  renderSpotlight(spotlight);
+}
+
+function renderWorkspaceStats(ws){
+  const el=document.getElementById('workspaceStats');
+  const agents=ws.agents||[];
+  const active=agents.filter(a=>a.status==='active').length;
+  const total=agents.length;
+  const bq=ws.broadcast_queue_size||0;
+  const sl=ws.spotlight_size||0;
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div><div style="font-size:2rem;font-weight:700;color:var(--accent);">${total}</div><div style="font-size:0.8rem;color:var(--muted);">Total Agents</div></div>
+      <div><div style="font-size:2rem;font-weight:700;color:var(--success);">${active}</div><div style="font-size:0.8rem;color:var(--muted);">Active</div></div>
+      <div><div style="font-size:2rem;font-weight:700;color:var(--info);">${bq}</div><div style="font-size:0.8rem;color:var(--muted);">Queued Broadcasts</div></div>
+      <div><div style="font-size:2rem;font-weight:700;color:var(--secondary);">${sl}</div><div style="font-size:0.8rem;color:var(--muted);">In Spotlight</div></div>
+    </div>`;
+}
+
+function renderEntropy(ent){
+  const el=document.getElementById('entropyPanel');
+  const bits=ent.entropy_bits||0;
+  const thresh=5.0;
+  const pct=Math.min(bits/10*100,100);
+  const above=ent.above_threshold;
+  const col=above?'var(--danger)':'var(--success)';
+  el.innerHTML=`
+    <div class="entropy-meter">
+      <span class="entropy-label">Bits</span>
+      <div class="entropy-bar">
+        <div class="entropy-fill" style="width:${pct}%;background:${col};">${bits.toFixed(2)}</div>
+        <div class="entropy-threshold" style="left:${thresh/10*100}%;" title="Threshold: ${thresh}"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.82rem;color:var(--muted);">
+      <div>Panels: <strong style="color:var(--text);">${ent.panel_count||0}</strong></div>
+      <div>Widgets: <strong style="color:var(--text);">${ent.widget_count||0}</strong></div>
+      <div>Partitions: <strong style="color:var(--text);">${ent.data_partitions||0}</strong></div>
+      <div>Events: <strong style="color:var(--text);">${ent.pending_events||0}</strong></div>
+    </div>
+    <div style="margin-top:0.75rem;">
+      <span class="stat-badge ${above?'red':'green'}">${above?'⚠ Above Threshold':'✓ Within Threshold'}</span>
+    </div>`;
+}
+
+function renderAgents(agents){
+  const el=document.getElementById('agentList');
+  if(!agents.length){el.innerHTML='<div style="color:var(--dim);font-size:0.85rem;">No agents registered. Click "Register Demo Agent" to add one.</div>';return;}
+  el.innerHTML=agents.map(a=>`
+    <div class="agent-row">
+      <div class="agent-status ${a.status||'offline'}"></div>
+      <div class="agent-name">${a.agent_id||'unknown'}</div>
+      <div class="agent-role">${a.role||'—'}</div>
+      <div class="agent-tokens">${(a.context_tokens||0).toLocaleString()} tok</div>
+    </div>`).join('');
+}
+
+function renderSpotlight(items){
+  const el=document.getElementById('spotlightList');
+  if(!items.length){el.innerHTML='<div style="color:var(--dim);font-size:0.85rem;">No broadcasts competing for attention yet.</div>';return;}
+  el.innerHTML=items.map(s=>`
+    <div class="spotlight-item">
+      <div class="spotlight-priority">Priority ${(s.priority||0).toFixed(2)}</div>
+      <div class="spotlight-event">${s.event_type||'event'}: ${truncate(JSON.stringify(s.payload||{}),120)}</div>
+      <div class="spotlight-agent">From: ${s.agent_id||'?'} · ${timeAgo(s.timestamp)}</div>
+    </div>`).join('');
+}
+
+function renderReductionPlan(plan){
+  const el=document.getElementById('reductionPlan');
+  const actions=[
+    {icon:'📐',key:'collapse_panels',label:'Collapse Panels'},
+    {icon:'🔗',key:'group_anomalies',label:'Group Anomalies'},
+    {icon:'👁',key:'hide_empty_widgets',label:'Hide Empty Widgets'},
+    {icon:'🔄',key:'merge_partitions',label:'Merge Partitions'},
+    {icon:'📋',key:'summarize_broadcasts',label:'Summarize Broadcasts'}
+  ];
+  const hasAny=actions.some(a=>plan[a.key]);
+  if(!hasAny){el.innerHTML='<div style="color:var(--success);font-size:0.85rem;">✓ No entropy reduction needed — system is well-organized.</div>';return;}
+  el.innerHTML=actions.filter(a=>plan[a.key]).map(a=>`
+    <div class="plan-item">
+      <span class="plan-icon">${a.icon}</span>
+      <div class="plan-text"><strong>${a.label}</strong> — ${typeof plan[a.key]==='string'?plan[a.key]:'Recommended'}</div>
+    </div>`).join('');
+}
+
+function truncate(s,n){return s.length>n?s.slice(0,n)+'…':s;}
+function timeAgo(ts){
+  if(!ts)return'just now';
+  const d=Date.now()/1000-ts;
+  if(d<60)return Math.round(d)+'s ago';if(d<3600)return Math.round(d/60)+'m ago';
+  return Math.round(d/3600)+'h ago';
+}
+
+async function registerDemoAgent(){
+  demoCounter++;
+  const roles=['planner','executor','critic','observer','synthesizer'];
+  const role=roles[demoCounter%roles.length];
+  const d=await fetchJSON('/v21/cognitive/agent',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({agent_id:'agent-'+demoCounter,role:role})});
+  if(d)addBroadcast('Agent agent-'+demoCounter+' ('+role+') registered');
+  refreshAll();
+}
+
+async function submitDemoBroadcast(){
+  const types=['anomaly_detected','pattern_found','resource_alert','decision_required','insight'];
+  const t=types[Math.floor(Math.random()*types.length)];
+  const d=await fetchJSON('/v21/cognitive/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({agent_id:'agent-'+(demoCounter||1),event_type:t,priority:Math.random().toFixed(2),payload:{detail:'Demo broadcast '+t}})});
+  if(d)addBroadcast(t+' from agent-'+(demoCounter||1));
+  refreshAll();
+}
+
+function addBroadcast(msg){
+  const el=document.getElementById('broadcastFeed');
+  const now=new Date().toLocaleTimeString();
+  const div=document.createElement('div');
+  div.className='broadcast';
+  div.innerHTML=`<span class="bc-time">${now}</span> <span class="bc-type">${msg}</span>`;
+  el.prepend(div);
+  if(el.children.length>50)el.lastChild.remove();
+}
+
+async function refreshAll(){await loadCognitiveSummary();}
+
+// Initial load
+refreshAll();
+setInterval(refreshAll,15000);
+</script>
+</body>
+</html>

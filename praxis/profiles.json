@@ -1,0 +1,38 @@
+{
+  "test": {
+    "profile_id": "test",
+    "industry": "retail",
+    "budget": "low",
+    "team_size": "solo",
+    "skill_level": "beginner",
+    "existing_tools": [
+      "ChatGPT",
+      "Canva AI"
+    ],
+    "goals": [
+      "automate marketing"
+    ],
+    "constraints": [],
+    "preferences": {},
+    "created_at": "2026-02-21T03:57:51.032685Z",
+    "updated_at": "2026-02-21T03:57:51.032970Z"
+  },
+  "journey": {
+    "profile_id": "journey",
+    "industry": "saas",
+    "budget": "low",
+    "team_size": "solo",
+    "skill_level": "intermediate",
+    "existing_tools": [],
+    "goals": [
+      "design"
+    ],
+    "constraints": [],
+    "preferences": {},
+    "created_at": "2026-02-27T04:43:45.168224Z",
+    "updated_at": "2026-02-27T04:43:45.171211Z",
+    "requires_us_sovereignty": false,
+    "strict_privacy_mode": false,
+    "sovereignty_tier_preference": null
+  }
+}

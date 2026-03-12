@@ -1,0 +1,25 @@
+{
+  "computed_at": "2026-03-11T03:24:32.209737Z",
+  "tool_quality": {
+    "5": {
+      "avg_rating": 0,
+      "total_feedback": 18,
+      "accept_rate": 1.0,
+      "recent_trend": "stable"
+    },
+    "Amplitude": {
+      "avg_rating": 6.33,
+      "total_feedback": 3,
+      "accept_rate": 0.667,
+      "recent_trend": "stable"
+    },
+    "GitHub Actions": {
+      "avg_rating": 5.0,
+      "total_feedback": 3,
+      "accept_rate": 1.0,
+      "recent_trend": "stable"
+    }
+  },
+  "pair_affinities": [],
+  "intent_tool_map": {}
+}

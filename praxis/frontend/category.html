@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Category — Praxis</title>
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.035);
+      --bg-card-hover: rgba(255,255,255,0.055);
+      --bg-glass: rgba(255,255,255,0.05);
+      --border-glass: rgba(255,255,255,0.06);
+      --border-glass-hover: rgba(255,255,255,0.12);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-dim: rgba(255,255,255,0.30);
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.30);
+      --accent-secondary: #50e3c2;
+      --accent-warm: #f5a623;
+      --accent-danger: #ef4444;
+      --radius-sm: 8px; --radius-md: 12px; --radius-card: 16px; --radius-pill: 999px;
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg-primary); color: var(--text-primary);
+      min-height: 100vh; line-height: 1.55;
+    }
+    .aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .aurora::before {
+      content: ''; position: absolute; width: 550px; height: 550px; border-radius: 50%;
+      filter: blur(140px); opacity: 0.15;
+      background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+      top: -10%; left: -5%;
+    }
+    .aurora::after {
+      content: ''; position: absolute; width: 400px; height: 400px; border-radius: 50%;
+      filter: blur(120px); opacity: 0.10;
+      background: radial-gradient(circle, #50e3c2 0%, transparent 70%);
+      bottom: -15%; right: -8%;
+    }
+    .noise {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.018;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 256px;
+    }
+    .nav-bar {
+      position: sticky; top: 0; z-index: 100;
+      padding: 0.65rem 1.5rem;
+      display: flex; align-items: center; justify-content: center; gap: 2rem;
+      background: rgba(6,6,14,0.75);
+      backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.25);
+    }
+    .nav-bar a {
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px;
+      transition: color var(--transition-fast);
+    }
+    .nav-bar a:hover { color: var(--text-primary); }
+    .nav-bar a.active { color: var(--accent); }
+    .nav-logo { font-weight: 700; font-size: 0.95rem; color: var(--text-primary) !important; letter-spacing: -0.5px; }
+
+    .content {
+      position: relative; z-index: 2;
+      max-width: 1100px; margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── Category Hero ── */
+    .cat-hero {
+      padding: 2rem 0 1.5rem; margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .cat-breadcrumb {
+      font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;
+    }
+    .cat-breadcrumb a { color: var(--accent); text-decoration: none; }
+    .cat-breadcrumb a:hover { text-decoration: underline; }
+    .cat-hero h1 {
+      font-size: 2rem; font-weight: 700; letter-spacing: -1px;
+      background: linear-gradient(135deg, #f0f0f5, #6366f1);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 0.4rem;
+    }
+    .cat-hero p { font-size: 0.95rem; color: var(--text-secondary); max-width: 650px; }
+    .cat-stats {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;
+    }
+    .cat-stat {
+      padding: 0.25rem 0.6rem; border-radius: 4px;
+      font-size: 0.72rem; font-weight: 600;
+    }
+
+    /* ── Tool Grid ── */
+    .tool-grid {
+      display: grid; gap: 0.75rem;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
+    .tool-card {
+      padding: 1.2rem; border-radius: var(--radius-card);
+      position: relative; overflow: hidden;
+      transition: all var(--transition-smooth);
+    }
+    .tool-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    }
+    .card-sovereign {
+      background: rgba(80,227,194,0.04); backdrop-filter: blur(24px);
+      border: 1px solid rgba(80,227,194,0.12);
+      box-shadow: 0 4px 24px rgba(80,227,194,0.06);
+    }
+    .card-sovereign::before { background: linear-gradient(90deg, transparent, rgba(80,227,194,0.15), transparent); }
+    .card-sovereign:hover { background: rgba(80,227,194,0.07); border-color: rgba(80,227,194,0.22); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(80,227,194,0.1); }
+    .card-durable {
+      background: rgba(99,102,241,0.04); backdrop-filter: blur(20px);
+      border: 1px solid rgba(99,102,241,0.1);
+      box-shadow: 0 2px 16px rgba(99,102,241,0.05);
+    }
+    .card-durable::before { background: linear-gradient(90deg, transparent, rgba(99,102,241,0.12), transparent); }
+    .card-durable:hover { background: rgba(99,102,241,0.07); border-color: rgba(99,102,241,0.2); transform: translateY(-3px); }
+    .card-moderate { background: var(--bg-card); border: 1px solid var(--border-glass); }
+    .card-moderate:hover { background: var(--bg-card-hover); border-color: var(--border-glass-hover); }
+    .card-fragile, .card-wrapper {
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+      padding: 0.8rem 1rem; border-radius: var(--radius-sm);
+    }
+    .card-fragile::before, .card-wrapper::before { display: none; }
+
+    .tc-top { display: flex; align-items: flex-start; gap: 0.7rem; margin-bottom: 0.5rem; }
+    .tc-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1rem; flex-shrink: 0; color: white;
+    }
+    .tc-icon-sovereign { background: linear-gradient(135deg, #50e3c2, #3dc4a7); box-shadow: 0 4px 12px rgba(80,227,194,0.25); }
+    .tc-icon-durable { background: linear-gradient(135deg, #6366f1, #6366f1); box-shadow: 0 4px 12px var(--accent-glow); }
+    .tc-icon-moderate { background: linear-gradient(135deg, #f5a623, #e09520); }
+    .tc-icon-fragile { background: rgba(231,76,60,0.2); color: #ef4444; width: 30px; height: 30px; font-size: 0.8rem; border-radius: 6px; }
+    .tc-icon-wrapper { background: rgba(255,71,87,0.2); color: #ef4444; width: 30px; height: 30px; font-size: 0.8rem; border-radius: 6px; }
+    .tc-info { flex: 1; min-width: 0; }
+    .tc-name { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+    .tc-badge {
+      position: absolute; top: 0.85rem; right: 0.85rem;
+      padding: 0.15rem 0.5rem; border-radius: 4px;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.5px;
+    }
+    .tc-badge-sovereign { background: rgba(80,227,194,0.15); color: #50e3c2; border: 1px solid rgba(80,227,194,0.3); }
+    .tc-badge-durable { background: rgba(99,102,241,0.15); color: #a99bf5; border: 1px solid rgba(99,102,241,0.3); }
+    .tc-badge-moderate { background: rgba(245,166,35,0.12); color: #f5a623; border: 1px solid rgba(245,166,35,0.25); }
+    .tc-badge-fragile { background: rgba(231,76,60,0.1); color: #ef4444; border: 1px solid rgba(231,76,60,0.2); }
+    .tc-badge-wrapper { background: rgba(255,71,87,0.1); color: #ef4444; border: 1px solid rgba(255,71,87,0.2); }
+    .tc-usecase { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.5rem; }
+    .tc-pills { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-bottom: 0.6rem; }
+    .tc-pill {
+      padding: 0.15rem 0.45rem; border-radius: 4px;
+      font-size: 0.65rem; font-weight: 600;
+      background: rgba(255,255,255,0.04); color: var(--text-dim);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .tc-pill-compliance { background: rgba(80,227,194,0.06); color: #50e3c2; border-color: rgba(80,227,194,0.15); }
+    .tc-pill-pricing { background: rgba(99,102,241,0.06); color: #a99bf5; border-color: rgba(99,102,241,0.15); }
+
+    .tc-actions { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
+    .tc-btn {
+      flex: 1; text-align: center; padding: 0.4rem 0.6rem;
+      border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 600;
+      text-decoration: none; cursor: pointer; border: none;
+      font-family: inherit; transition: all var(--transition-fast);
+    }
+    .tc-btn-eval { background: var(--accent); color: white; box-shadow: 0 2px 8px var(--accent-glow); }
+    .tc-btn-eval:hover { background: #6366f1; transform: translateY(-1px); }
+    .tc-btn-roi { background: rgba(255,255,255,0.04); color: var(--text-secondary); border: 1px solid var(--border-glass); }
+    .tc-btn-roi:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
+
+    /* ── Comparison Matrix ── */
+    .compare-section { margin-top: 2.5rem; }
+    .compare-section h2 {
+      font-size: 1.15rem; font-weight: 600; margin-bottom: 1rem;
+      padding-bottom: 0.4rem; border-bottom: 1px solid rgba(99,102,241,0.2);
+      background: linear-gradient(135deg, #f0f0f5, #6366f1);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .compare-table-wrap {
+      overflow-x: auto; border-radius: var(--radius-md);
+      border: 1px solid var(--border-glass);
+    }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .compare-table th {
+      background: rgba(99,102,241,0.1); color: var(--text-primary);
+      padding: 0.6rem 0.75rem; text-align: left; font-weight: 600;
+      border-bottom: 1px solid rgba(99,102,241,0.2); font-size: 0.75rem;
+    }
+    .compare-table td {
+      padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.03);
+      color: var(--text-secondary); vertical-align: middle;
+    }
+    .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ── Loading / Empty ── */
+    .loading { text-align: center; padding: 3rem; color: var(--text-dim); font-size: 0.88rem; }
+    .pulse { animation: pulse 1.8s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    @media (max-width: 768px) {
+      .nav-bar { gap: 1rem; font-size: 0.75rem; overflow-x: auto; justify-content: flex-start; padding-left: 1rem; }
+      .tool-grid { grid-template-columns: 1fr; }
+      .cat-hero h1 { font-size: 1.5rem; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
+    ::selection { background: rgba(99,102,241,0.3); color: white; }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="noise"></div>
+
+  <nav class="nav-bar">
+    <a href="/" class="nav-logo">Praxis</a>
+    <a href="/">Search</a>
+    <a href="/static/journey.html">Journey</a>
+    <a href="/static/tools.html">All Tools</a>
+    <a href="/static/tuesday-test.html">ROI Calculator</a>
+    <a href="/static/rfp.html">RFP Builder</a>
+    <a href="/static/manifesto.html">Methodology</a>
+  </nav>
+
+  <div class="content">
+    <div class="loading pulse" id="loadingState">Loading category data&hellip;</div>
+
+    <div class="cat-hero" id="catHero" style="display:none;">
+      <div class="cat-breadcrumb">
+        <a href="/static/tools.html">All Tools</a> &rsaquo; <span id="breadcrumbCat"></span>
+      </div>
+      <h1 id="catTitle"></h1>
+      <p id="catDesc"></p>
+      <div class="cat-stats" id="catStats"></div>
+    </div>
+
+    <div class="tool-grid" id="toolGrid"></div>
+
+    <div class="compare-section" id="compareSection" style="display:none;">
+      <h2>Quick Comparison &mdash; Top 3</h2>
+      <div class="compare-table-wrap">
+        <table class="compare-table" id="compareTable">
+          <thead id="compareHead"></thead>
+          <tbody id="compareBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var _tierColors = {
+      sovereign: '#50e3c2', durable: '#6366f1', moderate: '#f5a623',
+      fragile: '#ef4444', wrapper: '#ef4444'
+    };
+
+    /* Category editorial overviews */
+    var _catMeta = {
+      marketing: { title: 'Marketing AI Tools', desc: 'AI-powered tools for content creation, SEO optimization, social media management, and campaign analytics. Evaluate platforms by their native IP, data portability, and long-term viability.' },
+      automation: { title: 'Automation & Workflow', desc: 'Process automation, workflow orchestration, and integration platforms. Critical infrastructure tools where lock-in risk directly impacts operational flexibility.' },
+      analytics: { title: 'Analytics & Business Intelligence', desc: 'Data visualization, reporting, and predictive analytics platforms. Sovereign tools in this category own their query engines and data transformation logic.' },
+      coding: { title: 'Coding & Development', desc: 'AI coding assistants, IDE integrations, and development platforms. Evaluate model ownership, code privacy guarantees, and IDE environment lock-in.' },
+      writing: { title: 'Writing & Content', desc: 'AI writing assistants, content generators, and editorial tools. Key differentiator: does the tool have its own language model or wrap an upstream API?' },
+      design: { title: 'Design & Creative', desc: 'AI-powered design tools, image generators, and creative platforms. Sovereign tools own their generation models and creative engines.' },
+      productivity: { title: 'Productivity & Collaboration', desc: 'Team collaboration, project management, and productivity suites with AI capabilities. Watch for ecosystem lock-in in this category.' },
+      finance: { title: 'Finance & Accounting', desc: 'AI-enhanced financial tools, accounting platforms, and expense management. Compliance posture is critical in this regulated space.' },
+      'customer support': { title: 'Customer Support AI', desc: 'AI chatbots, helpdesk automation, and customer experience platforms. Integration depth and data portability are key evaluation criteria.' },
+      sales: { title: 'Sales Intelligence', desc: 'CRM enrichment, lead scoring, and sales automation platforms. Evaluate proprietary data moats and integration ecosystems.' },
+    };
+
+    (async function init() {
+      var params = new URLSearchParams(window.location.search);
+      var cat = params.get('cat') || '';
+      if (!cat) {
+        document.getElementById('loadingState').innerHTML = '<span style="color:#ef4444">No category specified. <a href="/static/tools.html" style="color:#6366f1;">View all tools</a></span>';
+        return;
+      }
+
+      document.title = cat.charAt(0).toUpperCase() + cat.slice(1) + ' — Praxis';
+
+      try {
+        var res = await fetch('/tools/category/' + encodeURIComponent(cat));
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        var data = await res.json();
+        var tools = data.tools || [];
+
+        document.getElementById('loadingState').style.display = 'none';
+
+        // Hero
+        var meta = _catMeta[cat.toLowerCase()] || {
+          title: cat.charAt(0).toUpperCase() + cat.slice(1) + ' Tools',
+          desc: 'AI tools in the ' + cat + ' category, scored by the Praxis Anti-Wrapper Verification Shield.'
+        };
+        document.getElementById('catTitle').textContent = meta.title;
+        document.getElementById('catDesc').textContent = meta.desc;
+        document.getElementById('breadcrumbCat').textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+        document.getElementById('catHero').style.display = 'block';
+
+        // Stats
+        var stats = document.getElementById('catStats');
+        stats.innerHTML = '<span class="cat-stat" style="background:rgba(255,255,255,0.06);color:var(--text-primary);">' + tools.length + ' tools</span>';
+        var tierCounts = {};
+        tools.forEach(function(t) {
+          tierCounts[t.tier] = (tierCounts[t.tier] || 0) + 1;
+        });
+        Object.keys(tierCounts).forEach(function(tier) {
+          var c = _tierColors[tier] || '#999';
+          stats.innerHTML += '<span class="cat-stat" style="background:' + c + '15;color:' + c + ';border:1px solid ' + c + '30;">' + tier.charAt(0).toUpperCase() + tier.slice(1) + ': ' + tierCounts[tier] + '</span>';
+        });
+
+        // Render tool cards
+        var grid = document.getElementById('toolGrid');
+        tools.forEach(function(t) {
+          grid.appendChild(buildCard(t));
+        });
+
+        // Comparison matrix for top 3
+        if (tools.length >= 2) {
+          var topTools = tools.slice(0, Math.min(3, tools.length));
+          buildComparison(topTools);
+        }
+      } catch(e) {
+        document.getElementById('loadingState').innerHTML = '<span style="color:#ef4444">Failed to load: ' + e.message + '</span>';
+      }
+    })();
+
+    function buildCard(t) {
+      var tier = t.tier || 'moderate';
+      var card = document.createElement('div');
+      card.className = 'tool-card card-' + tier;
+
+      var pricing = t.pricing || {};
+      var priceStr = pricing.free_tier ? 'Free tier' : (pricing.starter ? '$' + pricing.starter + '/mo' : '');
+
+      card.innerHTML =
+        '<span class="tc-badge tc-badge-' + tier + '">' + t.grade + ' \u00B7 ' + tier.toUpperCase() + '</span>' +
+        '<div class="tc-top">' +
+          '<div class="tc-icon tc-icon-' + tier + '">' + t.name.charAt(0) + '</div>' +
+          '<div class="tc-info">' +
+            '<div class="tc-name">' + t.name + '</div>' +
+            '<div style="font-size:0.68rem;color:var(--text-dim);margin-top:0.15rem;">' +
+              'Score: ' + t.resilience_score + '/100' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="tc-usecase">' + (t.description || '') + '</div>' +
+        '<div class="tc-pills">' +
+          (t.compliance || []).map(function(c) { return '<span class="tc-pill tc-pill-compliance">' + c + '</span>'; }).join('') +
+          (priceStr ? '<span class="tc-pill tc-pill-pricing">' + priceStr + '</span>' : '') +
+          (t.skill_level ? '<span class="tc-pill">' + t.skill_level + '</span>' : '') +
+        '</div>' +
+        '<div class="tc-actions">' +
+          (t.url ? '<a class="tc-btn tc-btn-eval" href="' + t.url + '" target="_blank">Evaluate</a>' : '') +
+          '<a class="tc-btn tc-btn-roi" href="/static/tuesday-test.html">Calculate ROI</a>' +
+        '</div>';
+      return card;
+    }
+
+    function buildComparison(tools) {
+      var section = document.getElementById('compareSection');
+      section.style.display = 'block';
+
+      var thead = document.getElementById('compareHead');
+      var headerRow = '<tr><th>Dimension</th>';
+      tools.forEach(function(t) {
+        var c = _tierColors[t.tier] || '#999';
+        headerRow += '<th style="color:' + c + ';">' + t.name + '</th>';
+      });
+      headerRow += '</tr>';
+      thead.innerHTML = headerRow;
+
+      var rows = [
+        { label: 'Resilience Tier', key: 'tier', render: function(t) { var c = _tierColors[t.tier]; return '<span style="color:' + c + ';font-weight:700;">' + t.tier.toUpperCase() + '</span>'; }},
+        { label: 'Grade', key: 'grade', render: function(t) { return '<strong>' + t.grade + '</strong>'; }},
+        { label: 'Score', key: 'resilience_score', render: function(t) { return t.resilience_score + '/100'; }},
+        { label: 'Compliance', key: 'compliance', render: function(t) { return (t.compliance || []).join(', ') || 'None'; }},
+        { label: 'Pricing', key: 'pricing', render: function(t) {
+            var p = t.pricing || {};
+            return p.free_tier ? 'Free tier' : (p.starter ? '$' + p.starter + '/mo' : 'N/A');
+          }},
+        { label: 'Integrations', key: 'integrations', render: function(t) { return (t.integrations || []).slice(0,4).join(', ') || 'None listed'; }},
+        { label: 'Skill Level', key: 'skill_level', render: function(t) { return t.skill_level || 'N/A'; }},
+      ];
+
+      var tbody = document.getElementById('compareBody');
+      tbody.innerHTML = '';
+      rows.forEach(function(row) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td><strong>' + row.label + '</strong></td>';
+        tools.forEach(function(t) {
+          tr.innerHTML += '<td>' + row.render(t) + '</td>';
+        });
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>

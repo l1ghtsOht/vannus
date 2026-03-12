@@ -1,0 +1,143 @@
+{
+  "c4dd763a186de1ea": {
+    "journey_id": "c4dd763a186de1ea",
+    "user_id": "test_user",
+    "query": "need CI/CD tools",
+    "current_stage": "outcome",
+    "stages": [
+      {
+        "stage": "intake",
+        "entered_at": "2026-03-10T22:40:00.054715",
+        "metadata": {
+          "query": "need CI/CD tools",
+          "profile_id": null
+        }
+      },
+      {
+        "stage": "discovery",
+        "entered_at": "2026-03-10T22:40:00.208723",
+        "metadata": {}
+      },
+      {
+        "stage": "outcome",
+        "entered_at": "2026-03-10T22:40:00.220214",
+        "metadata": {
+          "trigger": "outcome_recorded"
+        }
+      }
+    ],
+    "target_vectors": {},
+    "outcomes": [
+      {
+        "tool_name": "GitHub Actions",
+        "satisfaction": 0.9,
+        "roi": 0.8,
+        "integration_success": 0.0,
+        "still_using": true,
+        "recorded_at": "2026-03-10T22:40:00.220187"
+      }
+    ],
+    "drift_signals": [],
+    "context_snapshot": {
+      "raw_query": "need CI/CD tools",
+      "fields": {
+        "task_type": {
+          "value": null,
+          "confidence": 0.0,
+          "tier": 3,
+          "source": "none",
+          "evidence": ""
+        },
+        "industry": {
+          "value": null,
+          "confidence": 0.0,
+          "tier": 3,
+          "source": "none",
+          "evidence": ""
+        },
+        "budget": {
+          "value": null,
+          "confidence": 0.0,
+          "tier": 3,
+          "source": "none",
+          "evidence": ""
+        },
+        "existing_tools": {
+          "value": [],
+          "confidence": 0.0,
+          "tier": 3,
+          "source": "none",
+          "evidence": ""
+        },
+        "team_size": {
+          "value": null,
+          "confidence": 0.0,
+          "tier": 3,
+          "source": "none",
+          "evidence": ""
+        },
+        "skill_level": {
+          "value": null,
+          "confidence": 0.0,
+          "tier": 3,
+          "source": "none",
+          "evidence": ""
+        },
+        "compliance": {
+          "value": [],
+          "confidence": 0.0,
+          "tier": 3,
+          "source": "none",
+          "evidence": ""
+        },
+        "constraints": {
+          "value": [],
+          "confidence": 0.0,
+          "tier": 3,
+          "source": "none",
+          "evidence": ""
+        },
+        "timeline": {
+          "value": null,
+          "confidence": 0.0,
+          "tier": 3,
+          "source": "none",
+          "evidence": ""
+        }
+      },
+      "tier_assignments": {
+        "task_type": 3,
+        "industry": 3,
+        "budget": 3,
+        "existing_tools": 3,
+        "team_size": 3,
+        "skill_level": 3,
+        "compliance": 3,
+        "constraints": 3,
+        "timeline": 3
+      },
+      "auto_filled": {},
+      "pre_filled": {},
+      "missing": [
+        "task_type",
+        "industry",
+        "budget",
+        "existing_tools",
+        "team_size",
+        "skill_level",
+        "compliance",
+        "constraints",
+        "timeline"
+      ],
+      "vertical_matches": [],
+      "stack_template": null,
+      "graph_neighbors": [],
+      "pruned_tools": [],
+      "extraction_time_ms": 6.89
+    },
+    "gap_snapshot": null,
+    "created_at": "2026-03-10T22:40:00.054715",
+    "updated_at": "2026-03-10T22:40:00.220214",
+    "completed": true
+  }
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "query": "automate",
+    "timestamp": "2026-02-21T22:04:37",
+    "results_count": 15,
+    "top_score": 2
+  },
+  {
+    "query": "automate",
+    "timestamp": "2026-02-21T22:04:37",
+    "results_count": 15,
+    "top_score": 2
+  },
+  {
+    "query": "",
+    "timestamp": "2026-02-21T22:04:38",
+    "results_count": 0,
+    "top_score": 0,
+    "interpreted": {
+      "raw": "",
+      "intent": null,
+      "industry": null,
+      "goal": null,
+      "keywords": [],
+      "entities": [],
+      "clarification_needed": true,
+      "suggested_questions": [
+        "Please describe the task you need help with."
+      ]
+    }
+  }
+]

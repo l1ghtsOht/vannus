@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Praxis — Differential Diagnosis Engine</title>
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-glass: rgba(255,255,255,0.06);
+      --bg-glass-hover: rgba(255,255,255,0.10);
+      --bg-glass-strong: rgba(255,255,255,0.12);
+      --border-glass: rgba(255,255,255,0.08);
+      --border-glass-hover: rgba(255,255,255,0.18);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-dim: rgba(255,255,255,0.35);
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.35);
+      --accent-secondary: #50e3c2;
+      --accent-warm: #f5a623;
+      --accent-danger: #ef4444;
+      --sov: #50e3c2;
+      --dur: #6366f1;
+      --mod: #f5a623;
+      --fra: #ef4444;
+      --wrap: #888;
+      --glass-blur: 24px;
+      --radius-pill: 999px;
+      --radius-card: 20px;
+      --radius-sm: 12px;
+      --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* ── Aurora ── */
+    .aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .aurora::before, .aurora::after {
+      content: ""; position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12;
+    }
+    .aurora::before { width: 700px; height: 700px; background: var(--accent); top: -200px; left: -100px; animation: aurora1 18s ease-in-out infinite alternate; }
+    .aurora::after  { width: 500px; height: 500px; background: var(--accent-secondary); bottom: -100px; right: -100px; animation: aurora2 22s ease-in-out infinite alternate; }
+    @keyframes aurora1 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(100px,80px) scale(1.2)} }
+    @keyframes aurora2 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-80px,-60px) scale(1.15)} }
+
+    /* ── Layout ── */
+    .container { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 20px; }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6,6,14,0.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-glass);
+      padding: 10px 24px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    nav .brand { font-weight: 700; font-size: 1.1rem; color: var(--accent); text-decoration: none; }
+    nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.82rem; transition: color var(--transition-fast); }
+    nav a:hover, nav a.active { color: var(--text-primary); }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center; padding: 60px 0 20px;
+    }
+    .hero h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; }
+    .hero h1 span { background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--text-secondary); font-size: 1rem; margin-top: 8px; max-width: 600px; margin-inline: auto; }
+
+    /* ── Query Input ── */
+    .query-section {
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-card); padding: 28px;
+      margin: 28px 0;
+    }
+    .query-section label { display: block; font-weight: 600; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .query-row { display: flex; gap: 10px; }
+    .query-input {
+      flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm); padding: 14px 18px;
+      color: var(--text-primary); font-size: 1rem; outline: none;
+      transition: border-color var(--transition-fast);
+    }
+    .query-input:focus { border-color: var(--accent); }
+    .query-input::placeholder { color: var(--text-dim); }
+    .btn-diagnose {
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      padding: 14px 28px; font-weight: 700; font-size: 0.95rem;
+      cursor: pointer; white-space: nowrap;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .btn-diagnose:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
+    .btn-diagnose:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── Profile Section ── */
+    .profile-toggle {
+      background: none; border: 1px solid var(--border-glass); color: var(--text-secondary);
+      padding: 8px 16px; border-radius: var(--radius-pill); font-size: 0.8rem;
+      cursor: pointer; margin-top: 14px; transition: all var(--transition-fast);
+    }
+    .profile-toggle:hover { border-color: var(--accent); color: var(--text-primary); }
+    .profile-form {
+      display: none; margin-top: 18px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;
+    }
+    .profile-form.hidden { display: none; }
+    .pf-field { display: flex; flex-direction: column; gap: 4px; }
+    .pf-field label { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+    .pf-field select, .pf-field input {
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass);
+      border-radius: 8px; padding: 8px 10px; color: var(--text-primary); font-size: 0.85rem;
+      outline: none;
+    }
+    .pf-field select:focus, .pf-field input:focus { border-color: var(--accent); }
+
+    /* ── Funnel Visualisation ── */
+    .funnel-section { margin: 24px 0; display: none; }
+    .funnel-section.active { display: block; }
+    .funnel-steps { display: flex; flex-direction: column; gap: 0; }
+    .funnel-step {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 18px;
+      background: var(--bg-glass); border-left: 3px solid var(--border-glass);
+      font-size: 0.88rem; opacity: 0; transform: translateX(-20px);
+      transition: all 0.5s ease;
+    }
+    .funnel-step.visible { opacity: 1; transform: translateX(0); }
+    .funnel-step .step-icon {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--bg-glass-strong); display: flex; align-items: center;
+      justify-content: center; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .funnel-step:nth-child(1) { border-color: var(--accent); }
+    .funnel-step:nth-child(2) { border-color: var(--accent-secondary); }
+    .funnel-step:nth-child(3) { border-color: var(--accent-danger); }
+    .funnel-step:nth-child(4) { border-color: var(--accent-warm); }
+    .funnel-step:nth-child(5) { border-color: var(--sov); }
+    .funnel-step:nth-child(6) { border-color: var(--dur); }
+
+    /* ── Clarification ── */
+    .clarification {
+      background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.3);
+      border-radius: var(--radius-card); padding: 28px; margin: 24px 0; display: none;
+    }
+    .clarification.active { display: block; }
+    .clarification h3 { font-size: 1rem; margin-bottom: 12px; color: var(--accent); }
+    .clarification .cq-btn {
+      display: block; width: 100%; text-align: left;
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: 10px; padding: 12px 16px; margin: 6px 0;
+      color: var(--text-primary); font-size: 0.88rem; cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .clarification .cq-btn:hover { background: var(--bg-glass-hover); border-color: var(--accent); }
+
+    /* ── Survivor Dashboard ── */
+    .survivors-section { margin: 32px 0; display: none; }
+    .survivors-section.active { display: block; }
+    .survivors-section h2 {
+      font-size: 1.3rem; font-weight: 700; margin-bottom: 4px;
+    }
+    .survivors-section .summary {
+      font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;
+    }
+
+    .survivor-card {
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-card); padding: 24px; margin-bottom: 16px;
+      transition: all var(--transition-smooth);
+      position: relative; overflow: hidden;
+    }
+    .survivor-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .survivor-card.tier-sovereign { border-color: rgba(80,227,194,0.2); }
+    .survivor-card.tier-sovereign::before { background: linear-gradient(90deg, var(--sov), transparent); }
+    .survivor-card.tier-sovereign:hover { border-color: rgba(80,227,194,0.4); box-shadow: 0 8px 40px rgba(80,227,194,0.08); }
+    .survivor-card.tier-durable { border-color: rgba(99,102,241,0.2); }
+    .survivor-card.tier-durable::before { background: linear-gradient(90deg, var(--dur), transparent); }
+    .survivor-card.tier-durable:hover { border-color: rgba(99,102,241,0.4); box-shadow: 0 8px 40px rgba(99,102,241,0.08); }
+    .survivor-card.tier-moderate { border-color: rgba(245,166,35,0.2); }
+    .survivor-card.tier-moderate::before { background: linear-gradient(90deg, var(--mod), transparent); }
+    .survivor-card.tier-fragile, .survivor-card.tier-wrapper { border-color: rgba(255,107,107,0.15); }
+    .survivor-card.tier-fragile::before, .survivor-card.tier-wrapper::before { background: linear-gradient(90deg, var(--fra), transparent); }
+
+    .survivor-header { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+    .survivor-name { font-size: 1.15rem; font-weight: 700; }
+    .resilience-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: var(--radius-pill);
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-sovereign { background: rgba(80,227,194,0.15); color: var(--sov); }
+    .badge-durable { background: rgba(99,102,241,0.15); color: var(--dur); }
+    .badge-moderate { background: rgba(245,166,35,0.15); color: var(--mod); }
+    .badge-fragile { background: rgba(255,107,107,0.15); color: var(--fra); }
+    .badge-wrapper { background: rgba(136,136,136,0.15); color: var(--wrap); }
+
+    .survivor-score {
+      margin-left: auto; font-size: 1.4rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .survivor-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.5; }
+    .survival-reasons {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+    }
+    .reason-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(80,227,194,0.08); border: 1px solid rgba(80,227,194,0.15);
+      border-radius: var(--radius-pill); padding: 4px 12px;
+      font-size: 0.72rem; color: var(--sov);
+    }
+    .penalty-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.15);
+      border-radius: var(--radius-pill); padding: 4px 12px;
+      font-size: 0.72rem; color: var(--mod);
+    }
+    .survivor-meta {
+      display: flex; flex-wrap: wrap; gap: 16px; font-size: 0.78rem; color: var(--text-dim);
+    }
+    .survivor-meta span { display: inline-flex; align-items: center; gap: 4px; }
+    .survivor-actions { display: flex; gap: 8px; margin-top: 14px; }
+    .btn-sm {
+      padding: 6px 14px; border-radius: 8px; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: all var(--transition-fast); border: 1px solid var(--border-glass);
+    }
+    .btn-visit { background: var(--accent); color: #fff; border: none; text-decoration: none; }
+    .btn-visit:hover { box-shadow: 0 4px 20px var(--accent-glow); transform: translateY(-1px); }
+    .btn-details { background: var(--bg-glass); color: var(--text-secondary); }
+    .btn-details:hover { background: var(--bg-glass-hover); color: var(--text-primary); }
+
+    /* ── Eliminated Accordion ── */
+    .eliminated-section { margin: 32px 0; display: none; }
+    .eliminated-section.active { display: block; }
+    .eliminated-toggle {
+      width: 100%; text-align: left;
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-card); padding: 16px 22px;
+      color: var(--text-primary); font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 10px;
+      transition: all var(--transition-fast);
+    }
+    .eliminated-toggle:hover { background: var(--bg-glass-hover); }
+    .eliminated-toggle .arrow { transition: transform var(--transition-fast); font-size: 0.7rem; }
+    .eliminated-toggle.open .arrow { transform: rotate(90deg); }
+    .eliminated-toggle .badge-count {
+      margin-left: auto; background: rgba(255,107,107,0.15);
+      color: var(--fra); padding: 2px 10px; border-radius: var(--radius-pill);
+      font-size: 0.72rem;
+    }
+    .eliminated-list {
+      max-height: 0; overflow: hidden; transition: max-height 0.5s ease;
+    }
+    .eliminated-list.open { max-height: 5000px; }
+    .elim-card {
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px; padding: 16px; margin: 8px 0;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .elim-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; flex-shrink: 0;
+    }
+    .elim-icon.hard { background: rgba(255,107,107,0.15); }
+    .elim-icon.soft { background: rgba(245,166,35,0.15); }
+    .elim-content { flex: 1; }
+    .elim-name { font-weight: 700; font-size: 0.88rem; }
+    .elim-stage { font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; }
+    .elim-reason { font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+    .btn-challenge {
+      background: none; border: 1px solid rgba(255,107,107,0.2);
+      color: var(--fra); border-radius: 6px; padding: 3px 10px;
+      font-size: 0.68rem; cursor: pointer; margin-top: 6px;
+      transition: all var(--transition-fast);
+    }
+    .btn-challenge:hover { background: rgba(255,107,107,0.1); }
+
+    /* ── Stage Meta ── */
+    .stage-meta {
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius-card); padding: 20px; margin: 24px 0;
+      display: none;
+    }
+    .stage-meta.active { display: block; }
+    .stage-meta h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+    .stage-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+    .stage-cell { background: var(--bg-card); border-radius: 10px; padding: 14px; }
+    .stage-cell .label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stage-cell .value { font-size: 1.5rem; font-weight: 800; margin-top: 4px; }
+    .stage-cell .sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      .hero h1 { font-size: 1.5rem; }
+      .query-row { flex-direction: column; }
+      .profile-form { grid-template-columns: 1fr 1fr; }
+      .stage-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+
+  <nav>
+    <a href="/static/home.html" class="brand">Praxis</a>
+    <a href="/static/home.html">Search</a>
+    <a href="/static/differential.html" class="active">Diagnosis</a>
+    <a href="/static/trust_badges.html">Trust Badges</a>
+    <a href="/static/tools.html">All Tools</a>
+    <a href="/static/manifesto.html">Methodology</a>
+  </nav>
+
+  <div class="container">
+    <!-- Hero -->
+    <div class="hero">
+      <h1>Differential <span>Diagnosis</span> Engine</h1>
+      <p>Elimination-first software selection. We scan 246 tools, ruthlessly prune by your hard constraints, penalise for risk factors, and surface only the resilient survivors.</p>
+    </div>
+
+    <!-- Query Input -->
+    <div class="query-section">
+      <label>Describe what you need</label>
+      <div class="query-row">
+        <input class="query-input" id="queryInput" type="text"
+               placeholder="e.g. I need a CRM for healthcare, must be HIPAA compliant, not Salesforce"
+               autocomplete="off" />
+        <button class="btn-diagnose" id="btnDiagnose" onclick="runDiagnosis()">Diagnose</button>
+      </div>
+
+      <button class="profile-toggle" onclick="toggleProfile()">⚙ Add Organisational Profile</button>
+      <div class="profile-form hidden" id="profileForm">
+        <div class="pf-field">
+          <label>Industry</label>
+          <select id="pfIndustry">
+            <option value="">Any</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="finance">Finance</option>
+            <option value="e-commerce">E-Commerce</option>
+            <option value="saas">SaaS</option>
+            <option value="agency">Agency</option>
+            <option value="startup">Startup</option>
+            <option value="legal">Legal</option>
+            <option value="education">Education</option>
+          </select>
+        </div>
+        <div class="pf-field">
+          <label>Budget</label>
+          <select id="pfBudget">
+            <option value="medium">Medium ($50-500/mo)</option>
+            <option value="free">Free only</option>
+            <option value="low">Low (&lt;$50/mo)</option>
+            <option value="high">High ($500+/mo)</option>
+          </select>
+        </div>
+        <div class="pf-field">
+          <label>Team Size</label>
+          <select id="pfTeam">
+            <option value="solo">Solo</option>
+            <option value="small">Small (2-10)</option>
+            <option value="medium">Medium (11-50)</option>
+            <option value="large">Large (50+)</option>
+          </select>
+        </div>
+        <div class="pf-field">
+          <label>Skill Level</label>
+          <select id="pfSkill">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+        <div class="pf-field">
+          <label>Existing Tools</label>
+          <input id="pfExisting" placeholder="HubSpot, Slack, ..." />
+        </div>
+        <div class="pf-field">
+          <label>Compliance Needs</label>
+          <input id="pfConstraints" placeholder="HIPAA, SOC2, GDPR..." />
+        </div>
+      </div>
+    </div>
+
+    <!-- Funnel Visualisation -->
+    <div class="funnel-section" id="funnelSection">
+      <div class="funnel-steps" id="funnelSteps"></div>
+    </div>
+
+    <!-- Clarification -->
+    <div class="clarification" id="clarificationSection">
+      <h3>🔍 We need a bit more context</h3>
+      <p id="clarificationMsg" style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:12px;"></p>
+      <div id="clarificationBtns"></div>
+    </div>
+
+    <!-- Stage Metadata -->
+    <div class="stage-meta" id="stageMeta">
+      <h3>Pipeline Metrics</h3>
+      <div class="stage-grid" id="stageGrid"></div>
+    </div>
+
+    <!-- Survivors -->
+    <div class="survivors-section" id="survivorsSection">
+      <h2>🛡️ Optimal Survivors</h2>
+      <p class="summary" id="summaryText"></p>
+      <div id="survivorCards"></div>
+    </div>
+
+    <!-- Eliminated Alternatives -->
+    <div class="eliminated-section" id="eliminatedSection">
+      <button class="eliminated-toggle" id="elimToggle" onclick="toggleEliminated()">
+        <span class="arrow">▶</span>
+        View Eliminated Alternatives
+        <span class="badge-count" id="elimCount">0</span>
+      </button>
+      <div class="eliminated-list" id="elimList"></div>
+    </div>
+  </div>
+
+  <script>
+    // ══════════════════════════════════════
+    // Differential Diagnosis — Frontend Logic
+    // ══════════════════════════════════════
+
+    const _API = '';  // same-origin
+
+    function toggleProfile() {
+      document.getElementById('profileForm').classList.toggle('hidden');
+    }
+
+    function toggleEliminated() {
+      const toggle = document.getElementById('elimToggle');
+      const list = document.getElementById('elimList');
+      toggle.classList.toggle('open');
+      list.classList.toggle('open');
+    }
+
+    function _buildProfile() {
+      const industry = document.getElementById('pfIndustry').value;
+      const budget = document.getElementById('pfBudget').value;
+      const team_size = document.getElementById('pfTeam').value;
+      const skill_level = document.getElementById('pfSkill').value;
+      const existing = document.getElementById('pfExisting').value
+        .split(',').map(s => s.trim()).filter(Boolean);
+      const constraints = document.getElementById('pfConstraints').value
+        .split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+
+      if (!industry && !existing.length && !constraints.length && budget === 'medium') {
+        return null;
+      }
+
+      return { industry, budget, team_size, skill_level, existing_tools: existing, constraints, goals: [], preferences: {} };
+    }
+
+    // ── Funnel Animation ──
+    async function animateFunnel(steps) {
+      const section = document.getElementById('funnelSection');
+      const container = document.getElementById('funnelSteps');
+      container.innerHTML = '';
+      section.classList.add('active');
+
+      const icons = ['🔍', '📦', '🚫', '✅', '⚖️', '🏆', '⚠️'];
+
+      for (let i = 0; i < steps.length; i++) {
+        const el = document.createElement('div');
+        el.className = 'funnel-step';
+        el.innerHTML = `<span class="step-icon">${icons[i] || '•'}</span><span>${steps[i]}</span>`;
+        container.appendChild(el);
+
+        await new Promise(r => setTimeout(r, 400));
+        el.classList.add('visible');
+      }
+    }
+
+    // ── Survivor Cards ──
+    function renderSurvivors(survivors, presentation) {
+      const section = document.getElementById('survivorsSection');
+      const summary = document.getElementById('summaryText');
+      const cards = document.getElementById('survivorCards');
+
+      summary.textContent = presentation.summary || '';
+      cards.innerHTML = '';
+
+      const presCards = presentation.survivor_cards || [];
+
+      survivors.forEach((s, idx) => {
+        const tier = (s.resilience || {}).tier || 'moderate';
+        const grade = (s.resilience || {}).grade || '?';
+        const pres = presCards[idx] || {};
+
+        const badgeClass = {sovereign:'badge-sovereign',durable:'badge-durable',moderate:'badge-moderate',fragile:'badge-fragile',wrapper:'badge-wrapper'}[tier] || 'badge-moderate';
+
+        const reasons = (s.survival_reasons || []).map(r =>
+          `<span class="reason-chip">✓ ${r}</span>`
+        ).join('');
+
+        const penalties = (s.penalties_applied || []).map(p =>
+          `<span class="penalty-chip">⚠ ${p.split('(')[0].trim()}</span>`
+        ).join('');
+
+        const pricing = s.pricing || {};
+        const priceStr = pricing.free_tier ? 'Free tier available' :
+          pricing.starter ? `From $${pricing.starter}/mo` : 'See pricing';
+
+        const compliance = (s.compliance || []).slice(0, 3).join(', ') || 'None listed';
+
+        const card = document.createElement('div');
+        card.className = `survivor-card tier-${tier}`;
+        card.innerHTML = `
+          <div class="survivor-header">
+            <span class="survivor-name">${s.name}</span>
+            <span class="resilience-badge ${badgeClass}">🛡️ ${tier.toUpperCase()} · ${grade}</span>
+            <span class="survivor-score">${Math.round(s.final_score * 100)}%</span>
+          </div>
+          <div class="survivor-desc">${s.description || ''}</div>
+          <div class="survival-reasons">${reasons}</div>
+          ${penalties ? `<div class="survival-reasons">${penalties}</div>` : ''}
+          <div class="survivor-meta">
+            <span>💰 ${priceStr}</span>
+            <span>📋 ${compliance}</span>
+            <span>🔧 ${(s.integrations || []).length} integrations</span>
+            <span>🎯 ${s.skill_level || 'any'}</span>
+          </div>
+          <div class="survivor-actions">
+            ${s.url ? `<a href="${s.url}" target="_blank" class="btn-sm btn-visit">Visit Tool →</a>` : ''}
+            <button class="btn-sm btn-details" onclick="window.open('/static/tools.html','_blank')">Compare All</button>
+          </div>
+        `;
+        cards.appendChild(card);
+      });
+
+      section.classList.add('active');
+    }
+
+    // ── Eliminated Cards ──
+    function renderEliminated(eliminated, presentation) {
+      const section = document.getElementById('eliminatedSection');
+      const list = document.getElementById('elimList');
+      const count = document.getElementById('elimCount');
+
+      count.textContent = eliminated.length;
+      list.innerHTML = '';
+
+      const presCards = presentation.elimination_cards || [];
+
+      eliminated.forEach((e, idx) => {
+        const pres = presCards[idx] || {};
+        const isHard = e.reason_type === 'HARD_CONSTRAINT';
+
+        const card = document.createElement('div');
+        card.className = 'elim-card';
+        card.innerHTML = `
+          <div class="elim-icon ${isHard ? 'hard' : 'soft'}">${isHard ? '🚫' : '⚠️'}</div>
+          <div class="elim-content">
+            <div class="elim-name">${e.name}</div>
+            <div class="elim-stage">${e.stage_label || (isHard ? 'Hard Constraint' : 'Soft Penalty')}</div>
+            <div class="elim-reason">${e.explanation}</div>
+            <button class="btn-challenge" onclick="challengeElimination('${e.name.replace(/'/g, "\\'")}', '${e.code}')">
+              🏴 Challenge this result
+            </button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      section.classList.add('active');
+    }
+
+    // ── Stage Metadata ──
+    function renderStages(stages) {
+      const section = document.getElementById('stageMeta');
+      const grid = document.getElementById('stageGrid');
+      grid.innerHTML = '';
+
+      const cells = [
+        { label: 'Broad Candidates', value: stages.stage_2_broad?.candidates_generated || 0, sub: 'tools matched initial query' },
+        { label: 'Hard Eliminated', value: stages.stage_3_hard_prune?.eliminated || 0, sub: 'failed mandatory requirements' },
+        { label: 'Hard Survivors', value: stages.stage_3_hard_prune?.survivors || 0, sub: 'passed deterministic pruning' },
+        { label: 'Soft Eliminated', value: stages.stage_4_soft_penalty?.eliminated_by_threshold || 0, sub: 'below viability threshold' },
+        { label: 'Final Survivors', value: stages.stage_4_soft_penalty?.survivors || 0, sub: 'optimal recommendations' },
+        { label: 'Ambiguity', value: (stages.stage_1_parsing?.ambiguity_severity * 100 || 0).toFixed(0) + '%', sub: 'query confidence' },
+      ];
+
+      if (stages.airlock_activated) {
+        cells.push({ label: 'Airlock', value: '⚠ ON', sub: 'constraints relaxed' });
+      }
+
+      cells.forEach(c => {
+        const el = document.createElement('div');
+        el.className = 'stage-cell';
+        el.innerHTML = `<div class="label">${c.label}</div><div class="value">${c.value}</div><div class="sub">${c.sub}</div>`;
+        grid.appendChild(el);
+      });
+
+      section.classList.add('active');
+    }
+
+    // ── Challenge Elimination ──
+    async function challengeElimination(toolName, code) {
+      const query = document.getElementById('queryInput').value;
+      try {
+        const resp = await fetch(_API + '/differential/challenge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, tool_name: toolName, reason_code: code }),
+        });
+        const data = await resp.json();
+        alert(data.message || 'Challenge recorded.');
+      } catch (err) {
+        alert('Failed to record challenge: ' + err.message);
+      }
+    }
+
+    // ── Clarification ──
+    function renderClarification(clarification) {
+      const section = document.getElementById('clarificationSection');
+      const msg = document.getElementById('clarificationMsg');
+      const btns = document.getElementById('clarificationBtns');
+
+      msg.textContent = clarification.message || 'Please provide more detail.';
+      btns.innerHTML = '';
+
+      (clarification.suggested_questions || []).forEach(q => {
+        const btn = document.createElement('button');
+        btn.className = 'cq-btn';
+        btn.textContent = q;
+        btn.onclick = () => {
+          document.getElementById('queryInput').value = q;
+          section.classList.remove('active');
+        };
+        btns.appendChild(btn);
+      });
+
+      section.classList.add('active');
+    }
+
+    // ── Main Diagnosis ──
+    async function runDiagnosis() {
+      const query = document.getElementById('queryInput').value.trim();
+      if (!query) return;
+
+      const btn = document.getElementById('btnDiagnose');
+      btn.disabled = true;
+      btn.textContent = 'Scanning...';
+
+      // Reset UI
+      ['funnelSection','clarificationSection','survivorsSection','eliminatedSection','stageMeta']
+        .forEach(id => document.getElementById(id).classList.remove('active'));
+
+      const profile = _buildProfile();
+      const body = { query, top_n: 5 };
+      if (profile) body.profile = profile;
+
+      try {
+        // Start funnel animation optimistically
+        const funnelPromise = animateFunnel([
+          `Scanning 246 tools in the Praxis knowledge base...`,
+          'Parsing intent and extracting constraints...',
+        ]);
+
+        const resp = await fetch(_API + '/differential', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const data = await resp.json();
+
+        // Animate full funnel
+        await animateFunnel(data.funnel_narrative || []);
+
+        if (data.clarification_needed) {
+          renderClarification(data.clarification);
+          return;
+        }
+
+        // Wait a beat then show results
+        await new Promise(r => setTimeout(r, 600));
+
+        renderStages(data.stages || {});
+        renderSurvivors(data.survivors || [], data.presentation || {});
+        renderEliminated(data.eliminated || [], data.presentation || {});
+
+      } catch (err) {
+        console.error('Diagnosis failed:', err);
+        alert('Diagnosis failed: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Diagnose';
+      }
+    }
+
+    // Enter key submits
+    document.getElementById('queryInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') runDiagnosis();
+    });
+  </script>
+</body>
+</html>

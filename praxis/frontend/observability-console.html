@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Praxis — Observability Console</title>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:rgba(255,255,255,0.035);--surface-hover:rgba(255,255,255,0.055);
+  --border:rgba(255,255,255,0.06);--text:#f0f0f5;--muted:rgba(255,255,255,0.50);--dim:rgba(255,255,255,0.30);
+  --accent:#6366f1;--accent-glow:rgba(99,102,241,0.30);--secondary:#50e3c2;
+  --warn:#fb923c;--danger:#ef4444;--success:#34d399;--info:#38bdf8;
+  --shadow-card:0 2px 20px rgba(0,0,0,0.28),0 0 0 1px rgba(255,255,255,0.04);
+  --radius:12px;--radius-lg:16px;--radius-pill:999px;
+  --fast:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(140px);opacity:0.18;animation:af 20s ease-in-out infinite alternate;}
+.aurora::before{width:500px;height:500px;background:radial-gradient(circle,#6366f1 0%,transparent 70%);top:-12%;left:-6%;}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#50e3c2 0%,transparent 70%);bottom:-15%;right:-6%;animation-delay:-9s;}
+@keyframes af{0%{transform:translate(0,0) scale(1);}50%{transform:translate(25px,-18px) scale(1.06);}100%{transform:translate(-18px,10px) scale(0.96);}}
+
+.container{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:2;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#f0f0f5 30%,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.subtitle{color:var(--muted);font-size:0.9rem;}
+.nav{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.nav a{padding:0.4rem 1rem;background:var(--surface);color:var(--muted);text-decoration:none;border-radius:var(--radius-pill);font-size:0.8rem;font-weight:500;transition:all var(--fast);backdrop-filter:blur(12px);}
+.nav a:hover,.nav a.active{background:var(--surface-hover);color:var(--text);}
+.nav a.active{border:1px solid var(--accent);color:var(--accent);}
+
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:1024px){.grid-3,.grid-2{grid-template-columns:1fr;}}
+
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);}
+.card-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all var(--fast);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#818cf8);color:#fff;box-shadow:0 2px 12px var(--accent-glow);}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-ghost{background:var(--surface);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);}
+
+/* Metric cards */
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+@media(max-width:800px){.metric-row{grid-template-columns:1fr 1fr;}}
+.metric-card{text-align:center;background:var(--surface);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-card);}
+.metric-val{font-size:2rem;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;}
+.metric-label{font-size:0.75rem;color:var(--muted);margin-top:0.2rem;}
+
+/* Trace list */
+.trace-row{display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.75rem;border-bottom:1px solid var(--border);font-size:0.82rem;cursor:pointer;transition:background var(--fast);border-radius:6px;}
+.trace-row:hover{background:rgba(99,102,241,0.05);}
+.trace-row.selected{background:rgba(99,102,241,0.08);border-color:var(--accent);}
+.trace-id{font-family:monospace;font-size:0.72rem;color:var(--muted);min-width:80px;}
+.trace-op{flex:1;font-weight:500;}
+.trace-dur{font-variant-numeric:tabular-nums;color:var(--dim);min-width:70px;text-align:right;}
+.trace-status{min-width:50px;text-align:center;}
+
+.stat-badge{display:inline-flex;align-items:center;padding:0.15rem 0.45rem;border-radius:var(--radius-pill);font-size:0.68rem;font-weight:600;}
+.stat-badge.green{background:rgba(52,211,153,0.12);color:var(--success);}
+.stat-badge.red{background:rgba(251,113,133,0.12);color:var(--danger);}
+.stat-badge.blue{background:rgba(56,189,248,0.12);color:var(--info);}
+.stat-badge.amber{background:rgba(251,146,60,0.12);color:var(--warn);}
+
+/* Reasoning tree */
+.tree-node{margin-left:1.5rem;position:relative;}
+.tree-node::before{content:'';position:absolute;left:-1rem;top:0;bottom:0;width:1px;background:var(--border);}
+.tree-item{padding:0.4rem 0.6rem;margin:0.25rem 0;border-radius:6px;font-size:0.82rem;cursor:pointer;transition:all var(--fast);border-left:3px solid transparent;}
+.tree-item:hover{background:rgba(99,102,241,0.05);}
+.tree-item.step{border-left-color:var(--accent);}
+.tree-item.assumption{border-left-color:var(--warn);}
+.tree-item.tool_call{border-left-color:var(--info);}
+.tree-item.observation{border-left-color:var(--secondary);}
+.tree-item.conclusion{border-left-color:var(--success);}
+.tree-type{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-right:0.4rem;}
+.tree-content{color:var(--muted);}
+.tree-confidence{font-size:0.68rem;color:var(--dim);margin-left:0.4rem;}
+
+/* Timeline canvas */
+#timelineCanvas{width:100%;height:200px;border-radius:var(--radius);background:rgba(0,0,0,0.2);}
+
+/* CoT input */
+.cot-input{width:100%;min-height:100px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;color:var(--text);font-size:0.85rem;font-family:monospace;resize:vertical;margin-bottom:1rem;}
+.cot-input:focus{outline:none;border-color:var(--accent);}
+
+/* Telemetry bars */
+.telem-row{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;}
+.telem-label{min-width:50px;font-size:0.78rem;color:var(--muted);text-align:right;}
+.telem-bar{flex:1;height:20px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;}
+.telem-fill{height:100%;border-radius:10px;transition:width 0.8s ease;display:flex;align-items:center;padding-left:6px;font-size:0.68rem;font-weight:600;color:#000;}
+.telem-val{min-width:60px;font-size:0.78rem;color:var(--text);text-align:right;font-variant-numeric:tabular-nums;}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1>Observability Console</h1>
+      <span class="subtitle">OpenTelemetry Tracing · Chain-of-Thought Parsing · Telemetry Windows</span>
+    </div>
+    <nav class="nav">
+      <a href="/static/home.html">Home</a>
+      <a href="/static/cognitive-dashboard.html">Cognitive</a>
+      <a href="/static/agent-orchestration.html">Agents</a>
+      <a href="/static/knowledge-explorer.html">Knowledge</a>
+      <a href="/static/observability-console.html" class="active">Observability</a>
+      <a href="/static/governance-center.html">Governance</a>
+      <a href="/static/economics-hub.html">Economics</a>
+      <a href="/static/fort-knox.html">Fort Knox</a>
+      <a href="/static/pipeline.html">Pipeline</a>
+    </nav>
+  </div>
+
+  <!-- Top metrics -->
+  <div class="metric-row" id="metricsRow">
+    <div class="metric-card"><div class="metric-val" id="totalTraces">—</div><div class="metric-label">Total Traces</div></div>
+    <div class="metric-card"><div class="metric-val" id="totalSpans">—</div><div class="metric-label">Total Spans</div></div>
+    <div class="metric-card"><div class="metric-val" id="errorRate">—</div><div class="metric-label">Error Rate</div></div>
+    <div class="metric-card"><div class="metric-val" id="avgDuration">—</div><div class="metric-label">Avg Duration</div></div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Trace List -->
+    <div class="card" style="max-height:500px;overflow-y:auto;">
+      <div class="card-title"><span class="dot"></span>Recent Traces</div>
+      <div id="traceList"><div style="color:var(--dim);font-size:0.85rem;">Loading traces…</div></div>
+      <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+        <button class="btn btn-primary" onclick="createDemoTrace()" aria-label="Create demo trace">+ Demo Trace</button>
+        <button class="btn btn-ghost" onclick="refreshAll()" aria-label="Refresh observability data">↻ Refresh</button>
+      </div>
+    </div>
+
+    <!-- Telemetry -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--info);"></span>Telemetry Percentiles</div>
+      <div id="telemetryPanel"><div style="color:var(--dim);font-size:0.85rem;">Loading telemetry…</div></div>
+    </div>
+  </div>
+
+  <!-- Chain of Thought -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--secondary);"></span>Chain-of-Thought Parser</div>
+      <textarea class="cot-input" id="cotInput" placeholder="Paste reasoning text…">Step 1: Analyze the user's query about enterprise AI architecture.
+Assumption: The user needs a scalable multi-agent system.
+Step 2: Evaluate available orchestration frameworks.
+Tool call: search_tools("orchestration framework")
+Observation: Found LangGraph, CrewAI, and AutoGen as top candidates.
+Step 3: Compare pricing and scalability.
+Assumption: Budget constraint of $50K/month for inference costs.
+Step 4: Design the architecture with failover.
+Conclusion: Recommend LangGraph with concurrent agent execution and Praxis for tool intelligence.</textarea>
+      <button class="btn btn-primary" onclick="parseCoT()">Parse Reasoning</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--warn);"></span>Reasoning Tree</div>
+      <div id="reasoningTree"><div style="color:var(--dim);font-size:0.85rem;">Click "Parse Reasoning" to visualize chain-of-thought.</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API=window.location.origin;
+let selectedTrace=null;
+
+async function fetchJSON(url,opts){
+  try{const r=await fetch(API+url,opts);if(!r.ok)throw new Error(r.status);return await r.json();}
+  catch(e){console.warn('fetch:',url,e);return null;}
+}
+
+async function loadReport(){
+  const d=await fetchJSON('/v21/observability/report');
+  if(!d)return;
+  const s=d.tracing||{};
+  document.getElementById('totalTraces').textContent=s.total_traces||0;
+  document.getElementById('totalSpans').textContent=s.total_spans||0;
+  const errPct=s.total_spans>0?((s.error_spans||0)/s.total_spans*100).toFixed(1)+'%':'0%';
+  document.getElementById('errorRate').textContent=errPct;
+  document.getElementById('avgDuration').textContent=(s.avg_duration_ms||0).toFixed(0)+'ms';
+
+  // Traces
+  const traces=d.recent_traces||[];
+  renderTraces(traces);
+
+  // Telemetry
+  const telem=d.telemetry||{};
+  renderTelemetry(telem);
+}
+
+function renderTraces(traces){
+  const el=document.getElementById('traceList');
+  if(!traces.length){el.innerHTML='<div style="color:var(--dim);font-size:0.85rem;">No traces. Create a demo trace.</div>';return;}
+  el.innerHTML=traces.map(t=>{
+    const root=t.root_span||{};
+    const status=root.status||'ok';
+    const badge=status==='error'?'red':status==='ok'?'green':'blue';
+    return`<div class="trace-row ${selectedTrace===t.trace_id?'selected':''}" onclick="selectTrace('${t.trace_id}')">
+      <span class="trace-id">${(t.trace_id||'').slice(0,8)}…</span>
+      <span class="trace-op">${root.operation||'—'}</span>
+      <span class="trace-dur">${(t.total_duration_ms||0).toFixed(0)}ms</span>
+      <span class="trace-status"><span class="stat-badge ${badge}">${status}</span></span>
+    </div>`;
+  }).join('');
+}
+
+function renderTelemetry(telem){
+  const el=document.getElementById('telemetryPanel');
+  const metrics=Object.keys(telem);
+  if(!metrics.length){el.innerHTML='<div style="color:var(--dim);font-size:0.85rem;">No telemetry data yet.</div>';return;}
+  el.innerHTML=metrics.map(m=>{
+    const d=telem[m]||{};
+    const p50=d.p50||0,p95=d.p95||0,p99=d.p99||0;
+    const max=Math.max(p99,1);
+    return`<div style="margin-bottom:1rem;">
+      <div style="font-size:0.82rem;font-weight:600;margin-bottom:0.5rem;">${m}</div>
+      <div class="telem-row">
+        <span class="telem-label">p50</span>
+        <div class="telem-bar"><div class="telem-fill" style="width:${p50/max*100}%;background:var(--success);">${p50.toFixed(1)}</div></div>
+        <span class="telem-val">${p50.toFixed(1)}ms</span>
+      </div>
+      <div class="telem-row">
+        <span class="telem-label">p95</span>
+        <div class="telem-bar"><div class="telem-fill" style="width:${p95/max*100}%;background:var(--warn);">${p95.toFixed(1)}</div></div>
+        <span class="telem-val">${p95.toFixed(1)}ms</span>
+      </div>
+      <div class="telem-row">
+        <span class="telem-label">p99</span>
+        <div class="telem-bar"><div class="telem-fill" style="width:${p99/max*100}%;background:var(--danger);">${p99.toFixed(1)}</div></div>
+        <span class="telem-val">${p99.toFixed(1)}ms</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectTrace(id){selectedTrace=id;loadReport();}
+
+async function createDemoTrace(){
+  const d=await fetchJSON('/v21/observability/trace',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({operation:'demo-query',agent_id:'agent-1',attributes:{query:'test search',model:'gpt-4o'}})});
+  refreshAll();
+}
+
+async function parseCoT(){
+  const text=document.getElementById('cotInput').value.trim();
+  if(!text){alert('Enter reasoning text.');return;}
+  const d=await fetchJSON('/v21/observability/cot',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({text:text,query:'enterprise AI architecture'})});
+  if(d)renderTree(d);
+}
+
+function renderTree(node,depth=0){
+  if(depth===0)document.getElementById('reasoningTree').innerHTML='';
+  const el=document.getElementById('reasoningTree');
+  const typeColors={step:'accent',assumption:'warn',tool_call:'info',observation:'secondary',conclusion:'success',root:'muted'};
+  const tc=typeColors[node.node_type]||'muted';
+
+  const wrapper=document.createElement('div');
+  wrapper.className=depth>0?'tree-node':'';
+
+  const item=document.createElement('div');
+  item.className='tree-item '+(node.node_type||'');
+  item.innerHTML=`<span class="tree-type" style="color:var(--${tc});">${node.node_type||'node'}</span>
+    <span class="tree-content">${node.content||node.label||''}</span>
+    ${node.confidence!==undefined?`<span class="tree-confidence">(${(node.confidence*100).toFixed(0)}%)</span>`:''}`;
+  wrapper.appendChild(item);
+
+  if(depth===0){el.appendChild(wrapper);}
+  else{el.appendChild(wrapper);}
+
+  if(node.children&&node.children.length){
+    node.children.forEach(c=>renderTree(c,depth+1));
+  }
+}
+
+async function refreshAll(){await loadReport();}
+refreshAll();
+setInterval(refreshAll,20000);
+</script>
+</body>
+</html>

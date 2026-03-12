@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Praxis — Enterprise Engine</title>
+<style>
+  :root {
+    --bg: #0a0a0f; --surface: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08); --text: #f0f0f5;
+    --muted: #8888aa; --accent: #38bdf8; --green: #34d399;
+    --purple: #818cf8; --orange: #fb923c; --rose: #ef4444;
+    --cyan: #22d3ee; --gold: #fbbf24;
+    --glass: rgba(255,255,255,0.03);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+  h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+  .query-box { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; color: var(--text); font-size: 0.95rem; resize: vertical; min-height: 80px; margin-bottom: 1rem; }
+  .query-box:focus { outline: none; border-color: var(--accent); }
+  .btn { background: linear-gradient(135deg, var(--accent), var(--cyan)); color: #000; border: none; padding: 0.7rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.95rem; }
+  .btn:hover { opacity: 0.9; }
+
+  /* Score ring */
+  .score-section { display: flex; align-items: center; gap: 2rem; margin: 2rem 0; flex-wrap: wrap; }
+  .ring-wrap { position: relative; width: 160px; height: 160px; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+  .ring-fg { fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+  .ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring-score { font-size: 2.2rem; font-weight: 700; color: var(--accent); }
+  .ring-grade { font-size: 0.85rem; color: var(--muted); }
+  .summary-stats { display: flex; flex-direction: column; gap: 0.5rem; }
+  .stat { font-size: 0.9rem; color: var(--muted); }
+  .stat strong { color: var(--text); }
+  .ready-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem; }
+  .ready-yes { background: rgba(52,211,153,0.15); color: var(--green); box-shadow: 0 0 12px rgba(52,211,153,0.3); }
+  .ready-no { background: rgba(251,113,133,0.15); color: var(--rose); }
+
+  /* Grid cards */
+  .section-title { font-size: 1.1rem; font-weight: 600; margin: 2rem 0 1rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .card { background: var(--glass); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; transition: border-color 0.3s; }
+  .card:hover { border-color: var(--accent); }
+  .card-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+  .card-score { font-size: 1.6rem; font-weight: 700; }
+  .card-grade { font-size: 0.8rem; color: var(--muted); }
+
+  /* Bar charts */
+  .bar-group { margin-bottom: 1.5rem; }
+  .bar-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; }
+  .bar-name { width: 160px; font-size: 0.82rem; color: var(--muted); text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 22px; background: var(--surface); border-radius: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; transition: width 0.8s ease; display: flex; align-items: center; padding-left: 8px; font-size: 0.75rem; font-weight: 600; color: #000; }
+  .bar-val { width: 42px; text-align: right; font-size: 0.82rem; color: var(--text); flex-shrink: 0; }
+
+  /* Agent chips */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.5rem; }
+  .chip { padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500; border: 1px solid var(--border); color: var(--muted); transition: all 0.3s; }
+  .chip.active { border-color: var(--cyan); color: var(--cyan); background: rgba(34,211,238,0.1); box-shadow: 0 0 8px rgba(34,211,238,0.25); }
+
+  /* Tables */
+  .ref-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.85rem; }
+  .ref-table th { text-align: left; padding: 0.6rem 0.8rem; color: var(--accent); border-bottom: 1px solid var(--border); font-weight: 600; }
+  .ref-table td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); color: var(--muted); }
+  .ref-table tr:hover td { color: var(--text); }
+
+  /* Evidence / warnings */
+  .evidence-list { list-style: none; padding: 0; margin-bottom: 1rem; }
+  .evidence-list li { padding: 0.3rem 0; font-size: 0.82rem; color: var(--muted); border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .evidence-list li::before { content: "◆ "; color: var(--accent); }
+  .warning-list li::before { content: "⚠ "; color: var(--orange); }
+
+  /* Market metrics */
+  .market-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .market-card { background: var(--glass); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; }
+  .market-card h4 { font-size: 0.95rem; color: var(--gold); margin-bottom: 0.5rem; }
+  .market-card .metric { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.2rem; }
+  .market-card .metric strong { color: var(--text); }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Enterprise Engine Dashboard</h1>
+  <p class="subtitle">v17 — Architecting the Billion-Dollar Enterprise Decision Engine</p>
+
+  <textarea class="query-box" id="queryInput">We need a Hybrid GraphRAG architecture with Neo4j knowledge graph and Weaviate vector database for multi-hop reasoning across 25,000 AI tools. The multi-agent supervisor delegates to Intent Extraction, Vendor Intelligence, Architecture Orchestration, and Budget Compliance sub-agents via LangGraph concurrent orchestration. MCP integration connects our Agentic Service Bus for JSON-RPC inter-agent communication. Our proprietary data moat uses Cognism and ZoomInfo enrichment APIs with a Medallion Architecture (Bronze/Silver/Gold tiers) and B2B gamification leaderboards for RLHF feedback. Hybrid action-based pricing protects unit economics with pre-paid inference credits and usage caps. SOC 2 Type II plus NIST AI RMF governance, Firecracker microVM sandboxing, and Presidio PII sanitization ensure enterprise security with cryptographic audit trails.</textarea>
+  <button class="btn" onclick="runAssessment()">Assess Enterprise Readiness</button>
+
+  <!-- Score Ring -->
+  <div class="score-section hidden" id="scoreSection">
+    <div class="ring-wrap">
+      <svg viewBox="0 0 160 160" width="160" height="160">
+        <circle class="ring-bg" cx="80" cy="80" r="70" />
+        <circle class="ring-fg" id="ringFg" cx="80" cy="80" r="70"
+                stroke-dasharray="439.82" stroke-dashoffset="439.82" />
+      </svg>
+      <div class="ring-label">
+        <span class="ring-score" id="scoreVal">—</span>
+        <span class="ring-grade" id="gradeVal"></span>
+      </div>
+    </div>
+    <div class="summary-stats" id="summaryStats"></div>
+  </div>
+
+  <!-- Pillar Cards -->
+  <div class="section-title hidden" id="pillarTitle">Strategic Pillars</div>
+  <div class="card-grid hidden" id="pillarGrid"></div>
+
+  <!-- Telemetry Cards -->
+  <div class="section-title hidden" id="telemTitle">Telemetry Metrics</div>
+  <div class="card-grid hidden" id="telemGrid"></div>
+
+  <!-- Agent Roles Bar Chart -->
+  <div class="section-title hidden" id="agentBarTitle">Agent Role Activation</div>
+  <div class="bar-group hidden" id="agentBars"></div>
+
+  <!-- Agent Chips -->
+  <div class="section-title hidden" id="chipTitle">Active Sub-Agents</div>
+  <div class="chip-row hidden" id="agentChips"></div>
+
+  <!-- Medallion Bar Chart -->
+  <div class="section-title hidden" id="medalBarTitle">Medallion Architecture Tiers</div>
+  <div class="bar-group hidden" id="medalBars"></div>
+
+  <!-- Warnings -->
+  <div class="section-title hidden" id="warnTitle">Warnings</div>
+  <ul class="evidence-list warning-list hidden" id="warnList"></ul>
+
+  <!-- Evidence -->
+  <div class="section-title hidden" id="evidTitle">Evidence</div>
+  <ul class="evidence-list hidden" id="evidList"></ul>
+
+  <!-- Market Metrics -->
+  <div class="section-title hidden" id="marketTitle">Enterprise AI Market Projections</div>
+  <div class="market-cards hidden" id="marketCards"></div>
+
+  <!-- DB Architecture Table -->
+  <div class="section-title hidden" id="dbTitle">Database Architecture Evolution</div>
+  <table class="ref-table hidden" id="dbTable">
+    <thead><tr><th>Tier</th><th>Strengths</th><th>Limitations</th><th>Status</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Pricing Models Table -->
+  <div class="section-title hidden" id="priceTitle">Monetization Models</div>
+  <table class="ref-table hidden" id="priceTable">
+    <thead><tr><th>Model</th><th>Mechanics</th><th>Pros</th><th>Cons</th><th>Recommended</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Security Frameworks Table -->
+  <div class="section-title hidden" id="secTitle">Security & Governance Frameworks</div>
+  <table class="ref-table hidden" id="secTable">
+    <thead><tr><th>Framework</th><th>Scope</th><th>Criteria</th><th>Limitation</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Capitalization Phases Table -->
+  <div class="section-title hidden" id="capTitle">Capitalization Strategy</div>
+  <table class="ref-table hidden" id="capTable">
+    <thead><tr><th>Source</th><th>Type</th><th>Amount</th><th>Utilization</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+const API = window.location.origin;
+const PILLAR_COLORS = {
+  hybrid_graphrag: '#38bdf8', multi_agent: '#818cf8',
+  mcp_bus: '#22d3ee', data_moat: '#34d399',
+  monetization: '#fbbf24', security: '#ef4444'
+};
+const PILLAR_KEYS = ['hybrid_graphrag', 'multi_agent', 'mcp_bus', 'data_moat', 'monetization', 'security'];
+const PILLAR_LABELS = {
+  hybrid_graphrag: 'GraphRAG', multi_agent: 'Multi-Agent',
+  mcp_bus: 'MCP Bus', data_moat: 'Data Moat',
+  monetization: 'Monetization', security: 'Security'
+};
+const TELEM_KEYS = ['tam_coverage','graphrag_accuracy','agent_utilization','moat_strength','unit_economics','compliance_telem','capital_efficiency'];
+const TELEM_LABELS = {
+  tam_coverage: 'TAM', graphrag_accuracy: 'GraphRAG Acc',
+  agent_utilization: 'Agent Util', moat_strength: 'Moat',
+  unit_economics: 'Unit Econ', compliance_telem: 'Compliance',
+  capital_efficiency: 'Capital Eff'
+};
+const AGENT_IDS = ['intent_extraction','vendor_intelligence','architecture_orchestration','budget_compliance'];
+const AGENT_LABELS = {
+  intent_extraction: 'Intent Extraction', vendor_intelligence: 'Vendor Intelligence',
+  architecture_orchestration: 'Architecture Orchestration', budget_compliance: 'Budget & Compliance'
+};
+const MEDAL_IDS = ['bronze','silver','gold'];
+const MEDAL_COLORS = { bronze: '#cd7f32', silver: '#c0c0c0', gold: '#fbbf24' };
+
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+
+async function runAssessment() {
+  const text = document.getElementById('queryInput').value.trim();
+  if (!text) return;
+
+  // Fetch assessment + reference data in parallel
+  const [assessRes, dbRes, priceRes, secRes, capRes, marketRes] = await Promise.all([
+    fetch(API + '/enterprise/assess', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({text}) }),
+    fetch(API + '/enterprise/db-tiers'),
+    fetch(API + '/enterprise/pricing-models'),
+    fetch(API + '/enterprise/security-frameworks'),
+    fetch(API + '/enterprise/capitalization'),
+    fetch(API + '/enterprise/market-metrics'),
+  ]);
+
+  const d = await assessRes.json();
+  const dbData = await dbRes.json();
+  const priceData = await priceRes.json();
+  const secData = await secRes.json();
+  const capData = await capRes.json();
+  const marketData = await marketRes.json();
+
+  // Score ring
+  show('scoreSection');
+  const pct = d.enterprise_score;
+  const off = 439.82 * (1 - pct);
+  const ring = document.getElementById('ringFg');
+  ring.style.strokeDashoffset = off;
+  ring.style.stroke = pct >= 0.65 ? '#34d399' : pct >= 0.45 ? '#fbbf24' : '#ef4444';
+  document.getElementById('scoreVal').textContent = (pct * 100).toFixed(1);
+  document.getElementById('gradeVal').textContent = 'Grade ' + d.grade;
+
+  const stats = document.getElementById('summaryStats');
+  stats.innerHTML = `
+    <span class="stat"><strong>Pillar Composite:</strong> ${(d.pillar_composite*100).toFixed(1)}%</span>
+    <span class="stat"><strong>Telemetry Composite:</strong> ${(d.telemetry_composite*100).toFixed(1)}%</span>
+    <span class="stat"><strong>Agent Roles:</strong> ${d.agent_roles_grade}</span>
+    <span class="stat"><strong>Medallion:</strong> ${d.medallion_grade}</span>
+    <span class="ready-badge ${d.enterprise_ready ? 'ready-yes' : 'ready-no'}">${d.enterprise_ready ? 'ENTERPRISE READY' : 'NOT READY'}</span>
+  `;
+
+  // Pillar cards
+  show('pillarTitle');
+  show('pillarGrid');
+  const pg = document.getElementById('pillarGrid');
+  pg.innerHTML = '';
+  PILLAR_KEYS.forEach(k => {
+    const p = d[k];
+    const c = PILLAR_COLORS[k];
+    pg.innerHTML += `<div class="card"><div class="card-label">${PILLAR_LABELS[k]}</div><div class="card-score" style="color:${c}">${(p.score*100).toFixed(1)}</div><div class="card-grade">Grade ${p.grade}</div></div>`;
+  });
+
+  // Telemetry cards
+  show('telemTitle');
+  show('telemGrid');
+  const tg = document.getElementById('telemGrid');
+  tg.innerHTML = '';
+  TELEM_KEYS.forEach(k => {
+    const t = d[k];
+    tg.innerHTML += `<div class="card"><div class="card-label">${TELEM_LABELS[k]}</div><div class="card-score" style="color:var(--cyan)">${(t.score*100).toFixed(1)}</div><div class="card-grade">Grade ${t.grade}</div></div>`;
+  });
+
+  // Agent role bars — fetch score_agent_roles
+  const arRes = await fetch(API + '/enterprise/agent-roles', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({text}) });
+  const arData = await arRes.json();
+  show('agentBarTitle');
+  show('agentBars');
+  const ab = document.getElementById('agentBars');
+  ab.innerHTML = '';
+  AGENT_IDS.forEach(id => {
+    const val = arData.roles[id] || 0;
+    const pctW = (val * 100).toFixed(1);
+    ab.innerHTML += `<div class="bar-row"><span class="bar-name">${AGENT_LABELS[id]}</span><div class="bar-track"><div class="bar-fill" style="width:${pctW}%;background:var(--purple)">${pctW}%</div></div><span class="bar-val">${pctW}%</span></div>`;
+  });
+
+  // Agent chips
+  show('chipTitle');
+  show('agentChips');
+  const cc = document.getElementById('agentChips');
+  cc.innerHTML = '';
+  AGENT_IDS.forEach(id => {
+    const isActive = d.active_agents.includes(id);
+    cc.innerHTML += `<span class="chip ${isActive ? 'active' : ''}">${AGENT_LABELS[id]}</span>`;
+  });
+
+  // Medallion bars
+  const mdRes = await fetch(API + '/enterprise/medallion', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({text}) });
+  const mdData = await mdRes.json();
+  show('medalBarTitle');
+  show('medalBars');
+  const mb = document.getElementById('medalBars');
+  mb.innerHTML = '';
+  MEDAL_IDS.forEach(id => {
+    const val = mdData.tiers[id] || 0;
+    const pctW = (val * 100).toFixed(1);
+    mb.innerHTML += `<div class="bar-row"><span class="bar-name">${id.charAt(0).toUpperCase()+id.slice(1)} Tier</span><div class="bar-track"><div class="bar-fill" style="width:${pctW}%;background:${MEDAL_COLORS[id]}">${pctW}%</div></div><span class="bar-val">${pctW}%</span></div>`;
+  });
+
+  // Warnings
+  if (d.warnings.length) {
+    show('warnTitle'); show('warnList');
+    document.getElementById('warnList').innerHTML = d.warnings.map(w => `<li>${w}</li>`).join('');
+  }
+
+  // Evidence
+  if (d.evidence.length) {
+    show('evidTitle'); show('evidList');
+    document.getElementById('evidList').innerHTML = d.evidence.map(e => `<li>${e}</li>`).join('');
+  }
+
+  // Market metrics
+  show('marketTitle'); show('marketCards');
+  const mc = document.getElementById('marketCards');
+  mc.innerHTML = '';
+  (marketData.market_metrics || []).forEach(m => {
+    mc.innerHTML += `<div class="market-card"><h4>${m.title}</h4><div class="metric"><strong>Current:</strong> ${m.current_value}</div><div class="metric"><strong>Projected:</strong> ${m.projection}</div><div class="metric"><strong>CAGR:</strong> ${m.cagr}</div><div class="metric">${m.drivers}</div></div>`;
+  });
+
+  // DB Architecture table
+  show('dbTitle'); show('dbTable');
+  const dtb = document.querySelector('#dbTable tbody');
+  dtb.innerHTML = '';
+  (dbData.db_tiers || []).forEach(t => {
+    dtb.innerHTML += `<tr><td>${t.title}</td><td>${t.strengths}</td><td>${t.limitations}</td><td>${t.status}</td></tr>`;
+  });
+
+  // Pricing table
+  show('priceTitle'); show('priceTable');
+  const ptb = document.querySelector('#priceTable tbody');
+  ptb.innerHTML = '';
+  (priceData.pricing_models || []).forEach(m => {
+    ptb.innerHTML += `<tr><td>${m.title}</td><td>${m.mechanics}</td><td>${m.pros}</td><td>${m.cons}</td><td>${m.recommended ? '✓ Recommended' : '—'}</td></tr>`;
+  });
+
+  // Security table
+  show('secTitle'); show('secTable');
+  const stb = document.querySelector('#secTable tbody');
+  stb.innerHTML = '';
+  (secData.security_frameworks || []).forEach(f => {
+    stb.innerHTML += `<tr><td>${f.title}</td><td>${f.scope}</td><td>${(f.criteria||[]).join(', ')}</td><td>${f.limitation}</td></tr>`;
+  });
+
+  // Capitalization table
+  show('capTitle'); show('capTable');
+  const ctb = document.querySelector('#capTable tbody');
+  ctb.innerHTML = '';
+  (capData.capitalization_phases || []).forEach(p => {
+    ctb.innerHTML += `<tr><td>${p.title}</td><td>${p.funding_type}</td><td>${p.amount}</td><td>${p.utilization}</td></tr>`;
+  });
+}
+</script>
+</body>
+</html>

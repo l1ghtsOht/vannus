@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2026-02-25T06:20:23.523621Z",
+    "query": "CRM tools",
+    "tool": "Salesforce",
+    "reason_code": "NEGATIVE_INTENT_MATCH",
+    "profile_id": null
+  },
+  {
+    "timestamp": "2026-02-25T06:37:45.451586Z",
+    "query": "",
+    "tool": "TestTool",
+    "reason_code": "BUDGET_EXCEEDED",
+    "profile_id": null
+  }
+]

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Praxis — Sovereignty &amp; Trust Dashboard</title>
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-glass: rgba(255,255,255,0.06);
+      --bg-glass-hover: rgba(255,255,255,0.10);
+      --bg-glass-strong: rgba(255,255,255,0.12);
+      --border-glass: rgba(255,255,255,0.08);
+      --border-glass-hover: rgba(255,255,255,0.18);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-dim: rgba(255,255,255,0.35);
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.35);
+      --accent-secondary: #50e3c2;
+      --accent-warm: #f5a623;
+      --accent-danger: #ef4444;
+      --tier-us: #50e3c2;
+      --tier-allied: #6366f1;
+      --tier-high-risk: #ef4444;
+      --tier-unknown: #888;
+      --glass-blur: 24px;
+      --radius: 16px;
+      --radius-pill: 999px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+    a { color: var(--accent-secondary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Nav ── */
+    .nav {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 2rem;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(var(--glass-blur));
+      border-bottom: 1px solid var(--border-glass);
+      overflow-x: auto;
+    }
+    .nav-brand { font-weight: 700; font-size: 1.2rem; color: var(--accent-secondary); white-space: nowrap; }
+    .nav a { color: var(--text-secondary); font-size: .85rem; white-space: nowrap; padding: .3rem .6rem; border-radius: 8px; }
+    .nav a:hover, .nav a.active { color: var(--text-primary); background: var(--bg-glass); text-decoration: none; }
+    .nav a.active { color: var(--accent-secondary); }
+
+    /* ── Layout ── */
+    .main { flex: 1; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+    .header { text-align: center; margin-bottom: 2rem; }
+    .header h1 { font-size: 2rem; font-weight: 700; }
+    .header h1 span { color: var(--accent-secondary); }
+    .header p { color: var(--text-secondary); margin-top: .5rem; }
+
+    /* ── Stats Row ── */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius); padding: 1.2rem; text-align: center;
+    }
+    .stat-card .value { font-size: 2rem; font-weight: 700; }
+    .stat-card .label { color: var(--text-secondary); font-size: .85rem; margin-top: .3rem; }
+
+    /* ── Tier Colors ── */
+    .tier-us { color: var(--tier-us); }
+    .tier-allied { color: var(--tier-allied); }
+    .tier-high-risk { color: var(--tier-high-risk); }
+    .tier-unknown { color: var(--tier-unknown); }
+
+    /* ── Filter Pills ── */
+    .filter-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.5rem; justify-content: center; }
+    .pill {
+      padding: .4rem 1rem; border-radius: var(--radius-pill); border: 1px solid var(--border-glass);
+      background: var(--bg-glass); cursor: pointer; font-size: .85rem; color: var(--text-secondary);
+      transition: all .2s;
+    }
+    .pill:hover { background: var(--bg-glass-hover); color: var(--text-primary); border-color: var(--border-glass-hover); }
+    .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* ── Tool Grid ── */
+    .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+    .tool-card {
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius); padding: 1.2rem;
+      transition: all .2s; cursor: pointer;
+    }
+    .tool-card:hover { background: var(--bg-glass-hover); border-color: var(--border-glass-hover); transform: translateY(-2px); }
+    .tool-card .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+    .tool-card .tool-name { font-weight: 600; font-size: 1.05rem; }
+    .tool-card .tool-badge {
+      padding: .2rem .6rem; border-radius: var(--radius-pill);
+      font-size: .75rem; font-weight: 600;
+    }
+    .badge-us { background: rgba(80,227,194,.15); color: var(--tier-us); }
+    .badge-allied { background: rgba(99,102,241,.15); color: var(--tier-allied); }
+    .badge-high-risk { background: rgba(255,107,107,.15); color: var(--tier-high-risk); }
+    .badge-unknown { background: rgba(136,136,136,.15); color: var(--tier-unknown); }
+    .tool-card .tool-origin { color: var(--text-secondary); font-size: .8rem; }
+    .tool-card .tool-warnings { color: var(--accent-warm); font-size: .8rem; margin-top: .5rem; }
+    .tool-card .tool-risk { display: flex; align-items: center; gap: .5rem; margin-top: .5rem; }
+    .risk-bar { flex: 1; height: 4px; background: rgba(255,255,255,.1); border-radius: 4px; overflow: hidden; }
+    .risk-fill { height: 100%; border-radius: 4px; transition: width .5s; }
+    .risk-low .risk-fill { background: var(--tier-us); }
+    .risk-med .risk-fill { background: var(--accent-warm); }
+    .risk-high .risk-fill { background: var(--tier-high-risk); }
+    .tool-card .tool-risk .risk-label { font-size: .75rem; color: var(--text-dim); min-width: 30px; }
+
+    /* ── Nutrition Panel ── */
+    .nutrition-panel {
+      position: fixed; right: -420px; top: 0; bottom: 0; width: 400px;
+      background: var(--bg-primary); border-left: 1px solid var(--border-glass);
+      padding: 1.5rem; overflow-y: auto; transition: right .3s; z-index: 100;
+    }
+    .nutrition-panel.open { right: 0; }
+    .nutrition-panel .close-btn {
+      position: absolute; top: 1rem; right: 1rem; background: var(--bg-glass);
+      border: 1px solid var(--border-glass); color: var(--text-primary);
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nutrition-panel h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+    .nutrition-section { margin-bottom: 1rem; }
+    .nutrition-section h3 { font-size: .9rem; color: var(--accent-secondary); margin-bottom: .4rem; }
+    .nutrition-row { display: flex; justify-content: space-between; padding: .3rem 0; border-bottom: 1px solid var(--border-glass); font-size: .85rem; }
+    .nutrition-row .label { color: var(--text-secondary); }
+    .nutrition-row .value { font-weight: 500; }
+
+    /* ── Outcome Pills ── */
+    .outcome-section { margin-top: 2rem; }
+    .outcome-section h2 { text-align: center; margin-bottom: 1rem; }
+    .outcome-pills { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .outcome-pill {
+      padding: .5rem 1.2rem; border-radius: var(--radius-pill); border: 1px solid var(--border-glass);
+      background: var(--bg-glass); cursor: pointer; font-size: .9rem; color: var(--text-secondary);
+      transition: all .2s;
+    }
+    .outcome-pill:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .outcome-pill .icon { margin-right: .4rem; }
+
+    /* ── Prompt Assist ── */
+    .prompt-section { margin-top: 2rem; }
+    .prompt-section h2 { text-align: center; margin-bottom: 1rem; }
+    .prompt-input-row { display: flex; gap: .5rem; max-width: 700px; margin: 0 auto 1rem; }
+    .prompt-input { flex: 1; padding: .6rem 1rem; border-radius: var(--radius); border: 1px solid var(--border-glass); background: var(--bg-glass); color: var(--text-primary); font-size: .9rem; }
+    .prompt-input:focus { outline: none; border-color: var(--accent); }
+    .prompt-btn { padding: .6rem 1.2rem; border-radius: var(--radius); border: none; background: var(--accent); color: #fff; cursor: pointer; font-weight: 600; }
+    .prompt-btn:hover { opacity: .85; }
+    .prompt-result { max-width: 700px; margin: 0 auto; background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius); padding: 1rem; font-family: 'Fira Code', monospace; font-size: .85rem; white-space: pre-wrap; display: none; }
+
+    /* ── Self-Label ── */
+    .self-label {
+      margin-top: 2rem; text-align: center; padding: 1.5rem;
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: var(--radius);
+    }
+    .self-label .banner { font-size: 1.1rem; font-weight: 600; color: var(--accent-secondary); }
+    .self-label p { color: var(--text-secondary); font-size: .85rem; margin-top: .5rem; }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 3rem; color: var(--text-dim); }
+    .loading .spinner { display: inline-block; width: 24px; height: 24px; border: 2px solid var(--border-glass); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .tool-grid { grid-template-columns: 1fr; }
+      .nutrition-panel { width: 100%; right: -100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav class="nav">
+  <span class="nav-brand">⚡ Praxis</span>
+  <a href="/static/home.html">Home</a>
+  <a href="/static/tools.html">Tools</a>
+  <a href="/static/differential.html">Diagnosis</a>
+  <a href="/static/trust_badges.html">Trust Badges</a>
+  <a href="/static/manifesto.html">Manifesto</a>
+</nav>
+
+<!-- ── Main Content ── -->
+<div class="main">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>🛡 <span>Sovereignty</span> &amp; Trust Dashboard</h1>
+    <p>Foreign influence detection, AI nutrition labels, outcome-oriented recommendations</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats" id="stats">
+    <div class="stat-card"><div class="value tier-us" id="stat-us">—</div><div class="label">✓ US-Controlled</div></div>
+    <div class="stat-card"><div class="value tier-allied" id="stat-allied">—</div><div class="label">🛡 Allied</div></div>
+    <div class="stat-card"><div class="value tier-high-risk" id="stat-risk">—</div><div class="label">✗ High-Risk</div></div>
+    <div class="stat-card"><div class="value tier-unknown" id="stat-unknown">—</div><div class="label">? Unknown</div></div>
+  </div>
+
+  <!-- Tier Filter -->
+  <div class="filter-row" id="tier-filters">
+    <button class="pill active" data-tier="all">All Tools</button>
+    <button class="pill" data-tier="us_controlled">✓ US-Controlled</button>
+    <button class="pill" data-tier="allied">🛡 Allied</button>
+    <button class="pill" data-tier="high_risk">✗ High-Risk</button>
+    <button class="pill" data-tier="unknown">? Unknown</button>
+  </div>
+
+  <!-- Tool Grid -->
+  <div class="tool-grid" id="tool-grid">
+    <div class="loading"><div class="spinner"></div><br>Loading sovereignty data…</div>
+  </div>
+
+  <!-- Outcome Section -->
+  <div class="outcome-section">
+    <h2>📈 Outcome-Oriented Navigation</h2>
+    <div class="outcome-pills" id="outcome-pills"></div>
+  </div>
+
+  <!-- Prompt Assist Section -->
+  <div class="prompt-section">
+    <h2>🧠 Prompt Assistance</h2>
+    <div class="prompt-input-row">
+      <input class="prompt-input" id="prompt-input" placeholder="Describe what you need help with…" />
+      <select class="prompt-input" id="model-select" style="flex:.4"><option value="">Model…</option></select>
+      <button class="prompt-btn" onclick="generatePrompt()">Generate</button>
+    </div>
+    <pre class="prompt-result" id="prompt-result"></pre>
+  </div>
+
+  <!-- Praxis Self-Label -->
+  <div class="self-label" id="self-label">
+    <div class="banner">Loading Praxis AI Nutrition Label…</div>
+  </div>
+
+</div>
+
+<!-- ── Nutrition Label Panel ── -->
+<div class="nutrition-panel" id="nutrition-panel">
+  <button class="close-btn" onclick="closeNutrition()">×</button>
+  <h2 id="nutrition-title">AI Nutrition Label</h2>
+  <div id="nutrition-content"></div>
+</div>
+
+<script>
+const API = '';
+
+// ── State ──
+let allTools = [];
+let currentTier = 'all';
+
+// ── Load Dashboard ──
+async function loadDashboard() {
+  try {
+    const resp = await fetch(`${API}/sovereignty/dashboard`);
+    const data = await resp.json();
+
+    const summary = data.summary || {};
+    document.getElementById('stat-us').textContent = summary.us_controlled || 0;
+    document.getElementById('stat-allied').textContent = summary.allied || 0;
+    document.getElementById('stat-risk').textContent = summary.high_risk || 0;
+    document.getElementById('stat-unknown').textContent = summary.unknown || 0;
+
+    allTools = data.tools || [];
+    renderGrid(allTools);
+  } catch (e) {
+    document.getElementById('tool-grid').innerHTML = `<p style="color:var(--accent-danger)">Failed to load: ${e.message}</p>`;
+  }
+}
+
+function renderGrid(tools) {
+  const grid = document.getElementById('tool-grid');
+  const filtered = currentTier === 'all' ? tools : tools.filter(t => t.assessment?.trust_tier === currentTier);
+
+  if (!filtered.length) {
+    grid.innerHTML = '<p style="text-align:center;color:var(--text-dim)">No tools match this filter.</p>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(t => {
+    const a = t.assessment || {};
+    const badge = t.badge || {};
+    const tier = a.trust_tier || 'unknown';
+    const risk = (a.risk_score || 0) * 100;
+    const riskClass = risk > 60 ? 'risk-high' : risk > 30 ? 'risk-med' : 'risk-low';
+    const badgeClass = tier === 'us_controlled' ? 'badge-us' : tier === 'allied' ? 'badge-allied' : tier === 'high_risk' ? 'badge-high-risk' : 'badge-unknown';
+    const warnings = (a.warnings || []).slice(0, 2);
+
+    return `
+      <div class="tool-card" onclick="showNutrition('${t.tool_name}')">
+        <div class="tool-header">
+          <span class="tool-name">${t.tool_name}</span>
+          <span class="tool-badge ${badgeClass}">${badge.icon || '?'} ${badge.label || tier}</span>
+        </div>
+        <div class="tool-origin">${badge.tooltip || a.recommendation || ''}</div>
+        ${warnings.length ? `<div class="tool-warnings">⚠ ${warnings.join(' · ')}</div>` : ''}
+        <div class="tool-risk ${riskClass}">
+          <span class="risk-label">${risk.toFixed(0)}%</span>
+          <div class="risk-bar"><div class="risk-fill" style="width:${risk}%"></div></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Tier Filtering ──
+document.getElementById('tier-filters').addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  document.querySelectorAll('#tier-filters .pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  currentTier = pill.dataset.tier;
+  renderGrid(allTools);
+});
+
+// ── Nutrition Panel ──
+async function showNutrition(toolName) {
+  const panel = document.getElementById('nutrition-panel');
+  const content = document.getElementById('nutrition-content');
+  document.getElementById('nutrition-title').textContent = `${toolName} — AI Nutrition Label`;
+  content.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  panel.classList.add('open');
+
+  try {
+    const resp = await fetch(`${API}/nutrition/${encodeURIComponent(toolName)}`);
+    const label = await resp.json();
+    content.innerHTML = renderNutritionLabel(label);
+  } catch (e) {
+    content.innerHTML = `<p style="color:var(--accent-danger)">Failed to load: ${e.message}</p>`;
+  }
+}
+
+function renderNutritionLabel(label) {
+  const sections = [];
+  const s = label.sections || label;  // Handle both nested and flat
+
+  if (s.provenance) {
+    sections.push(renderSection('Provenance', s.provenance));
+  }
+  if (s.data_usage) {
+    sections.push(renderSection('Data Usage', s.data_usage));
+  }
+  if (s.retention) {
+    sections.push(renderSection('Data Retention', s.retention));
+  }
+  if (s.compliance) {
+    sections.push(renderSection('Compliance', s.compliance));
+  }
+  if (s.sovereignty) {
+    sections.push(renderSection('Sovereignty', s.sovereignty));
+  }
+  if (s.outcome) {
+    sections.push(renderSection('Outcome Metrics', s.outcome));
+  }
+  if (label.risk_summary) {
+    const flags = (label.risk_summary.flags || []).map(f => `<div style="color:var(--accent-warm);font-size:.8rem;margin:.2rem 0">⚠ ${f}</div>`).join('');
+    sections.push(`<div class="nutrition-section"><h3>Risk Summary</h3>
+      <div class="nutrition-row"><span class="label">Overall Risk</span><span class="value">${label.risk_summary.overall_risk || '—'}</span></div>
+      ${flags}
+    </div>`);
+  }
+
+  return sections.join('');
+}
+
+function renderSection(title, obj) {
+  if (!obj || typeof obj !== 'object') return '';
+  const rows = Object.entries(obj).map(([k, v]) => {
+    const val = typeof v === 'object' ? JSON.stringify(v) : String(v);
+    const label = k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return `<div class="nutrition-row"><span class="label">${label}</span><span class="value">${val}</span></div>`;
+  }).join('');
+  return `<div class="nutrition-section"><h3>${title}</h3>${rows}</div>`;
+}
+
+function closeNutrition() {
+  document.getElementById('nutrition-panel').classList.remove('open');
+}
+
+// ── Outcome Pills ──
+async function loadOutcomePills() {
+  try {
+    const resp = await fetch(`${API}/outcomes/pills`);
+    const data = await resp.json();
+    const container = document.getElementById('outcome-pills');
+    container.innerHTML = (data.pills || []).map(p =>
+      `<button class="outcome-pill" onclick="filterByOutcome('${p.id}')">
+        <span class="icon">${p.icon}</span>${p.label}
+      </button>`
+    ).join('');
+  } catch (e) { /* silent */ }
+}
+
+async function filterByOutcome(outcomeId) {
+  try {
+    const resp = await fetch(`${API}/outcomes/recommend`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: outcomeId, force_outcome: outcomeId }),
+    });
+    const data = await resp.json();
+    alert(`Top ${outcomeId} tools: ${(data.ranked_results || []).map(r => r.tool_name).join(', ') || 'None found'}`);
+  } catch (e) { /* silent */ }
+}
+
+// ── Prompt Assist ──
+async function loadModels() {
+  try {
+    const resp = await fetch(`${API}/prompt-assist/models`);
+    const data = await resp.json();
+    const sel = document.getElementById('model-select');
+    (data.models || []).forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = m.name;
+      sel.appendChild(opt);
+    });
+  } catch (e) { /* silent */ }
+}
+
+async function generatePrompt() {
+  const query = document.getElementById('prompt-input').value.trim();
+  if (!query) return;
+  const model = document.getElementById('model-select').value;
+  const result = document.getElementById('prompt-result');
+  result.style.display = 'block';
+  result.textContent = 'Generating…';
+
+  try {
+    const resp = await fetch(`${API}/prompt-assist/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, target_model: model || null }),
+    });
+    const data = await resp.json();
+    result.textContent = data.optimized_prompt || JSON.stringify(data, null, 2);
+  } catch (e) {
+    result.textContent = `Error: ${e.message}`;
+  }
+}
+
+// ── Self-Label ──
+async function loadSelfLabel() {
+  try {
+    const resp = await fetch(`${API}/nutrition/self-label`);
+    const data = await resp.json();
+    const el = document.getElementById('self-label');
+    el.innerHTML = `
+      <div class="banner">🏷 ${data.banner_text || data.title || 'Praxis AI Nutrition Label'}</div>
+      <p>${data.tool_name || 'Praxis'} — ${data.compliance_posture || ''}</p>
+      <p style="margin-top:.5rem;color:var(--tier-us)">${data.training_data_usage || 'never'} training data usage · ${data.data_retention_ttl || 'ephemeral'} retention</p>
+    `;
+  } catch (e) { /* silent */ }
+}
+
+// ── Init ──
+loadDashboard();
+loadOutcomePills();
+loadModels();
+loadSelfLabel();
+</script>
+</body>
+</html>

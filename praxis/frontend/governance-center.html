@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Praxis — Governance &amp; Compliance Center</title>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:rgba(255,255,255,0.035);--surface-hover:rgba(255,255,255,0.055);
+  --border:rgba(255,255,255,0.06);--text:#f0f0f5;--muted:rgba(255,255,255,0.50);--dim:rgba(255,255,255,0.30);
+  --accent:#6366f1;--accent-glow:rgba(99,102,241,0.30);--secondary:#50e3c2;
+  --warn:#fb923c;--danger:#ef4444;--success:#34d399;--info:#38bdf8;
+  --shadow-card:0 2px 20px rgba(0,0,0,0.28),0 0 0 1px rgba(255,255,255,0.04);
+  --radius:12px;--radius-lg:16px;--radius-pill:999px;
+  --fast:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.aurora::before,.aurora::after{content:'';position:absolute;border-radius:50%;filter:blur(140px);opacity:0.18;animation:af 20s ease-in-out infinite alternate;}
+.aurora::before{width:500px;height:500px;background:radial-gradient(circle,#6366f1 0%,transparent 70%);top:-12%;left:-6%;}
+.aurora::after{width:400px;height:400px;background:radial-gradient(circle,#50e3c2 0%,transparent 70%);bottom:-15%;right:-6%;animation-delay:-9s;}
+@keyframes af{0%{transform:translate(0,0) scale(1);}50%{transform:translate(25px,-18px) scale(1.06);}100%{transform:translate(-18px,10px) scale(0.96);}}
+
+.container{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:2;}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.page-header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#f0f0f5 30%,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.subtitle{color:var(--muted);font-size:0.9rem;}
+.nav{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.nav a{padding:0.4rem 1rem;background:var(--surface);color:var(--muted);text-decoration:none;border-radius:var(--radius-pill);font-size:0.8rem;font-weight:500;transition:all var(--fast);backdrop-filter:blur(12px);}
+.nav a:hover,.nav a.active{background:var(--surface-hover);color:var(--text);}
+.nav a.active{border:1px solid var(--accent);color:var(--accent);}
+
+.grid-top{display:grid;grid-template-columns:200px 1fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:800px){.grid-top{grid-template-columns:1fr;}}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+@media(max-width:800px){.grid-2{grid-template-columns:1fr;}}
+
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow-card);backdrop-filter:blur(16px);}
+.card-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
+.card-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all var(--fast);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#818cf8);color:#fff;box-shadow:0 2px 12px var(--accent-glow);}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-ghost{background:var(--surface);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);}
+
+/* Grade ring */
+.grade-ring{text-align:center;padding:1rem;}
+.grade-letter{font-size:4rem;font-weight:800;line-height:1;}
+.grade-score{font-size:1.2rem;font-weight:600;color:var(--muted);margin-top:0.3rem;}
+.grade-label{font-size:0.78rem;color:var(--dim);margin-top:0.2rem;}
+
+/* Framework tabs */
+.fw-tabs{display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;}
+.fw-tab{padding:0.4rem 0.8rem;border-radius:var(--radius-pill);font-size:0.78rem;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:transparent;transition:all var(--fast);}
+.fw-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(99,102,241,0.1);}
+.fw-tab:hover{border-color:rgba(255,255,255,0.12);color:var(--text);}
+
+/* Requirement rows */
+.req-row{display:flex;align-items:flex-start;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;}
+.req-row:last-child{border-bottom:none;}
+.req-status{min-width:16px;margin-top:0.15rem;}
+.req-status .check{color:var(--success);}
+.req-status .warn{color:var(--warn);}
+.req-status .cross{color:var(--danger);}
+.req-body{flex:1;}
+.req-id{font-family:monospace;font-size:0.72rem;color:var(--dim);margin-bottom:0.1rem;}
+.req-title{font-weight:500;margin-bottom:0.1rem;}
+.req-desc{color:var(--muted);font-size:0.78rem;}
+.req-control{font-size:0.72rem;color:var(--info);margin-top:0.2rem;}
+.risk-badge{display:inline-flex;padding:0.12rem 0.4rem;border-radius:var(--radius-pill);font-size:0.65rem;font-weight:600;margin-left:0.5rem;}
+.risk-badge.high{background:rgba(251,113,133,0.12);color:var(--danger);}
+.risk-badge.medium{background:rgba(251,146,60,0.12);color:var(--warn);}
+.risk-badge.low{background:rgba(52,211,153,0.12);color:var(--success);}
+
+/* Audit trail */
+.audit-row{display:flex;gap:0.5rem;padding:0.5rem 0.6rem;border-bottom:1px solid var(--border);font-size:0.78rem;align-items:center;transition:background var(--fast);}
+.audit-row:hover{background:rgba(99,102,241,0.04);}
+.audit-time{min-width:70px;color:var(--dim);font-variant-numeric:tabular-nums;}
+.audit-type{min-width:100px;font-weight:600;color:var(--accent);}
+.audit-actor{min-width:80px;color:var(--muted);}
+.audit-action{flex:1;color:var(--muted);}
+.audit-hash{font-family:monospace;font-size:0.65rem;color:var(--dim);min-width:60px;}
+
+/* PII Masking */
+.pii-input{width:100%;min-height:80px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;color:var(--text);font-size:0.88rem;font-family:inherit;resize:vertical;margin-bottom:1rem;}
+.pii-input:focus{outline:none;border-color:var(--accent);}
+.pii-output{background:rgba(0,0,0,0.2);border-radius:var(--radius);padding:1rem;font-family:monospace;font-size:0.82rem;white-space:pre-wrap;word-break:break-all;margin-bottom:1rem;}
+.pii-highlight{background:rgba(251,113,133,0.2);border-radius:3px;padding:0.1rem 0.2rem;}
+.pii-stats{display:flex;gap:1rem;flex-wrap:wrap;font-size:0.78rem;color:var(--muted);}
+.pii-stats strong{color:var(--text);}
+
+.stat-badge{display:inline-flex;padding:0.15rem 0.45rem;border-radius:var(--radius-pill);font-size:0.68rem;font-weight:600;}
+.stat-badge.green{background:rgba(52,211,153,0.12);color:var(--success);}
+.stat-badge.red{background:rgba(251,113,133,0.12);color:var(--danger);}
+.stat-badge.amber{background:rgba(251,146,60,0.12);color:var(--warn);}
+.stat-badge.blue{background:rgba(56,189,248,0.12);color:var(--info);}
+
+.integrity-bar{display:flex;align-items:center;gap:0.5rem;margin-top:0.75rem;font-size:0.82rem;}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1>Governance &amp; Compliance Center</h1>
+      <span class="subtitle">EU AI Act · HIPAA · GDPR · Immutable Audit Trail · Dynamic PII Masking</span>
+    </div>
+    <nav class="nav">
+      <a href="/static/home.html">Home</a>
+      <a href="/static/cognitive-dashboard.html">Cognitive</a>
+      <a href="/static/agent-orchestration.html">Agents</a>
+      <a href="/static/knowledge-explorer.html">Knowledge</a>
+      <a href="/static/observability-console.html">Observability</a>
+      <a href="/static/governance-center.html" class="active">Governance</a>
+      <a href="/static/economics-hub.html">Economics</a>
+      <a href="/static/fort-knox.html">Fort Knox</a>
+      <a href="/static/pipeline.html">Pipeline</a>
+    </nav>
+  </div>
+
+  <!-- Compliance posture Overview -->
+  <div class="grid-top">
+    <!-- Grade -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Posture</div>
+      <div class="grade-ring">
+        <div class="grade-letter" id="gradeDisplay" style="color:var(--accent);">—</div>
+        <div class="grade-score" id="gradeScore">—%</div>
+        <div class="grade-label">Compliance Score</div>
+      </div>
+      <div class="integrity-bar">
+        <span id="integrityBadge" class="stat-badge green">—</span>
+        <span style="font-size:0.78rem;color:var(--muted);">Audit Integrity</span>
+      </div>
+    </div>
+
+    <!-- Regulatory Frameworks -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--info);"></span>Regulatory Matrix</div>
+      <div class="fw-tabs" id="fwTabs"></div>
+      <div id="reqList" style="max-height:400px;overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Audit Trail -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--secondary);"></span>Audit Trail (Immutable)</div>
+      <div id="auditTrail" style="max-height:350px;overflow-y:auto;"><div style="color:var(--dim);font-size:0.82rem;">Loading…</div></div>
+      <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+        <button class="btn btn-primary" onclick="logDemoEvent()" aria-label="Log demo audit event">+ Log Event</button>
+        <button class="btn btn-ghost" onclick="verifyIntegrity()" aria-label="Verify audit chain integrity">✓ Verify Chain</button>
+        <button class="btn btn-ghost" onclick="refreshAll()" aria-label="Refresh governance data" title="Refresh governance data">↻</button>
+      </div>
+    </div>
+
+    <!-- PII Masking -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--danger);"></span>PII Detection &amp; Masking</div>
+      <textarea class="pii-input" id="piiInput" placeholder="Enter text with PII to mask…">Contact John Smith at john.smith@example.com or call 555-123-4567. SSN: 123-45-6789. Credit card: 4111-1111-1111-1111. Patient record MRN-2024-001234 from IP 192.168.1.100. DOB: 1990-01-15. Passport: AB1234567.</textarea>
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+        <button class="btn btn-primary" onclick="maskPII()">Mask PII</button>
+        <button class="btn btn-ghost" onclick="detectPII()">Detect Only</button>
+      </div>
+      <div class="pii-output" id="piiOutput">Masked text will appear here…</div>
+      <div class="pii-stats" id="piiStats"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API=window.location.origin;
+let regData={};
+let activeFramework='eu_ai_act';
+
+async function fetchJSON(url,opts){
+  try{const r=await fetch(API+url,opts);if(!r.ok)throw new Error(r.status);return await r.json();}
+  catch(e){console.warn('fetch:',url,e);return null;}
+}
+
+async function loadPosture(){
+  const d=await fetchJSON('/v21/compliance/posture');
+  if(!d)return;
+
+  // Grade
+  const grade=d.compliance_grade||'—';
+  const score=d.overall_score||0;
+  document.getElementById('gradeDisplay').textContent=grade;
+  document.getElementById('gradeDisplay').style.color=score>=90?'var(--success)':score>=70?'var(--info)':score>=50?'var(--warn)':'var(--danger)';
+  document.getElementById('gradeScore').textContent=score.toFixed(1)+'%';
+
+  // Integrity
+  const integrity=d.audit_integrity;
+  const ib=document.getElementById('integrityBadge');
+  if(integrity===true){ib.textContent='✓ Verified';ib.className='stat-badge green';}
+  else if(integrity===false){ib.textContent='✕ Broken';ib.className='stat-badge red';}
+  else{ib.textContent='— No data';ib.className='stat-badge blue';}
+
+  // Regulatory
+  regData=d.regulatory_map||{};
+  renderFrameworkTabs();
+  renderRequirements();
+
+  // Audit trail
+  const audit=d.audit_stats||{};
+  await loadAuditTrail();
+}
+
+function renderFrameworkTabs(){
+  const fws=Object.keys(regData.frameworks||{});
+  const el=document.getElementById('fwTabs');
+  const labels={eu_ai_act:'EU AI Act',hipaa:'HIPAA',gdpr:'GDPR'};
+  el.innerHTML=fws.map(f=>`<button class="fw-tab ${activeFramework===f?'active':''}" onclick="switchFramework('${f}')">${labels[f]||f}</button>`).join('');
+}
+
+function switchFramework(f){activeFramework=f;renderFrameworkTabs();renderRequirements();}
+
+function renderRequirements(){
+  const el=document.getElementById('reqList');
+  const fw=regData.frameworks||{};
+  const reqs=(fw[activeFramework]||{}).requirements||[];
+  if(!reqs.length){el.innerHTML='<div style="color:var(--dim);font-size:0.82rem;">No requirements loaded.</div>';return;}
+  el.innerHTML=reqs.map(r=>{
+    const statusIcon=r.status==='implemented'?'<span class="check">✓</span>':r.status==='partial'?'<span class="warn">◐</span>':'<span class="cross">✕</span>';
+    const riskCls=r.risk_level==='high'?'high':r.risk_level==='medium'?'medium':'low';
+    return`<div class="req-row">
+      <div class="req-status">${statusIcon}</div>
+      <div class="req-body">
+        <div class="req-id">${r.requirement_id||''} <span class="risk-badge ${riskCls}">${r.risk_level||''}</span></div>
+        <div class="req-title">${r.title||''}</div>
+        <div class="req-desc">${r.description||''}</div>
+        ${r.mapped_control?`<div class="req-control">→ ${r.mapped_control}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadAuditTrail(){
+  const d=await fetchJSON('/v21/compliance/audit/trail');
+  const el=document.getElementById('auditTrail');
+  if(!d||!d.entries||!d.entries.length){el.innerHTML='<div style="color:var(--dim);font-size:0.82rem;">Audit trail empty. Log an event.</div>';return;}
+  el.innerHTML=d.entries.slice(-50).reverse().map(e=>`
+    <div class="audit-row">
+      <span class="audit-time">${e.timestamp?new Date(e.timestamp*1000).toLocaleTimeString():'—'}</span>
+      <span class="audit-type">${e.event_type||''}</span>
+      <span class="audit-actor">${e.actor||''}</span>
+      <span class="audit-action">${e.action||''} ${e.resource||''}</span>
+      <span class="audit-hash">${(e.entry_hash||'').slice(0,10)}…</span>
+    </div>`).join('');
+}
+
+async function logDemoEvent(){
+  const types=['access','modification','query','export','deletion'];
+  const actors=['admin','analyst','agent-1','system','auditor'];
+  const t=types[Math.floor(Math.random()*types.length)];
+  const a=actors[Math.floor(Math.random()*actors.length)];
+  await fetchJSON('/v21/compliance/audit',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({event_type:t,actor:a,resource:'dataset-'+Math.floor(Math.random()*100),action:'demo_'+t,details:{source:'governance-ui'}})});
+  refreshAll();
+}
+
+async function verifyIntegrity(){
+  const d=await fetchJSON('/v21/compliance/audit/verify');
+  const ib=document.getElementById('integrityBadge');
+  if(d&&d.valid){ib.textContent='✓ Chain Valid';ib.className='stat-badge green';alert('Audit chain integrity verified!');}
+  else{ib.textContent='✕ Chain Broken';ib.className='stat-badge red';alert('WARNING: Audit chain integrity check failed!');}
+}
+
+async function maskPII(){
+  const text=document.getElementById('piiInput').value;
+  if(!text){alert('Enter text with PII.');return;}
+  const d=await fetchJSON('/v21/compliance/mask',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({text:text})});
+  if(d){
+    document.getElementById('piiOutput').textContent=d.masked_text||text;
+    const stats=document.getElementById('piiStats');
+    const dets=d.detections||[];
+    stats.innerHTML=`<span>PII Found: <strong>${d.pii_found?'Yes':'No'}</strong></span>
+      <span>Redactions: <strong>${d.total_redactions||0}</strong></span>
+      <span>Categories: <strong>${[...new Set(dets.map(x=>x.category))].join(', ')||'none'}</strong></span>`;
+  }
+}
+
+async function detectPII(){
+  const text=document.getElementById('piiInput').value;
+  if(!text){return;}
+  const d=await fetchJSON('/v21/compliance/detect',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({text:text})});
+  if(d){
+    const dets=d.detections||[];
+    document.getElementById('piiOutput').textContent=dets.length?dets.map(x=>`[${x.category}] "${x.matched}" at pos ${x.start}-${x.end}`).join('\n'):'No PII detected.';
+    document.getElementById('piiStats').innerHTML=`<span>Detections: <strong>${dets.length}</strong></span>`;
+  }
+}
+
+async function refreshAll(){await loadPosture();}
+refreshAll();
+</script>
+</body>
+</html>

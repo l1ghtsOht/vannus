@@ -28,6 +28,18 @@ coverage.xml
 # Praxis runtime artifacts (regenerated on import)
 praxis/tools.db
 
+# Node
+node_modules/
+
+# Build artifacts
+praxis/frontend/room/dist/
+
+# Screenshots (test artifacts)
+*.png
+screenshot_*.png
+ss_*.png
+audit_*.png
+
 # OS
 .DS_Store
 Thumbs.db

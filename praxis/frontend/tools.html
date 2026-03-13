@@ -159,10 +159,10 @@
     .tp-durable.active { background: rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.45); }
     .tp-moderate { background: rgba(245,166,35,0.1); color: #f5a623; border-color: rgba(245,166,35,0.25); }
     .tp-moderate.active { background: rgba(245,166,35,0.2); border-color: rgba(245,166,35,0.45); }
-    .tp-fragile { background: rgba(231,76,60,0.08); color: #ef4444; border-color: rgba(231,76,60,0.2); }
-    .tp-fragile.active { background: rgba(231,76,60,0.15); border-color: rgba(231,76,60,0.35); }
-    .tp-wrapper { background: rgba(255,71,87,0.08); color: #ef4444; border-color: rgba(255,71,87,0.2); }
-    .tp-wrapper.active { background: rgba(255,71,87,0.15); border-color: rgba(255,71,87,0.35); }
+    .tp-fragile { background: rgba(239,68,68,0.08); color: #ef4444; border-color: rgba(239,68,68,0.2); }
+    .tp-fragile.active { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.35); }
+    .tp-wrapper { background: rgba(239,68,68,0.08); color: #ef4444; border-color: rgba(239,68,68,0.2); }
+    .tp-wrapper.active { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.35); }
 
     .sort-select {
       padding: 0.4rem 0.75rem; border-radius: var(--radius-pill);
@@ -334,13 +334,13 @@
     .collapse-trigger {
       display: flex; align-items: center; gap: 0.5rem;
       width: 100%; padding: 0.75rem 1rem;
-      background: rgba(231,76,60,0.04); border: 1px solid rgba(231,76,60,0.1);
+      background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.1);
       border-radius: var(--radius-sm); color: var(--accent-danger);
       font-size: 0.78rem; font-weight: 600; cursor: pointer;
       font-family: inherit; transition: all var(--transition-fast);
       margin-bottom: 1rem;
     }
-    .collapse-trigger:hover { background: rgba(231,76,60,0.08); }
+    .collapse-trigger:hover { background: rgba(239,68,68,0.08); }
     .collapse-trigger .arrow { transition: transform var(--transition-fast); }
     .collapse-trigger.open .arrow { transform: rotate(90deg); }
     .collapsed-content { display: none; }
@@ -439,7 +439,7 @@
 
     <!-- Filter Bar -->
     <div class="filter-bar">
-      <input type="text" class="search-local" id="localSearch" placeholder="Search tools\u2026" oninput="applyFilters()" />
+      <input type="text" class="search-local" id="localSearch" placeholder="Search tools…" oninput="applyFilters()" />
       <div class="tier-pills" id="tierPills"></div>
       <label class="resilience-toggle" id="showAllToggle" onclick="toggleShowAll()">
         <span class="toggle-dot"></span>

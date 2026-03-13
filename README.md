@@ -21,7 +21,7 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Versions** | 17 major iterations (v1 → v17) |
 | **Total LOC** | ~76,300 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-11 04:31 UTC |
+| **Last auto-update** | 2026-03-12 19:51 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -1166,17 +1166,20 @@ scripts/                     Utility scripts
 
 ## Frontend
 
-33 files implementing a Liquid Glass UI design system with glassmorphism, dark theme, and responsive layouts. No build step — served directly by FastAPI as static files.
+29 static HTML pages + 1 React SPA implementing the Liquid Glass UI design system with glassmorphism, dark theme, and responsive layouts. Static pages served directly by FastAPI. Room SPA built with Vite/React and served from `/room`.
 
 ### Key Pages
 
 | Page | Description |
 |------|-------------|
-| `home.html` | **Primary UI** — Search, stack composition, tool browsing with glassmorphism effects |
-| `journey.html` | **Guided Journey** — 4-step wizard: task → industry → budget → skill → personalized stack |
-| `tools.html` | **Tool Catalog** — Browse all 246 tools with category filtering |
+| `home.html` | **Primary UI** — Command card search, category chips, tool browsing with glassmorphism effects |
+| `/room` | **Room SPA** — Persistent AI workspace with director controls, pin/pass tool actions, stack builder, multi-query sessions |
+| `/journey` | **Guided Journey** — 5-step wizard: task → industry → budget → skill → personalized stack |
+| `tools.html` | **Tool Catalog** — Browse all 246 tools with category filtering, curated/data-table views |
 | `differential.html` | **Elimination Pipeline** — Visual display of differential diagnosis results |
 | `trust_badges.html` | **Trust Badges** — Explore 9-category trust assessment per tool |
+| `tuesday-test.html` | **ROI Calculator** — "The Tuesday Test" — data-driven AI tool ROI estimator |
+| `rfp.html` | **RFP Builder** — Generate AI tool procurement RFPs |
 | `sovereignty.html` | **Sovereignty Risk** — Geopolitical risk dashboard |
 | `pipeline.html` | **Ingestion Pipeline** — Monitor tool ingestion, review queue, promotion status |
 | `governance-center.html` | **Governance** — Enterprise control plane: usage, costs, policies |
@@ -1185,7 +1188,29 @@ scripts/                     Utility scripts
 | `enterprise.html` | **Enterprise Engine** — Six-pillar enterprise assessment |
 | `manifesto.html` | **Methodology** — Assessment methodology and philosophical foundations |
 
-Navigation: Home → All Tools → Guided Journey → Differential → Trust Badges → Listening Post → Conductor → Enterprise
+### Room SPA (`/room`)
+
+The Room is a React-based persistent workspace where users direct AI tool evaluation like an orchestra conductor.
+
+- **Command Card Input** — Floating frosted-glass card with Find/Compare/Explain mode buttons, constraint chips (Budget, Team, Compliance, Industry), and circular submit button
+- **Director Actions** — Pin (add to stack) and Pass (dismiss) buttons on each tool card. Pinned tools appear in the right panel "Your Stack" with copy-to-clipboard
+- **Pipeline Visualization** — Real-time activity feed with auto-collapse to summary line after completion
+- **Multi-Query Sessions** — Previous query results archive and collapse; new queries take center stage
+- **SSE Streaming** — Real-time execution via `/room/{id}/stream` with cost tracking
+
+### Design System
+
+Canonical navigation across all pages: `Praxis | Search | Diagnosis | Trust Badges | All Tools | ROI Calculator | RFP Builder | Methodology`
+
+| Token | Value |
+|-------|-------|
+| `--accent` | `#6366f1` (indigo) — all primary CTAs |
+| `--accent-secondary` | `#50e3c2` (teal) — data/tier display only |
+| `--accent-danger` | `#ef4444` — warnings only |
+| `--bg-primary` | `#0a0a0f` |
+| `--radius-card` | `20px` |
+| `--radius-pill` | `999px` |
+| Nav background | `rgba(6, 6, 14, 0.75)` with `backdrop-filter: blur(20px)` |
 
 ---
 
@@ -1413,7 +1438,7 @@ _CONDUIT_OK = False  # set in except block
 
 5. **Tool catalog is manually curated** — 246 tools in `data.py` are hand-maintained. The `ingestion_engine.py` pipeline for automated ingestion is architecturally complete but not running in production.
 
-6. **Frontend is server-rendered static** — No React/Vue/Next.js build pipeline. All HTML/JS served as static files by FastAPI. Rich but not SPA.
+6. **Frontend is mostly server-rendered static** — 29 HTML pages served as static files by FastAPI. The Room (`/room`) is a React SPA built with Vite — requires `npm run build` in `praxis/frontend/room/` after changes.
 
 7. **Test coverage is module-clustered** — 645 tests cover v1–v23 features well, but some v19 modules (connectors, marketplace, contributions) have lighter coverage.
 
@@ -1421,22 +1446,34 @@ _CONDUIT_OK = False  # set in except block
 
 ## Roadmap
 
+### Completed (v24 — March 2026)
+- [x] Room SPA — React workspace at `/room` with SSE streaming, multi-query sessions
+- [x] Director experience — Pin/Pass tool actions, "Your Stack" panel, copy-to-clipboard
+- [x] Command card input — Floating frosted-glass card with mode buttons, constraint chips, circular submit
+- [x] Journey route — `/journey` serves guided wizard via FastAPI
+- [x] Room ID fix — `room_id` → `id` normalization, eliminated `/room/undefined/stream`
+- [x] Design system audit — Unified nav, colors, fonts across all 9+ pages
+- [x] Pipeline log UX — Auto-collapse after DONE, human-voice text, stripped internal reasoning
+- [x] Context panel fixes — Null filtering, reasoning bleed-through prevention, empty section hiding
+
 ### Near-term
 - [ ] Wire `journey.py` endpoints into `api.py` for full REST access
 - [ ] Add after-request middleware to automatically record journey stages
 - [ ] Connect journey drift signals to `learning.py` for automatic scoring adjustment
-- [ ] Update test suite for v22 journey oracle
+- [ ] Room: click-to-expand tool card detail drawers
+- [ ] Room: drag-and-drop stack reordering
 
 ### Medium-term
 - [ ] Activate `ingestion_engine.py` for live polling (TAAFT/Toolify/Futurepedia)
 - [ ] Deploy trust decay sweeps on schedule (72-hour cycle)
 - [ ] Build real provider connections in `llm_provider.py` (beyond dry-run)
 - [ ] Add WebSocket support for real-time dashboard updates
+- [ ] Room: real LLM cost tracking with per-model breakdown
 
 ### Long-term
 - [ ] Latent Flux integration (FluxManifold routing, Commitment Sink decisions)
 - [ ] Distributed architecture (Redis state, Celery workers, horizontal scaling)
-- [ ] SPA frontend rebuild (React/Svelte + real-time WebSocket)
+- [ ] Migrate remaining static pages to React SPA
 - [ ] Public API with rate-limited free tier
 
 ---
@@ -1454,6 +1491,39 @@ These questions have no clean answers. They shape Praxis's design decisions.
 4. **Should SMB relevance override capability?** A powerful tool that's too complex for a 5-person team might still be the "right" answer for their problem. Praxis currently penalizes complexity mismatch. Should it instead surface the tool with a "you'll need help deploying this" caveat?
 
 5. **How should consciousness-inspired scoring be weighted?** Modules like `conduit.py` and `resonance.py` score tools on dimensions borrowed from cognitive science (IIT, GWT). These dimensions are intellectually coherent but empirically unvalidated for tool selection. How much weight should they carry vs. straightforward keyword matching?
+
+---
+
+## Changelog
+
+### v24 — Room & Design System (2026-03-13)
+
+**Room SPA** — New React workspace at `/room`
+- Built Room React app (`praxis/frontend/room/`) with Vite, served from `/room`
+- Command card input with Find/Compare/Explain modes, constraint chips (Budget, Team, Compliance, Industry), inline popovers, circular submit button
+- Director actions: Pin/Pass on tool cards with visual states (indigo border for pinned, 40% opacity for passed)
+- Right panel: "Your Stack" — live pinned tool list with copy-to-clipboard
+- Activity feed: auto-collapse to summary after DONE, human-voice text replacements
+- Multi-query sessions: previous results archive and collapse
+- Room rename: single-click input swap, localStorage persistence
+- Fixed `room_id` → `id` normalization (eliminated `/room/undefined/stream`)
+- Fixed SSE `amount_usd` → `cost_usd` field mismatch for cost tracking
+- Filtered internal reasoning text and sub-query failure messages from UI
+
+**Design System Audit** — Unified 9+ pages to canonical design tokens
+- Standardized nav across all pages: `Search | Diagnosis | Trust Badges | All Tools | ROI Calculator | RFP Builder | Methodology`
+- Fixed differential.html: nav class `brand` → `nav-logo`, bg opacity 0.85 → 0.75
+- Fixed trust_badges.html: removed emoji from logo, nav bg, font stack
+- Fixed tools.html: unified Fragile/Wrapper chip reds to `#ef4444`, collapse trigger red, placeholder unicode
+- Fixed tuesday-test.html: canonical nav, range slider `accent-color`
+- Fixed rfp.html: canonical nav links
+- Fixed journey.html: added full canonical nav bar, progress bar height 3px → 5px
+- Fixed manifesto.html: ls-chip border consistency
+- Fixed home.html: removed Prompt Assistance section, footer z-index
+- Added `← Praxis` back link to Room header
+
+**Routes**
+- Added `/journey` route serving `journey.html` via FastAPI
 
 ---
 
@@ -1561,26 +1631,7 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
-d0e8d21 auto: 2026-03-10 23:30:59
-0b9dbd2 docs(auto): update README stats [skip ci]
-964cd0f auto: 2026-03-10 23:30:26
-f898315 docs(auto): update README stats [skip ci]
-fdcafd5 auto: 2026-03-10 23:29:51
-4ab4a68 docs(auto): update README stats [skip ci]
-d947f21 auto: 2026-03-10 23:25:43
-9a9762f docs(auto): update README stats [skip ci]
-8b86364 auto: 2026-03-10 23:22:08
-5783659 docs(auto): update README stats [skip ci]
-3b7a7f5 auto: 2026-03-10 23:21:34
-77c1984 docs(auto): update README stats [skip ci]
-4a48c3b auto: 2026-03-10 23:21:00
-df898a9 docs(auto): update README stats [skip ci]
-1056978 auto: 2026-03-10 23:20:26
-171cece docs(auto): update README stats [skip ci]
-d6ba693 auto: 2026-03-10 23:16:48
-1fd6ffb docs(auto): update README stats [skip ci]
-89c28f1 auto: 2026-03-10 23:15:44
-ef86da0 docs(auto): update README stats [skip ci]
+49f8319 Resolve merge conflict in Known Limitations section
 ```
 <!-- AUTO:GIT:END -->
 

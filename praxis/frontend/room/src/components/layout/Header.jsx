@@ -1,27 +1,70 @@
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRoomState, useRoomDispatch } from '../../context/RoomContext';
 
-export default function Header() {
-  const { room, cost, phase } = useRoomState();
-  const dispatch = useRoomDispatch();
+const LS_KEY = 'praxis_room_name';
 
-  const handleNameBlur = (e) => {
-    const newName = e.target.textContent.trim();
-    if (room && newName && newName !== room.name) {
-      dispatch({ type: 'UPDATE_ROOM_NAME', payload: newName });
-      fetch(`/room/${room.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newName }),
-      }).catch(() => {});
+export default function Header() {
+  const { room, cost, phase, pinnedTools } = useRoomState();
+  const dispatch = useRoomDispatch();
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState('');
+  const inputRef = useRef(null);
+
+  // Load saved room name from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved && room && room.name !== saved) {
+      dispatch({ type: 'UPDATE_ROOM_NAME', payload: saved });
     }
+  }, [room?.id]);
+
+  const displayName = room?.name || localStorage.getItem(LS_KEY) || 'My Room';
+
+  const startEditing = () => {
+    setEditValue(displayName);
+    setEditing(true);
+  };
+
+  useEffect(() => {
+    if (editing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editing]);
+
+  const commitName = () => {
+    const newName = editValue.trim();
+    setEditing(false);
+    if (newName && newName !== displayName) {
+      dispatch({ type: 'UPDATE_ROOM_NAME', payload: newName });
+      localStorage.setItem(LS_KEY, newName);
+      if (room?.id) {
+        fetch(`/room/${room.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newName }),
+        }).catch(() => {});
+      }
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); commitName(); }
+    if (e.key === 'Escape') { setEditing(false); }
   };
 
   return (
     <header className="relative z-30 flex items-center justify-between px-5 py-3 border-b border-white/[0.08]"
             style={{ background: 'rgba(10,10,15,0.7)', backdropFilter: 'blur(30px)' }}>
-      {/* Left: Logo + Room Name */}
+      {/* Left: Back link + Logo + Room Name */}
       <div className="flex items-center gap-3">
+        <a
+          href="/"
+          className="text-white/40 hover:text-white/70 text-sm transition-colors"
+          title="Back to Praxis"
+        >{'\u2190'} Praxis</a>
+        <span className="text-white/15">|</span>
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-[#6366f1] flex items-center justify-center">
             <span className="text-white text-xs font-bold">P</span>
@@ -29,14 +72,25 @@ export default function Header() {
           <span className="text-sm font-semibold text-white/80 tracking-tight">Room</span>
         </div>
         <span className="text-white/20">|</span>
-        <span
-          contentEditable
-          suppressContentEditableWarning
-          onBlur={handleNameBlur}
-          className="text-sm font-medium text-white/70 outline-none px-2 py-0.5 rounded hover:bg-white/5 focus:bg-white/5 cursor-text min-w-[60px]"
-        >
-          {room?.name || 'Untitled Room'}
-        </span>
+        {editing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={editValue}
+            onChange={e => setEditValue(e.target.value)}
+            onBlur={commitName}
+            onKeyDown={handleKeyDown}
+            className="text-sm font-medium text-white/70 bg-white/5 outline-none px-2 py-0.5 rounded border border-white/10 focus:border-indigo-500/40 min-w-[60px] max-w-[200px]"
+          />
+        ) : (
+          <span
+            onClick={startEditing}
+            className="text-sm font-medium text-white/70 px-2 py-0.5 rounded hover:bg-white/5 cursor-text min-w-[60px] select-none"
+            title="Click to rename"
+          >
+            {displayName}
+          </span>
+        )}
       </div>
 
       {/* Center: Phase Indicator */}
@@ -50,11 +104,18 @@ export default function Header() {
         <span className="text-xs text-white/40 uppercase tracking-widest font-medium">{phase}</span>
       </div>
 
-      {/* Right: Cost + Actions */}
+      {/* Right: Cost + Stack count + Actions */}
       <div className="flex items-center gap-4">
-        <div className="text-xs text-white/50 font-mono">
-          ${cost.total.toFixed(4)}
-        </div>
+        {cost.total > 0 && (
+          <div className="text-xs text-white/50 font-mono">
+            ${cost.total.toFixed(4)}
+          </div>
+        )}
+        {pinnedTools.length > 0 && (
+          <div className="text-[11px] text-indigo-400/70 font-medium">
+            {pinnedTools.length} in stack
+          </div>
+        )}
         <button
           onClick={() => dispatch({ type: 'NEW_CONVERSATION' })}
           className="text-[11px] text-white/40 hover:text-white/80 px-2.5 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.15] transition-all"

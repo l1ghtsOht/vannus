@@ -1,12 +1,34 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { useRoomState, PHASES } from '../../context/RoomContext';
+import { useRoomState, useRoomDispatch, PHASES } from '../../context/RoomContext';
 import SurvivorCard from './SurvivorCard';
 import EliminationAccordion from './EliminationAccordion';
 
+/* ── Collapsed summary for archived queries ── */
+function ArchivedQuery({ entry, onExpand }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 0.3 }}
+      className="mb-4 cursor-pointer"
+      onClick={onExpand}
+    >
+      <div className="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-white/[0.03] transition-colors">
+        <span className="text-emerald-400/60 text-xs">{'\u2713'}</span>
+        <span className="text-xs text-white/40">
+          Evaluated <span className="font-medium">{entry.toolsConsidered}</span> tools {'\u2192'}{' '}
+          <span className="text-emerald-400/60 font-medium">{entry.matchCount}</span> match
+        </span>
+        <span className="text-[9px] text-white/15 ml-auto">{'\u25B8'} Show</span>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function EliminationDisplay() {
-  const { differentialResult, phase } = useRoomState();
+  const { differentialResult, phase, queryHistory } = useRoomState();
+  const dispatch = useRoomDispatch();
   const [displayCount, setDisplayCount] = useState(0);
   const [showCards, setShowCards] = useState(false);
 
@@ -87,6 +109,11 @@ export default function EliminationDisplay() {
       transition={{ duration: 0.4 }}
       className="mb-6"
     >
+      {/* Archived previous queries */}
+      {queryHistory.length > 0 && queryHistory.map((entry, i) => (
+        <ArchivedQuery key={i} entry={entry} onExpand={() => {}} />
+      ))}
+
       {/* Scanner line */}
       <motion.div
         initial={{ scaleX: 0, opacity: 1 }}
@@ -99,26 +126,26 @@ export default function EliminationDisplay() {
         }}
       />
 
-      {/* Summary Line */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-1 h-4 rounded-full bg-[#6366f1]" />
-        <span className="text-sm text-white/60">
-          Reviewed{' '}
-          <span className="text-white/90 font-medium tabular-nums">{displayCount}</span> tools.{' '}
-          <span className="text-emerald-400/80 font-medium">{survivors.length}</span> match your needs.
-        </span>
-      </div>
-
-      {/* Narrative */}
-      {displayNarrative && showCards && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-xs text-white/30 mb-4 leading-relaxed prose prose-invert prose-xs max-w-none"
-        >
-          <ReactMarkdown>{displayNarrative}</ReactMarkdown>
-        </motion.div>
-      )}
+      {/* Narrative — strip backend error bleed-through */}
+      {displayNarrative && showCards && (() => {
+        const cleaned = displayNarrative
+          .split(/(?<=[.!?])\s+/)
+          .filter(s => !/I wasn't able to fully address/i.test(s))
+          .filter(s => !/Sub-query not well covered/i.test(s))
+          .filter(s => !/I won't be able to fully/i.test(s))
+          .join(' ')
+          .trim();
+        if (!cleaned) return null;
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-xs text-white/30 mb-4 leading-relaxed prose prose-invert prose-xs max-w-none"
+          >
+            <ReactMarkdown>{cleaned}</ReactMarkdown>
+          </motion.div>
+        );
+      })()}
 
       {/* Survivors */}
       <AnimatePresence>
@@ -131,7 +158,7 @@ export default function EliminationDisplay() {
             <div className="flex items-center gap-2 mb-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
               <span className="text-[11px] font-medium text-emerald-400/70 uppercase tracking-wider">
-                {survivors.length} Recommended
+                {survivors.length} Matched
               </span>
             </div>
             {survivors.map((survivor, idx) => (

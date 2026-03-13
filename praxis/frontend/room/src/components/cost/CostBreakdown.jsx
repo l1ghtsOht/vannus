@@ -1,17 +1,20 @@
-import { useRoomState } from '../../context/RoomContext';
+import { useRoomState, PHASES } from '../../context/RoomContext';
 
 export default function CostBreakdown() {
-  const { cost, executionEvents } = useRoomState();
+  const { cost, phase } = useRoomState();
 
   const models = Object.entries(cost.perModel || {});
   const hasData = cost.total > 0 || models.length > 0;
+
+  // Hide the entire section if no cost data and a query has already completed
+  if (!hasData && phase === PHASES.COMPLETE) return null;
 
   return (
     <div className="space-y-3">
       <h3 className="text-xs font-medium text-white/30 uppercase tracking-wider mb-2">Cost Breakdown</h3>
 
       {!hasData ? (
-        <p className="text-xs text-white/20 italic">No spend data yet</p>
+        <p className="text-xs text-white/20 italic">Awaiting query…</p>
       ) : (
         <>
           {/* Total */}

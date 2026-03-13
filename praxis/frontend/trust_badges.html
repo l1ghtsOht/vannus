@@ -50,7 +50,7 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
@@ -63,12 +63,12 @@
     .nav {
       display: flex; align-items: center; gap: 1rem;
       padding: 1rem 2rem;
-      background: rgba(0,0,0,0.4);
+      background: rgba(6,6,14,0.75);
       backdrop-filter: blur(var(--glass-blur));
       border-bottom: 1px solid var(--border-glass);
       overflow-x: auto;
     }
-    .nav-brand { font-weight: 700; font-size: 1.2rem; color: var(--accent-secondary); white-space: nowrap; }
+    .nav-logo { color: var(--text-primary) !important; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
     .nav a { color: var(--text-secondary); font-size: .85rem; white-space: nowrap; padding: .3rem .6rem; border-radius: 8px; }
     .nav a:hover, .nav a.active { color: var(--text-primary); background: var(--bg-glass); text-decoration: none; }
     .nav a.active { color: var(--accent-secondary); }
@@ -304,12 +304,14 @@
 
 <!-- ── Navigation ── -->
 <nav class="nav">
-  <span class="nav-brand">⚡ Praxis</span>
-  <a href="/static/home.html">Home</a>
-  <a href="/static/tools.html">Tools</a>
+  <a href="/" class="nav-logo">Praxis</a>
+  <a href="/">Search</a>
   <a href="/static/differential.html">Diagnosis</a>
   <a href="/static/trust_badges.html" class="active">Trust Badges</a>
-  <a href="/static/manifesto.html">Manifesto</a>
+  <a href="/static/tools.html">All Tools</a>
+  <a href="/static/tuesday-test.html">ROI Calculator</a>
+  <a href="/static/rfp.html">RFP Builder</a>
+  <a href="/static/manifesto.html">Methodology</a>
 </nav>
 
 <!-- ── Main Content ── -->

@@ -49,6 +49,13 @@ const initialState = {
   // Conversation history for multi-turn context
   conversationHistory: [],
 
+  // Director stack — user-curated tool selections
+  pinnedTools: [],   // array of tool name strings
+  passedTools: [],   // array of tool name strings
+
+  // Query history for multi-query collapse
+  queryHistory: [],  // array of { query, toolsConsidered, matchCount, survivors }
+
   // UI
   leftPanelOpen: false,
   rightPanelOpen: false,
@@ -57,13 +64,21 @@ const initialState = {
 
 let _activityId = 0;
 
+/* Normalize backend room objects: room_id → id */
+function normalizeRoom(room) {
+  if (!room) return room;
+  if (room.id) return room;
+  if (room.room_id) return { ...room, id: room.room_id };
+  return room;
+}
+
 function roomReducer(state, action) {
   switch (action.type) {
     // ── Room Management ──
     case 'SET_ROOM':
-      return { ...state, room: action.payload, error: null };
+      return { ...state, room: normalizeRoom(action.payload), error: null };
     case 'SET_ROOMS':
-      return { ...state, rooms: action.payload };
+      return { ...state, rooms: (action.payload || []).map(normalizeRoom) };
     case 'UPDATE_ROOM_NAME':
       return { ...state, room: state.room ? { ...state.room, name: action.payload } : null };
 
@@ -198,6 +213,35 @@ function roomReducer(state, action) {
       return { ...state, trustAlerts: action.payload };
     case 'SET_HEALTH_DATA':
       return { ...state, healthData: action.payload };
+
+    // ── Director Stack ──
+    case 'PIN_TOOL': {
+      const name = action.payload;
+      if (state.pinnedTools.includes(name)) return state;
+      return {
+        ...state,
+        pinnedTools: [...state.pinnedTools, name],
+        passedTools: state.passedTools.filter(n => n !== name),
+        rightPanelOpen: true,
+      };
+    }
+    case 'UNPIN_TOOL':
+      return { ...state, pinnedTools: state.pinnedTools.filter(n => n !== action.payload) };
+    case 'PASS_TOOL': {
+      const name = action.payload;
+      if (state.passedTools.includes(name)) return state;
+      return {
+        ...state,
+        passedTools: [...state.passedTools, name],
+        pinnedTools: state.pinnedTools.filter(n => n !== name),
+      };
+    }
+    case 'UNPASS_TOOL':
+      return { ...state, passedTools: state.passedTools.filter(n => n !== action.payload) };
+
+    // ── Query History ──
+    case 'ARCHIVE_QUERY':
+      return { ...state, queryHistory: [...state.queryHistory, action.payload] };
 
     // ── UI ──
     case 'TOGGLE_LEFT_PANEL':

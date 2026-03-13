@@ -1559,6 +1559,11 @@ def create_app():
             def index():
                 return FileResponse(frontend_dir / "home.html")
 
+            @app.get("/journey", tags=["Product"])
+            def journey_wizard():
+                """Guided Journey — multi-step AI stack recommendation wizard."""
+                return FileResponse(frontend_dir / "journey.html")
+
             @app.get("/room", tags=["Product"])
             def room_spa_entry():
                 """Praxis Room — persistent AI workspace."""

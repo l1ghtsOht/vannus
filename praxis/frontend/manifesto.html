@@ -579,7 +579,7 @@
 
         /* Live stats bar */
         var bar = document.getElementById('liveStats');
-        bar.innerHTML = '<span class="ls-chip" style="background:rgba(255,255,255,0.06);color:var(--text-primary);font-weight:700;">' + total + ' tools analyzed</span>';
+        bar.innerHTML = '<span class="ls-chip" style="background:rgba(255,255,255,0.06);color:var(--text-primary);font-weight:700;border:1px solid rgba(255,255,255,0.08);">' + total + ' tools analyzed</span>';
         Object.keys(dist).forEach(function(tier) {
           bar.innerHTML += '<span class="ls-chip" style="background:' + tierColors[tier] + '15;color:' + tierColors[tier] + ';border:1px solid ' + tierColors[tier] + '30;">' + tier.charAt(0).toUpperCase() + tier.slice(1) + ': ' + dist[tier] + '</span>';
         });

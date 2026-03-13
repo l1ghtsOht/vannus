@@ -10,7 +10,6 @@ import IntentInput from './components/input/IntentInput';
 import EliminationDisplay from './components/elimination/EliminationDisplay';
 import RoutingPlan from './components/routing/RoutingPlan';
 import ExecutionStream from './components/execution/ExecutionStream';
-import ArtifactShelf from './components/artifacts/ArtifactShelf';
 import TrustMonitor from './components/trust/TrustMonitor';
 import CostBreakdown from './components/cost/CostBreakdown';
 import ActivityFeed from './components/activity/ActivityFeed';
@@ -120,7 +119,6 @@ function RoomShell() {
           </main>
 
           <RightPanel>
-            <ArtifactShelf />
             <CostBreakdown />
           </RightPanel>
         </div>

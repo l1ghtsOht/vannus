@@ -279,10 +279,12 @@ def execute_in_room(
 
         # ── 5a. Record spend ──────────────────────────────────────
         cost = result_dict.get("total_cost_usd", 0.0)
+        models_used = result_dict.get("models_used", [])
         if cost > 0:
             record_spend(room_id, cost)
             yield _emit(EventType.SPEND_RECORDED, room_id, sid, {
-                "amount_usd": cost,
+                "cost_usd": cost,
+                "model_id": models_used[0] if models_used else "praxis",
             })
 
         # ── 5b. Persist artifact ──────────────────────────────────

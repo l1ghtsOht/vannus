@@ -94,7 +94,7 @@
     }
     .card-header p { font-size: 0.95rem; color: var(--text-secondary); line-height: var(--line-normal); }
 
-    .progress { height: 3px; background: rgba(255,255,255,0.04); }
+    .progress { height: 5px; background: rgba(255,255,255,0.04); border-radius: 3px; }
     .progress-bar {
       height: 100%;
       background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
@@ -318,18 +318,41 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
     ::selection { background: rgba(99,102,241,0.3); color: white; }
+
+    .nav-bar {
+      position: sticky; top: 0; z-index: 100;
+      padding: 0.65rem 1.5rem;
+      display: flex; align-items: center; justify-content: center; gap: 2rem;
+      background: rgba(6,6,14,0.75);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.25);
+    }
+    .nav-bar a {
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px;
+      transition: color 0.18s;
+    }
+    .nav-bar a:hover { color: var(--text-primary); }
+    .nav-bar a.active { color: var(--accent); }
+    .nav-logo { font-weight: 700; font-size: 0.95rem; color: var(--text-primary) !important; letter-spacing: -0.5px; }
   </style>
 </head>
 <body>
+  <nav class="nav-bar">
+    <a href="/" class="nav-logo">Praxis</a>
+    <a href="/">Search</a>
+    <a href="/static/differential.html">Diagnosis</a>
+    <a href="/static/trust_badges.html">Trust Badges</a>
+    <a href="/static/tools.html">All Tools</a>
+    <a href="/static/tuesday-test.html">ROI Calculator</a>
+    <a href="/static/rfp.html">RFP Builder</a>
+    <a href="/static/manifesto.html">Methodology</a>
+  </nav>
+
   <div class="aurora"></div>
   <div class="noise"></div>
 
   <div class="container">
-    <div style="display:flex;gap:1.5rem;margin-bottom:1.5rem;align-items:center;">
-      <a href="/" class="back-link">← Search</a>
-      <a href="/static/tools.html" class="back-link">All Tools</a>
-      <a href="/static/manifesto.html" class="back-link">Methodology</a>
-    </div>
 
     <div class="card">
       <div class="card-header">

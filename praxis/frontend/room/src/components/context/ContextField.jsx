@@ -10,8 +10,23 @@ function formatKey(key) {
   return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
+function isInternalReasoning(val) {
+  if (typeof val !== 'string') return false;
+  if (val.length > 100) return true;
+  if (/^Step\s*\d/i.test(val)) return true;
+  if (/sub-quer/i.test(val)) return true;
+  if (/Search for tools/i.test(val)) return true;
+  return false;
+}
+
 export default function ContextField({ field }) {
   const { key, value, confidence, tier, source, label } = field;
+
+  // Bug 3: skip null/undefined/empty values
+  if (value == null || value === 'null' || value === 'undefined' || value === '') return null;
+  // Bug 2: skip internal reasoning text bleeding through
+  if (isInternalReasoning(value)) return null;
+
   const color = tierColor(confidence);
 
   return (

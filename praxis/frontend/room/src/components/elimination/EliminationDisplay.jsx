@@ -31,6 +31,9 @@ export default function EliminationDisplay() {
   const dispatch = useRoomDispatch();
   const [displayCount, setDisplayCount] = useState(0);
   const [showCards, setShowCards] = useState(false);
+  const [expandedCardId, setExpandedCardId] = useState(null);
+
+  const toggleCard = (id) => setExpandedCardId(prev => prev === id ? null : id);
 
   const survivors = differentialResult?.tools_recommended || differentialResult?.survivors || [];
   const eliminated = differentialResult?.eliminated || [];
@@ -43,9 +46,11 @@ export default function EliminationDisplay() {
     if (!differentialResult || totalEvaluated <= 0) {
       setDisplayCount(0);
       setShowCards(false);
+      setExpandedCardId(null);
       return;
     }
     setShowCards(false);
+    setExpandedCardId(null);
     let current = 0;
     const step = Math.max(1, Math.ceil(totalEvaluated / 30));
     const timer = setInterval(() => {
@@ -162,7 +167,13 @@ export default function EliminationDisplay() {
               </span>
             </div>
             {survivors.map((survivor, idx) => (
-              <SurvivorCard key={survivor.name || idx} survivor={survivor} index={idx} />
+              <SurvivorCard
+                key={survivor.name || idx}
+                survivor={survivor}
+                index={idx}
+                isExpanded={expandedCardId === (survivor.name || idx)}
+                onToggle={toggleCard}
+              />
             ))}
           </motion.div>
         )}
@@ -170,7 +181,7 @@ export default function EliminationDisplay() {
 
       {/* Eliminated Accordion */}
       {showCards && eliminated.length > 0 && (
-        <EliminationAccordion eliminated={eliminated} />
+        <EliminationAccordion eliminated={eliminated} expandedCardId={expandedCardId} onToggleCard={toggleCard} />
       )}
     </motion.div>
   );

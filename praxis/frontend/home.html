@@ -368,7 +368,7 @@
       position: absolute;
       top: calc(100% + 8px);
       left: -0.35rem; right: -0.35rem;
-      background: rgba(16,16,28,0.94);
+      background: rgba(16,16,28,1);
       backdrop-filter: blur(36px);
       -webkit-backdrop-filter: blur(36px);
       border: 1px solid var(--border-glass-hover);
@@ -390,11 +390,10 @@
     .ac-dropdown::-webkit-scrollbar-track { background: transparent; }
     .ac-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
 
-    /* Bento Grid Layout */
+    /* Bento Grid Layout — two-column via flex */
     .bento-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
       gap: 0.5rem;
     }
     .bento-card {
@@ -403,34 +402,39 @@
       border-radius: 12px;
       padding: 0.6rem 0.7rem;
       transition: all 0.18s ease;
+      overflow: hidden;
+      min-width: 0;
     }
     .bento-card:hover {
       background: rgba(99,102,241,0.07);
       border-color: rgba(99,102,241,0.18);
     }
+    /* Left column — completions */
     .bento-primary {
-      grid-column: 1 / 2;
-      grid-row: 1 / 3;
+      min-width: 0;
+      max-height: 340px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    /* Right column wrapper — holds tools + workflows stacked */
+    .bento-right-col {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      overflow: hidden;
     }
     .bento-tools {
-      grid-column: 2 / 3;
-      grid-row: 1 / 2;
+      /* Natural height inside right column */
     }
     .bento-workflows {
-      grid-column: 2 / 3;
-      grid-row: 2 / 3;
+      grid-column: 1 / -1;
     }
     /* Responsive: collapse to single column on small screens */
     @media (max-width: 520px) {
-      .bento-grid {
-        grid-template-columns: 1fr;
-      }
-      .bento-primary,
-      .bento-tools,
-      .bento-workflows {
-        grid-column: 1;
-        grid-row: auto;
-      }
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-primary { max-height: none; }
+      .bento-workflows { grid-column: 1; }
     }
 
     .bento-card-header {
@@ -472,7 +476,7 @@
       color: var(--text-primary);
     }
     .ac-icon { font-size: 0.75rem; width: 18px; text-align: center; opacity: 0.65; flex-shrink: 0; }
-    .ac-label { flex: 1; line-height: 1.3; }
+    .ac-label { flex: 1; line-height: 1.3; overflow: hidden; min-width: 0; }
     .ac-hint { font-size: 0.65rem; color: var(--text-dim); flex-shrink: 0; }
     .ac-desc { font-size: 0.68rem; color: var(--text-dim); line-height: 1.25; margin-top: 0.1rem; }
 
@@ -1664,6 +1668,10 @@
           grid.appendChild(card);
         }
 
+        // Right column wrapper
+        const rightCol = hasTools ? document.createElement('div') : null;
+        if (rightCol) rightCol.className = 'bento-right-col';
+
         // TOOLS CARD (top-right)
         if (hasTools) {
           const card = document.createElement('div');
@@ -1678,10 +1686,12 @@
               <span class="ac-hint">tool</span>
             </div>`;
           });
-          grid.appendChild(card);
+          rightCol.appendChild(card);
         }
 
-        // WORKFLOWS CARD (bottom-right)
+        if (rightCol) grid.appendChild(rightCol);
+
+        // WORKFLOWS CARD (full-width below the two columns)
         if (hasWorkflows) {
           const card = document.createElement('div');
           card.className = 'bento-card bento-workflows';

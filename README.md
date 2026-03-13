@@ -1455,12 +1455,13 @@ _CONDUIT_OK = False  # set in except block
 - [x] Design system audit — Unified nav, colors, fonts across all 9+ pages
 - [x] Pipeline log UX — Auto-collapse after DONE, human-voice text, stripped internal reasoning
 - [x] Context panel fixes — Null filtering, reasoning bleed-through prevention, empty section hiding
+- [x] Room: click-to-expand tool card detail drawers (survival reasons, pricing, integrations, compliance, trust score, limitations, elimination reasoning)
+- [x] Home: search dropdown layout fixes (column overlap, z-index bleed, bottom stacking, overflow containment)
 
 ### Near-term
 - [ ] Wire `journey.py` endpoints into `api.py` for full REST access
 - [ ] Add after-request middleware to automatically record journey stages
 - [ ] Connect journey drift signals to `learning.py` for automatic scoring adjustment
-- [ ] Room: click-to-expand tool card detail drawers
 - [ ] Room: drag-and-drop stack reordering
 
 ### Medium-term
@@ -1495,6 +1496,26 @@ These questions have no clean answers. They shape Praxis's design decisions.
 ---
 
 ## Changelog
+
+### v24.1 — Tool Detail Drawers & Dropdown Fix (2026-03-13)
+
+**Room: Click-to-expand detail drawers** — Tool cards now expand to reveal full details
+- New `ToolDetailDrawer` component: survival reasons, pricing (free/starter/enterprise), integrations chips, compliance badges, trust score bar, limitations list
+- Eliminated tool drawers show reason code badge + explanation evidence
+- Single-drawer-open constraint: opening one card closes any previously open drawer
+- 200ms height animation via framer-motion, no layout jank
+- Pin/Pass buttons still work without triggering drawer (event guard via `closest('button')`)
+- Chevron indicator (`▸`/rotated) on each card header
+
+**Home: Search dropdown layout fixes**
+- Fixed column overlap: switched `.bento-grid` from flex to CSS grid (`grid-template-columns: 1fr 1fr`)
+- Fixed z-index bleed: dropdown background made fully opaque (`rgba(16,16,28,1)`)
+- Fixed workflows positioning: moved out of right column into full-width grid row (`grid-column: 1 / -1`)
+- Fixed text overflow: `.ac-label` gets `overflow: hidden; min-width: 0`
+- Fixed bottom stacking: all sections now flow in normal document order via CSS grid
+- Added `overflow: hidden` to `.bento-right-col` for containment
+
+---
 
 ### v24 — Room & Design System (2026-03-13)
 

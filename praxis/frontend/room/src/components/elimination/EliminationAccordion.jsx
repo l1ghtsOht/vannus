@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReasonCodeBadge from './ReasonCodeBadge';
+import ToolDetailDrawer from './ToolDetailDrawer';
 
-export default function EliminationAccordion({ eliminated }) {
+export default function EliminationAccordion({ eliminated, expandedCardId, onToggleCard }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -33,21 +34,35 @@ export default function EliminationAccordion({ eliminated }) {
             className="overflow-hidden"
           >
             <div className="px-3 pb-2 space-y-1">
-              {eliminated.map((item, i) => (
-                <motion.div
-                  key={item.name || i}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-white/[0.02]"
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="w-1 h-3 rounded-full bg-red-500/40 shrink-0" />
-                    <span className="text-xs text-white/40 truncate">{item.name}</span>
-                  </div>
-                  <ReasonCodeBadge code={item.reason_type || item.code} />
-                </motion.div>
-              ))}
+              {eliminated.map((item, i) => {
+                const itemId = `elim_${item.name || i}`;
+                const isItemExpanded = expandedCardId === itemId;
+                return (
+                  <motion.div
+                    key={item.name || i}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="rounded-lg overflow-hidden cursor-pointer hover:bg-white/[0.02]"
+                    onClick={() => onToggleCard?.(itemId)}
+                  >
+                    <div className="flex items-center justify-between py-1.5 px-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span
+                          className="text-white/25 text-[9px] transition-transform duration-200 shrink-0"
+                          style={{ transform: isItemExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                        >{'\u25B8'}</span>
+                        <span className="w-1 h-3 rounded-full bg-red-500/40 shrink-0" />
+                        <span className="text-xs text-white/40 truncate">{item.name}</span>
+                      </div>
+                      <ReasonCodeBadge code={item.reason_type || item.code} />
+                    </div>
+                    <AnimatePresence>
+                      {isItemExpanded && <ToolDetailDrawer tool={item} isEliminated />}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         )}

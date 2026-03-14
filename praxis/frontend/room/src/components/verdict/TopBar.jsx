@@ -96,10 +96,12 @@ export default function TopBar() {
         </div>
       ))}
 
-      {/* Cost */}
-      {cost.total > 0 && (
+      {/* Cost / Dry run indicator */}
+      {cost.total > 0 ? (
         <span className="text-[11px] text-white/30 font-mono shrink-0">${cost.total.toFixed(4)}</span>
-      )}
+      ) : phase !== 'idle' ? (
+        <span className="text-[10px] text-white/20 shrink-0">Dry run</span>
+      ) : null}
 
       {/* Error */}
       {error && (

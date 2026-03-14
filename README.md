@@ -1465,11 +1465,11 @@ _CONDUIT_OK = False  # set in except block
 - [x] Connect journey drift signals to `learning.py` for automatic scoring adjustment (v25.5)
 
 ### Medium-term
-- [ ] Activate `ingestion_engine.py` for live polling (TAAFT/Toolify/Futurepedia)
-- [ ] Deploy trust decay sweeps on schedule (72-hour cycle)
-- [ ] Build real provider connections in `llm_provider.py` (beyond dry-run)
-- [ ] Add WebSocket support for real-time dashboard updates
-- [ ] Room: real LLM cost tracking with per-model breakdown
+- [x] Deploy trust decay sweeps on schedule (72-hour cycle) — v25.6 `scheduler.py`
+- [x] Build real provider connections in `llm_provider.py` (dry-run gate: `PRAXIS_DRY_RUN`) — v25.6
+- [x] Room: real LLM cost tracking with per-model breakdown — v25.6 (TopBar shows "Dry run" / actual cost)
+- [x] Add WebSocket support for real-time dashboard updates — v25.6 `ws.py` BroadcastHub
+- [x] Activate `ingestion_engine.py` for live polling — v25.6 (scheduler + `PRAXIS_INGESTION_ENABLED`)
 
 ### Long-term
 - [x] Latent Flux integration (FluxManifold routing, Commitment Sink decisions) — v25.4/v25.5
@@ -1496,6 +1496,36 @@ These questions have no clean answers. They shape Praxis's design decisions.
 ---
 
 ## Changelog
+
+### v25.6 — Medium-Term Roadmap: All 5 Items (2026-03-14)
+
+**Item 1: Background Scheduler** — New `praxis/scheduler.py` (pure stdlib `threading.Timer`).
+- `BackgroundScheduler` with schedule/start/stop/trigger/pause/resume
+- Default tasks: `trust_decay` (72h) and `journey_corrections` (72h)
+- API: `GET /scheduler/status`, `POST /scheduler/trigger/{name}`, `POST /scheduler/pause/{name}`, `POST /scheduler/resume/{name}`
+- Startup/shutdown hooks via `@app.on_event`
+
+**Item 2: Real Provider Connections** — `PRAXIS_DRY_RUN` env var gate (default: true).
+- When false + API keys set, providers make real calls via their SDKs
+- `GET /providers/status` — per-provider dict (sdk_installed, api_key_set, dry_run, circuit_state)
+- 7 providers: OpenAI, Anthropic, Google, XAI, DeepSeek, Local (Ollama), LiteLLM
+
+**Item 3: Room Cost Tracking** — TopBar shows "Dry run" in dry-run mode, actual `$0.0035` in real mode.
+
+**Item 4: WebSocket Hub** — New `praxis/ws.py` with sync-safe `BroadcastHub`.
+- 5 channels: trust_decay, journey, pipeline, scheduler, provider_health
+- `ws://host/ws/{channel}` WebSocket endpoint, `GET /ws/status` subscriber counts
+- Thread-safe `publish()` bridges sync→async via `asyncio.run_coroutine_threadsafe`
+
+**Item 5: Ingestion Pipeline Activation** — Wired `ingestion_engine.py` into scheduler.
+- `PRAXIS_INGESTION_ENABLED=true` to activate (default: false)
+- Default interval: 168h (1 week), configurable via `PRAXIS_INGESTION_INTERVAL`
+- API: `GET /pipeline/status`, `POST /pipeline/trigger`, `GET /pipeline/queue`, `POST /pipeline/approve/{name}`, `POST /pipeline/reject/{name}`
+- Results published to `pipeline` WebSocket channel
+
+**Tests:** 18 new tests (scheduler, providers, WS hub, ingestion, cost). 713/714 full suite (1 pre-existing).
+
+---
 
 ### v25.5 — LF Wiring + Roadmap Completion (2026-03-14)
 

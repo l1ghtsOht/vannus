@@ -4598,6 +4598,215 @@ def create_app():
         corrections = oracle.apply_drift_corrections()
         return {"corrections": corrections, "count": len(corrections)}
 
+    # ══════════════════════════════════════════════════════════════════
+    # v25.6 — Scheduler, Provider Status, WebSocket, Pipeline
+    # ══════════════════════════════════════════════════════════════════
+
+    # ── Scheduler Endpoints ──
+    try:
+        from .scheduler import get_scheduler, setup_default_tasks
+    except ImportError:
+        try:
+            from scheduler import get_scheduler, setup_default_tasks  # type: ignore[no-redef]
+        except ImportError:
+            get_scheduler = setup_default_tasks = None  # type: ignore
+
+    if get_scheduler:
+        _sched = get_scheduler()
+        setup_default_tasks()
+
+        # Register ingestion if enabled
+        import os as _os_sched
+        if _os_sched.environ.get("PRAXIS_INGESTION_ENABLED", "false").lower() == "true":
+            try:
+                from .ingestion_engine import run_daily_pipeline
+                _ing_interval = int(_os_sched.environ.get("PRAXIS_INGESTION_INTERVAL", "604800"))
+                _sched.schedule("ingestion", lambda: run_daily_pipeline(), _ing_interval)
+            except ImportError:
+                pass
+
+        @app.on_event("startup")
+        async def _startup_scheduler():
+            _sched.start()
+            # Set WS event loop
+            try:
+                from .ws import get_hub
+                import asyncio
+                get_hub().set_event_loop(asyncio.get_running_loop())
+            except Exception:
+                pass
+
+        @app.on_event("shutdown")
+        async def _shutdown_scheduler():
+            _sched.stop()
+
+        @app.get("/scheduler/status")
+        def scheduler_status_ep():
+            return _sched.status()
+
+        @app.post("/scheduler/trigger/{task_name}")
+        def scheduler_trigger_ep(task_name: str):
+            ok = _sched.trigger(task_name)
+            if not ok:
+                raise _HTTPException(status_code=404, detail=f"Task '{task_name}' not found")
+            return {"triggered": task_name, "ok": True}
+
+        @app.post("/scheduler/pause/{task_name}")
+        def scheduler_pause_ep(task_name: str):
+            return {"paused": _sched.pause(task_name)}
+
+        @app.post("/scheduler/resume/{task_name}")
+        def scheduler_resume_ep(task_name: str):
+            return {"resumed": _sched.resume(task_name)}
+
+    # ── Provider Status Endpoint ──
+    @app.get("/providers/status")
+    def providers_status_ep():
+        import os as _os_ps
+        dry_run = _os_ps.environ.get("PRAXIS_DRY_RUN", "true").lower() in ("true", "1", "yes")
+        providers = {}
+        for pname, env_key in [
+            ("openai", "OPENAI_API_KEY"),
+            ("anthropic", "ANTHROPIC_API_KEY"),
+            ("google", "GOOGLE_API_KEY"),
+            ("xai", "XAI_API_KEY"),
+            ("deepseek", "PRAXIS_DEEPSEEK_API_KEY"),
+            ("local", "LOCAL_LLM_URL"),
+            ("litellm", "PRAXIS_LITELLM_API_KEY"),
+        ]:
+            api_key_set = bool(_os_ps.environ.get(env_key))
+            sdk_installed = False
+            try:
+                if pname == "openai":
+                    import openai; sdk_installed = True
+                elif pname == "anthropic":
+                    import anthropic; sdk_installed = True
+                elif pname == "google":
+                    import google.generativeai; sdk_installed = True
+                elif pname == "litellm":
+                    import litellm; sdk_installed = True
+                else:
+                    sdk_installed = True  # HTTP-based, no SDK needed
+            except ImportError:
+                pass
+
+            circuit_state = "closed"
+            try:
+                from .llm_resilience import get_provider_health
+                h = get_provider_health(pname)
+                circuit_state = h.get("circuit_state", "closed").lower()
+            except Exception:
+                pass
+
+            providers[pname] = {
+                "available": sdk_installed and (api_key_set or pname == "local") and not dry_run,
+                "sdk_installed": sdk_installed,
+                "api_key_set": api_key_set,
+                "dry_run": dry_run,
+                "circuit_state": circuit_state,
+            }
+        return providers
+
+    # ── WebSocket Endpoints ──
+    try:
+        from .ws import get_hub as _get_ws_hub
+        from fastapi import WebSocket as _WS_Type
+        from starlette.websockets import WebSocketDisconnect as _WSDisconnect
+
+        _ws_hub = _get_ws_hub()
+
+        @app.websocket("/ws/{channel}")
+        async def websocket_endpoint(websocket: _WS_Type, channel: str):
+            await websocket.accept()
+            await _ws_hub.subscribe(channel, websocket)
+            try:
+                while True:
+                    await websocket.receive_text()
+            except _WSDisconnect:
+                await _ws_hub.unsubscribe(channel, websocket)
+            except Exception:
+                await _ws_hub.unsubscribe(channel, websocket)
+
+        @app.get("/ws/status")
+        def ws_status_ep():
+            return _ws_hub.status()
+
+    except ImportError:
+        pass
+
+    # ── Pipeline Endpoints ──
+    try:
+        from .ingestion_engine import (
+            run_daily_pipeline as _run_pipeline,
+            get_review_queue as _get_review_queue,
+            approve_tool as _approve_tool,
+            reject_tool as _reject_tool,
+        )
+        _PIPELINE_OK = True
+    except ImportError:
+        try:
+            from ingestion_engine import (  # type: ignore[no-redef]
+                run_daily_pipeline as _run_pipeline,
+                get_review_queue as _get_review_queue,
+                approve_tool as _approve_tool,
+                reject_tool as _reject_tool,
+            )
+            _PIPELINE_OK = True
+        except ImportError:
+            _PIPELINE_OK = False
+
+    if _PIPELINE_OK:
+        @app.get("/pipeline/status")
+        def pipeline_status_ep():
+            queue = _get_review_queue()
+            sched_status = _sched.status() if get_scheduler else {}
+            ing_status = sched_status.get("ingestion", {})
+            return {
+                "queue_size": len(queue) if queue else 0,
+                "next_run": ing_status.get("next_run"),
+                "last_run": ing_status.get("last_run"),
+                "last_error": ing_status.get("last_error"),
+                "run_count": ing_status.get("run_count", 0),
+            }
+
+        @app.post("/pipeline/trigger")
+        def pipeline_trigger_ep():
+            try:
+                result = _run_pipeline()
+                try:
+                    _get_ws_hub().publish("pipeline", {"event": "cycle_complete", **result})
+                except Exception:
+                    pass
+                return result
+            except Exception as exc:
+                raise _HTTPException(status_code=500, detail=str(exc))
+
+        @app.get("/pipeline/queue")
+        def pipeline_queue_ep():
+            queue = _get_review_queue()
+            return {"queue": [t.to_dict() if hasattr(t, 'to_dict') else str(t) for t in (queue or [])]}
+
+        @app.post("/pipeline/approve/{tool_name}")
+        def pipeline_approve_ep(tool_name: str):
+            try:
+                _approve_tool(tool_name)
+                try:
+                    _get_ws_hub().publish("pipeline", {"event": "tool_approved", "name": tool_name})
+                except Exception:
+                    pass
+                return {"approved": tool_name, "ok": True}
+            except Exception as exc:
+                raise _HTTPException(status_code=400, detail=str(exc))
+
+        @app.post("/pipeline/reject/{tool_name}")
+        def pipeline_reject_ep(tool_name: str, body: dict = None):
+            reason = (body or {}).get("reason", "")
+            try:
+                _reject_tool(tool_name)
+                return {"rejected": tool_name, "reason": reason, "ok": True}
+            except Exception as exc:
+                raise _HTTPException(status_code=400, detail=str(exc))
+
     return app
 
 

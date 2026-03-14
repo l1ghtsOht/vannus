@@ -1313,7 +1313,7 @@
   <section class="hero" id="hero">
     <div class="hero-brand">
       <h1 class="hero-title">Praxis</h1>
-      <p class="hero-subtitle">The translation layer from human intention to machine action.</p>
+      <p class="hero-subtitle">Find the right AI tools for your business. Avoid the wrong ones.</p>
     </div>
 
     <div class="search-container" id="search-container">
@@ -1375,12 +1375,12 @@
           <button class="cpill" data-constraint="free_tier">Free tier</button>
           <button class="cpill" data-constraint="budget_50">Under $50</button>
           <button class="cpill" data-constraint="budget_100">Under $100</button>
-          <button class="cpill" data-constraint="hipaa">HIPAA</button>
-          <button class="cpill" data-constraint="soc2">SOC2</button>
-          <button class="cpill" data-constraint="gdpr">GDPR</button>
+          <button class="cpill" data-constraint="hipaa">HIPAA (healthcare)</button>
+          <button class="cpill" data-constraint="soc2">SOC2 (security)</button>
+          <button class="cpill" data-constraint="gdpr">GDPR (EU privacy)</button>
           <button class="cpill" data-constraint="beginner">Beginner</button>
           <button class="cpill" data-constraint="open_source">Open source</button>
-          <button class="cpill" data-constraint="api_access">API access</button>
+          <button class="cpill" data-constraint="api_access">API access (developers)</button>
         </div>
       </div>
 
@@ -1444,11 +1444,8 @@
     </div>
   </div>
 
-  <!-- Ambient footer (homepage only) -->
-  <div class="ambient-footer" id="ambient-footer">
-    <span class="ambient-tag">253 tools indexed</span>
-    <span class="ambient-tag" style="animation-delay:-3s;">11 trust signals</span>
-    <span class="ambient-tag" style="animation-delay:-6s;">Updated 2026</span>
+  <!-- Ambient footer (hidden — stats shown in hero footer line) -->
+  <div class="ambient-footer" id="ambient-footer" style="display:none">
   </div>
 
   <!-- ══════════════════════════════════════════════
@@ -1610,7 +1607,7 @@
     const CONSTRAINT_LABELS = {
       free_tier: 'free', budget_50: 'under $50/mo', budget_100: 'under $100/mo',
       hipaa: 'HIPAA-compliant', soc2: 'SOC2-certified', gdpr: 'GDPR-compliant',
-      beginner: 'beginner-friendly', open_source: 'open source', api_access: 'API-accessible',
+      beginner: 'beginner-friendly', open_source: 'open source', api_access: 'API access',
     };
     const TASK_LABELS = {
       writing: 'writing tools', coding: 'coding tools', analytics: 'analytics tools',
@@ -1663,45 +1660,14 @@
 
     /* ── Category chips replaced by command bar explore grid ── */
 
-    /* ── Autocomplete (Bento Grid Engine) ── */
-    queryInput.addEventListener('input', () => {
-      clearTimeout(acTimer);
-      const q = queryInput.value.trim();
-      if (q.length < 2) { closeAC(); return; }
-      acTimer = setTimeout(() => fetchSuggestions(q), 280);
-    });
+    /* ── Autocomplete disabled — task grid + constraint pills replace it ── */
 
     queryInput.addEventListener('keydown', e => {
-      const items = acDropdown.querySelectorAll('.ac-item');
-      if (!items.length) return;
-      if (e.key === 'ArrowDown') {
+      if (e.key === 'Enter') {
         e.preventDefault();
-        acIndex = Math.min(acIndex + 1, items.length - 1);
-        highlightAC(items);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        acIndex = Math.max(acIndex - 1, -1);
-        highlightAC(items);
-      } else if (e.key === 'Tab' && acIndex >= 0 && items[acIndex]) {
-        e.preventDefault();
-        queryInput.value = items[acIndex].dataset.value;
-        closeAC();
-      } else if (e.key === 'Enter') {
-        if (acIndex >= 0 && items[acIndex]) {
-          queryInput.value = items[acIndex].dataset.value;
-          closeAC();
-        }
-        doSearch();
+        submitSearch();
       } else if (e.key === 'Escape') {
         closeAC();
-      }
-    });
-
-    queryInput.addEventListener('focus', () => {
-      if (queryInput.value.trim().length >= 2 && acDropdown.children.length > 0) {
-        openAC();
-      } else if (queryInput.value.trim().length < 2) {
-        fetchFocusSuggestions();
       }
     });
     document.addEventListener('click', e => {
@@ -1889,11 +1855,24 @@
     /* ══════════════════════════════════════════════
        SEARCH
        ══════════════════════════════════════════════ */
-    async function doSearch() {
-      closeAC();
-      let q = document.getElementById('query').value.trim();
+    /* ── Submit to Room ── */
+    function submitSearch() {
+      const q = document.getElementById('query').value.trim();
       if (!q) return;
-      // Append active constraint labels to query
+      const constraints = [...document.querySelectorAll('.cpill.active')]
+        .map(el => el.textContent.trim())
+        .join(',');
+      let url = '/room?q=' + encodeURIComponent(q);
+      if (constraints) url += '&constraints=' + encodeURIComponent(constraints);
+      window.location.href = url;
+    }
+
+    async function doSearch() {
+      // Primary path: navigate to Room
+      submitSearch();
+      // Fallback: if submitSearch didn't navigate (empty query), do nothing
+      const q = document.getElementById('query').value.trim();
+      if (!q) return;
       const cLabels = [...activeConstraints].map(c => CONSTRAINT_LABELS[c] || c);
       if (cLabels.length) q += ', ' + cLabels.join(', ');
       lastQuery = q;

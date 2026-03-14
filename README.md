@@ -17,11 +17,11 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Tool catalog** | 253 curated AI tools with rich metadata |
 | **API endpoints** | 372 REST routes via FastAPI |
 | **Test coverage** | 719 tests across 16 test files, all passing |
-| **Frontend** | 29 HTML + 4 JS files (~14,300 lines), Liquid Glass UI |
+| **Frontend** | 29 HTML + 4 JS files (~14,400 lines), Liquid Glass UI |
 | **Versions** | 17 major iterations (v1 → v17) |
 | **Total LOC** | ~78,400 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-14 18:57 UTC |
+| **Last auto-update** | 2026-03-14 19:42 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -2023,6 +2023,9 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+319b8f0 v25.7: Homepage hero rebuild — task grid + constraint pills + paths
+b620f25 docs: Rewrite roadmap, add Strategic Positioning, update LF section
+2f1018b docs(auto): update README stats [skip ci]
 1a4de4d v25.6: Complete all 5 medium-term roadmap items
 b293ed0 docs(auto): update README stats [skip ci]
 95beb94 v25.5: LF wiring into journey.py + llm_resilience.py + roadmap completion
@@ -2040,9 +2043,6 @@ eaeb6b3 auto: 2026-03-14 11:45:12
 d0b0f9a v25.4: Latent Flux integration — orchestration reliability monitor
 c2ddbee docs(auto): update README stats [skip ci]
 d616582 v25.3: Shared Command Bar for homepage and Room
-bd43c86 docs(auto): update README stats [skip ci]
-4bef66c v25.2: Hero search input with two-state design
-ff0353b docs(auto): update README stats [skip ci]
 ```
 <!-- AUTO:GIT:END -->
 
@@ -2077,7 +2077,7 @@ An **elimination-first AI tool curation engine** that evolved into a **cognitive
 - **372 API routes**, all functional
 - **719 tests passing**
 - **116 Python modules**, ~64,100 lines
-- **33 frontend files**, ~14,300 lines
+- **33 frontend files**, ~14,400 lines
 - All critical bugs fixed (alias collision, caveats reset, dead code)
 - Server runs on port 8000 via `uvicorn praxis.api:app --port 8000`
 <!-- AUTO:STATE:END -->

@@ -26,6 +26,19 @@ from typing import Any, Callable, Optional, Sequence, Type
 
 log = logging.getLogger("praxis.llm_resilience")
 
+# ── Latent Flux per-provider monitoring (optional) ──
+_LF_AVAILABLE = False
+_provider_reservoirs: dict = {}
+try:
+    from .lf_monitor import ToolReservoir as _ToolReservoir
+    _LF_AVAILABLE = True
+except ImportError:
+    try:
+        from lf_monitor import ToolReservoir as _ToolReservoir
+        _LF_AVAILABLE = True
+    except ImportError:
+        pass
+
 
 # -----------------------------------------------------------------------
 # Circuit Breaker
@@ -82,6 +95,84 @@ class CircuitBreaker:
         self._failure_count = 0
         self._state = "CLOSED"
         self._last_failure_time = 0.0
+
+
+def _get_provider_reservoir(provider: str):
+    """Get or create a ToolReservoir for a provider."""
+    if not _LF_AVAILABLE:
+        return None
+    if provider not in _provider_reservoirs:
+        _provider_reservoirs[provider] = _ToolReservoir(
+            d=4, leak_rate=0.2, seed=hash(provider) % (2**31)
+        )
+    return _provider_reservoirs[provider]
+
+
+def record_provider_metrics(
+    provider: str,
+    latency_ms: float = 0.0,
+    error_rate: float = 0.0,
+    quality_score: float = 1.0,
+    cost_usd: float = 0.0,
+) -> float:
+    """Record provider metrics and return deviation score.
+
+    Returns 0.0 if LF is not available.
+    """
+    reservoir = _get_provider_reservoir(provider)
+    if not reservoir:
+        return 0.0
+    try:
+        # Normalize latency to 0-1 range (assume 5000ms = 1.0)
+        lat_norm = min(latency_ms / 5000.0, 1.0)
+        cost_norm = min(cost_usd / 1.0, 1.0)
+        reservoir.step([lat_norm, error_rate, quality_score, cost_norm])
+        return reservoir.deviation_score([lat_norm, error_rate, quality_score, cost_norm])
+    except Exception:
+        return 0.0
+
+
+def get_provider_health(provider: str) -> dict:
+    """Get combined health state for a provider."""
+    cb = _llm_circuit
+    reservoir = _provider_reservoirs.get(provider)
+    dev_score = 0.0
+    variance = []
+    if reservoir and reservoir.step_count > 0:
+        try:
+            dev_score = reservoir.deviation_score(reservoir._mean_ema)
+            variance = reservoir.variance
+        except Exception:
+            pass
+    return {
+        "deviation_score": dev_score,
+        "variance": variance,
+        "consecutive_failures": cb._failure_count,
+        "circuit_state": cb.state,
+        "lf_available": _LF_AVAILABLE,
+        "step_count": reservoir.step_count if reservoir else 0,
+    }
+
+
+def check_sigma_trip(provider: str, deviation_threshold: float = 4.0) -> bool:
+    """Check if a provider should trip based on sigma deviation.
+
+    Returns True if deviation_score exceeds threshold.
+    """
+    reservoir = _provider_reservoirs.get(provider)
+    if not reservoir or reservoir.step_count < 5:
+        return False
+    try:
+        dev = reservoir.deviation_score(reservoir._mean_ema)
+        if dev >= deviation_threshold:
+            log.warning(
+                "LF sigma trip: provider=%s deviation=%.2f > threshold=%.1f",
+                provider, dev, deviation_threshold,
+            )
+            return True
+    except Exception:
+        pass
+    return False
 
 
 # Singleton for the default LLM circuit

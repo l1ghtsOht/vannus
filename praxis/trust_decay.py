@@ -629,6 +629,16 @@ def run_trust_sweep(
     )
     result.completed_at = datetime.datetime.utcnow().isoformat()
 
+    # Auto-apply drift corrections from journey oracle if available
+    try:
+        from .journey import get_oracle as _sweep_oracle
+        oracle = _sweep_oracle()
+        corrections = oracle.apply_drift_corrections()
+        if corrections:
+            logger.info("[trust_decay] Applied %d drift corrections from journey oracle", len(corrections))
+    except Exception:
+        pass
+
     logger.info(
         "[trust_decay] === Sweep %s Complete — %d alerts (%d severe, %d mild) ===",
         sweep_id, result.alerts_generated, result.severe_alerts, result.mild_alerts,

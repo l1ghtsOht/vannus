@@ -1541,6 +1541,36 @@ def create_app():
         except Exception:
             pass
 
+    # ── Auto-Journey Middleware ──────────────────────────────────────
+    # Automatically records journey stage transitions based on API activity.
+    import os as _os_aj
+    _auto_journey = _os_aj.environ.get("PRAXIS_AUTO_JOURNEY", "true").lower() == "true"
+    if _auto_journey:
+        try:
+            from .journey import get_oracle as _aj_oracle_fn, JourneyStage as _AJStage
+            from starlette.middleware.base import BaseHTTPMiddleware as _AJBaseMW
+
+            class _AutoJourneyMiddleware(_AJBaseMW):
+                async def dispatch(self, request, call_next):
+                    response = await call_next(request)
+                    try:
+                        path = request.url.path
+                        if path in ("/search", "/cognitive") and request.method == "POST":
+                            oracle = _aj_oracle_fn()
+                            user_id = "anon"  # extract from body/auth if available
+                            jid = oracle.create_journey(user_id, f"auto:{path}")
+                        elif path.startswith("/stack") and request.method == "POST":
+                            pass  # SELECTION stage recorded by stack endpoint
+                        elif path == "/feedback" and request.method == "POST":
+                            pass  # OUTCOME stage recorded by feedback endpoint
+                    except Exception:
+                        pass  # Never break the response
+                    return response
+
+            app.add_middleware(_AutoJourneyMiddleware)
+        except Exception:
+            pass
+
     # Static frontend
     try:
         from fastapi.staticfiles import StaticFiles
@@ -4510,6 +4540,63 @@ def create_app():
         if state is None:
             raise _HTTPException(status_code=400, detail=f"Journey {journey_id} not found")
         return state.to_dict()
+
+    @app.post("/journey/{journey_id}/target")
+    def journey_target_ep(journey_id: str, body: dict):
+        """Set target vector for a tool at SELECTION stage."""
+        tool_name = body.get("tool_name", "")
+        if not tool_name:
+            raise _HTTPException(status_code=400, detail="tool_name is required")
+        from .journey import TargetScoreVector
+        vector = TargetScoreVector(
+            relevance=float(body.get("relevance", 0.0)),
+            budget_fit=float(body.get("budget_fit", 0.0)),
+            skill_fit=float(body.get("skill_fit", 0.0)),
+            integration_ease=float(body.get("integration_ease", 0.0)),
+        )
+        oracle = _get_journey_oracle()
+        try:
+            oracle.set_target_vector(journey_id, tool_name, vector)
+        except ValueError as exc:
+            raise _HTTPException(status_code=400, detail=str(exc))
+        return {"ok": True, "journey_id": journey_id, "tool": tool_name}
+
+    @app.get("/journey/{journey_id}/drift")
+    def journey_drift_ep(journey_id: str):
+        """Get drift signals for a journey."""
+        oracle = _get_journey_oracle()
+        try:
+            signals = oracle.detect_drift(journey_id)
+        except ValueError as exc:
+            raise _HTTPException(status_code=400, detail=str(exc))
+        return {"journey_id": journey_id, "drift_signals": [s.to_dict() for s in signals]}
+
+    @app.get("/journey/dashboard")
+    def journey_dashboard_ep():
+        """Aggregate journey dashboard with metrics."""
+        oracle = _get_journey_oracle()
+        return oracle.dashboard().to_dict()
+
+    @app.get("/journey/{journey_id}/reservoir")
+    def journey_reservoir_ep(journey_id: str):
+        """Get LF reservoir state for tools in a journey."""
+        oracle = _get_journey_oracle()
+        state = oracle.get_journey(journey_id)
+        if state is None:
+            raise _HTTPException(status_code=400, detail=f"Journey {journey_id} not found")
+        reservoirs = {}
+        for tool_name in state.target_vectors:
+            rstate = oracle.get_reservoir_state(tool_name)
+            if rstate:
+                reservoirs[tool_name] = rstate
+        return {"journey_id": journey_id, "reservoirs": reservoirs}
+
+    @app.post("/journey/apply-corrections")
+    def journey_corrections_ep():
+        """Apply MODERATE/SEVERE drift corrections to scoring."""
+        oracle = _get_journey_oracle()
+        corrections = oracle.apply_drift_corrections()
+        return {"corrections": corrections, "count": len(corrections)}
 
     return app
 

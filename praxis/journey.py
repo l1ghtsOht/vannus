@@ -145,6 +145,18 @@ class DriftSeverity(str, Enum):
     MODERATE = "moderate"   # 0.20 ≤ Δ < 0.40 — flag for review
     SEVERE   = "severe"     # Δ ≥ 0.40 — feed back into scoring
 
+# ── Latent Flux reservoir-based drift (optional) ──
+_LF_AVAILABLE = False
+try:
+    from .lf_monitor import ToolReservoir as _ToolReservoir
+    _LF_AVAILABLE = True
+except ImportError:
+    try:
+        from lf_monitor import ToolReservoir as _ToolReservoir
+        _LF_AVAILABLE = True
+    except ImportError:
+        pass
+
 
 # ═══════════════════════════════════════════════════════════════════
 # Data Types
@@ -399,6 +411,8 @@ class JourneyOracle:
         self._data_dir = Path(data_dir) if data_dir else Path(__file__).parent / "journey_data"
         self._journeys: Dict[str, JourneyState] = {}
         self._loaded = False
+        # Per-tool LF reservoirs for drift detection (d=4: relevance, budget_fit, skill_fit, integration_ease)
+        self._reservoirs: Dict[str, Any] = {}
 
     def _ensure_loaded(self) -> None:
         if self._loaded:
@@ -548,6 +562,13 @@ class JourneyOracle:
             if not state:
                 raise ValueError(f"Journey {journey_id} not found")
             state.target_vectors[tool_name] = vector
+            # Feed predicted vector into LF reservoir
+            reservoir = self._get_reservoir(tool_name)
+            if reservoir:
+                try:
+                    reservoir.step([vector.relevance, vector.budget_fit, vector.skill_fit, vector.integration_ease])
+                except Exception:
+                    pass
             state.updated_at = datetime.datetime.utcnow().isoformat()
             self._save()
 
@@ -577,6 +598,13 @@ class JourneyOracle:
             if not state:
                 raise ValueError(f"Journey {journey_id} not found")
             state.outcomes.append(record)
+            # Feed actual outcome into LF reservoir
+            reservoir = self._get_reservoir(tool_name)
+            if reservoir:
+                try:
+                    reservoir.step([record.satisfaction, record.roi, record.satisfaction, record.integration_success])
+                except Exception:
+                    pass
             state.updated_at = datetime.datetime.utcnow().isoformat()
 
             # Auto-advance to OUTCOME stage
@@ -593,6 +621,14 @@ class JourneyOracle:
 
         log.info("Outcome recorded for journey=%s tool=%s", journey_id, tool_name)
         return record
+
+    def _get_reservoir(self, tool_name: str):
+        """Get or create a ToolReservoir for drift detection."""
+        if not _LF_AVAILABLE:
+            return None
+        if tool_name not in self._reservoirs:
+            self._reservoirs[tool_name] = _ToolReservoir(d=4, leak_rate=0.15, seed=hash(tool_name) % (2**31))
+        return self._reservoirs[tool_name]
 
     # ── Drift Detection ──────────────────────────────────────────────
 
@@ -630,29 +666,67 @@ class JourneyOracle:
                     "integration_ease": outcome.integration_success,
                 }
 
-                for dim_name, predicted in vector.dimensions():
-                    actual = actuals.get(dim_name, 0.0)
-                    delta = predicted - actual
+                # LF-enhanced drift detection
+                reservoir = self._get_reservoir(outcome.tool_name)
+                if reservoir and _LF_AVAILABLE and reservoir.step_count >= 2:
+                    # Use reservoir deviation_score for severity
+                    actual_vec = [
+                        actuals.get("relevance", 0.0),
+                        actuals.get("budget_fit", 0.0),
+                        actuals.get("skill_fit", 0.0),
+                        actuals.get("integration_ease", 0.0),
+                    ]
+                    dev_score = reservoir.deviation_score(actual_vec)
+                    # Map deviation score to severity
+                    if dev_score >= 3.5:
+                        lf_severity = DriftSeverity.SEVERE.value
+                    elif dev_score >= 2.0:
+                        lf_severity = DriftSeverity.MODERATE.value
+                    elif dev_score >= 1.0:
+                        lf_severity = DriftSeverity.MILD.value
+                    else:
+                        lf_severity = DriftSeverity.NONE.value
 
-                    if (outcome.tool_name, dim_name) in existing:
-                        continue
+                    if lf_severity != DriftSeverity.NONE.value:
+                        # Emit a single aggregate signal per tool
+                        if (outcome.tool_name, "aggregate") not in existing:
+                            signal = DriftSignal(
+                                journey_id=journey_id,
+                                tool_name=outcome.tool_name,
+                                dimension="aggregate",
+                                predicted=0.0,
+                                actual=dev_score,
+                                delta=dev_score,
+                                severity=lf_severity,
+                                detected_at=now,
+                            )
+                            new_signals.append(signal)
+                            state.drift_signals.append(signal)
+                else:
+                    # Fallback: threshold-based per-dimension drift
+                    for dim_name, predicted in vector.dimensions():
+                        actual = actuals.get(dim_name, 0.0)
+                        delta = predicted - actual
 
-                    severity = _classify_drift(delta)
-                    if severity == DriftSeverity.NONE.value:
-                        continue
+                        if (outcome.tool_name, dim_name) in existing:
+                            continue
 
-                    signal = DriftSignal(
-                        journey_id=journey_id,
-                        tool_name=outcome.tool_name,
-                        dimension=dim_name,
-                        predicted=round(predicted, 4),
-                        actual=round(actual, 4),
-                        delta=round(delta, 4),
-                        severity=severity,
-                        detected_at=now,
-                    )
-                    new_signals.append(signal)
-                    state.drift_signals.append(signal)
+                        severity = _classify_drift(delta)
+                        if severity == DriftSeverity.NONE.value:
+                            continue
+
+                        signal = DriftSignal(
+                            journey_id=journey_id,
+                            tool_name=outcome.tool_name,
+                            dimension=dim_name,
+                            predicted=round(predicted, 4),
+                            actual=round(actual, 4),
+                            delta=round(delta, 4),
+                            severity=severity,
+                            detected_at=now,
+                        )
+                        new_signals.append(signal)
+                        state.drift_signals.append(signal)
 
             if new_signals:
                 state.updated_at = now
@@ -684,6 +758,62 @@ class JourneyOracle:
                 log.debug("Drift detection failed for %s: %s", jid, exc)
 
         return all_signals
+
+    def get_reservoir_state(self, tool_name: str) -> Optional[Dict]:
+        """Get LF reservoir state for a tool (variance, deviation, step count)."""
+        if not _LF_AVAILABLE:
+            return None
+        reservoir = self._reservoirs.get(tool_name)
+        if not reservoir:
+            return None
+        return reservoir.to_dict()
+
+    def apply_drift_corrections(self) -> List[Dict]:
+        """Feed MODERATE/SEVERE drift signals back into learning.py to adjust scoring."""
+        corrections = []
+        try:
+            from . import learning as _learning
+        except ImportError:
+            try:
+                import learning as _learning
+            except ImportError:
+                log.debug("learning module not available for drift corrections")
+                return corrections
+
+        all_signals = self.detect_drift_all()
+        for signal in all_signals:
+            if signal.severity in (DriftSeverity.MODERATE.value, DriftSeverity.SEVERE.value):
+                drift_magnitude = min(abs(signal.delta), 1.0)
+                adjusted_quality = max(0.0, 1.0 - drift_magnitude * 0.5)
+                try:
+                    # Record as negative quality signal
+                    fb = _learning._load_feedback()
+                    fb.append({
+                        "query": f"drift_correction:{signal.journey_id}",
+                        "tool": signal.tool_name,
+                        "rating": max(1, int(adjusted_quality * 10)),
+                        "accepted": False,
+                        "details": {
+                            "source": "drift_correction",
+                            "severity": signal.severity,
+                            "dimension": signal.dimension,
+                            "delta": signal.delta,
+                        },
+                    })
+                    import json, os
+                    fb_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "feedback.json")
+                    with open(fb_path, "w") as f:
+                        json.dump(fb, f, indent=2)
+                    corrections.append({
+                        "tool": signal.tool_name,
+                        "severity": signal.severity,
+                        "adjusted_quality": adjusted_quality,
+                    })
+                    log.info("Drift correction applied: %s severity=%s quality=%.2f",
+                             signal.tool_name, signal.severity, adjusted_quality)
+                except Exception as exc:
+                    log.debug("Drift correction failed for %s: %s", signal.tool_name, exc)
+        return corrections
 
     # ── Query & Dashboard ────────────────────────────────────────────
 

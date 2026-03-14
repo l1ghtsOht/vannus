@@ -1460,9 +1460,9 @@ _CONDUIT_OK = False  # set in except block
 - [x] Room: drag-and-drop stack reordering with role labels (Primary/Companion/Infrastructure)
 
 ### Near-term
-- [ ] Wire `journey.py` endpoints into `api.py` for full REST access
-- [ ] Add after-request middleware to automatically record journey stages
-- [ ] Connect journey drift signals to `learning.py` for automatic scoring adjustment
+- [x] Wire `journey.py` endpoints into `api.py` for full REST access (v25.5)
+- [x] Add after-request middleware to automatically record journey stages (v25.5)
+- [x] Connect journey drift signals to `learning.py` for automatic scoring adjustment (v25.5)
 
 ### Medium-term
 - [ ] Activate `ingestion_engine.py` for live polling (TAAFT/Toolify/Futurepedia)
@@ -1472,7 +1472,7 @@ _CONDUIT_OK = False  # set in except block
 - [ ] Room: real LLM cost tracking with per-model breakdown
 
 ### Long-term
-- [ ] Latent Flux integration (FluxManifold routing, Commitment Sink decisions)
+- [x] Latent Flux integration (FluxManifold routing, Commitment Sink decisions) — v25.4/v25.5
 - [ ] Distributed architecture (Redis state, Celery workers, horizontal scaling)
 - [ ] Migrate remaining static pages to React SPA
 - [ ] Public API with rate-limited free tier
@@ -1496,6 +1496,41 @@ These questions have no clean answers. They shape Praxis's design decisions.
 ---
 
 ## Changelog
+
+### v25.5 — LF Wiring + Roadmap Completion (2026-03-14)
+
+**Workstream 1: journey.py LF integration**
+- Per-tool ToolReservoir (d=4) created on `set_target_vector()`, fed on `record_outcome()`
+- `detect_drift()` uses reservoir `deviation_score()` when LF available (thresholds: <1.0 NONE, 1-2 MILD, 2-3.5 MODERATE, 3.5+ SEVERE), falls back to threshold-based delta when not
+- New methods: `get_reservoir_state()`, `apply_drift_corrections()` (feeds MODERATE/SEVERE signals into learning.py as negative quality feedback)
+
+**Workstream 2: llm_resilience.py LF integration**
+- Per-provider ToolReservoir (d=4: latency, error_rate, quality, cost) via `record_provider_metrics()`
+- `check_sigma_trip()` — trips circuit breaker when deviation_score >= 4.0 (catches erratic-but-not-fully-failing providers)
+- `get_provider_health()` — combined health state (deviation, variance, failures, circuit state)
+
+**Workstream 3a: Journey API endpoints** (added 6 new to api.py)
+- `POST /journey/{id}/target` — set target vector at SELECTION
+- `GET /journey/{id}/drift` — get drift signals
+- `GET /journey/dashboard` — aggregate metrics
+- `GET /journey/{id}/reservoir` — LF reservoir state for tools
+- `POST /journey/apply-corrections` — apply drift corrections to scoring
+
+**Workstream 3b: Auto-journey middleware**
+- `_AutoJourneyMiddleware` auto-creates journeys from `/search` and `/cognitive` POST requests
+- Controlled by `PRAXIS_AUTO_JOURNEY` env var (default: true)
+- Non-blocking — failures never break the API response
+
+**Workstream 3c: Drift → learning feedback loop**
+- `apply_drift_corrections()` records negative feedback for tools with MODERATE/SEVERE drift
+- Auto-triggered from `run_trust_sweep()` when journey module is available
+- Also callable via `POST /journey/apply-corrections`
+
+**Tests:** 51/51 LF integration tests pass. 694/696 full suite pass (2 pre-existing search ranking issues).
+
+**Roadmap:** All 3 near-term items completed. Latent Flux integration moved to completed.
+
+---
 
 ### v25.4 — Latent Flux Integration (2026-03-14)
 

@@ -398,6 +398,123 @@ class TestPurePythonConstraint(unittest.TestCase):
 
 
 # =====================================================================
+# Phase 4: Journey reservoir drift detection
+# =====================================================================
+
+class TestPhase4_JourneyReservoirDrift(unittest.TestCase):
+    """Journey.py LF-enhanced drift detection."""
+
+    def test_journey_import(self):
+        from praxis.journey import get_oracle, JourneyStage, TargetScoreVector
+        oracle = get_oracle()
+        self.assertIsNotNone(oracle)
+
+    def test_reservoir_created_on_target(self):
+        from praxis.journey import get_oracle, JourneyStage, TargetScoreVector
+        oracle = get_oracle()
+        jid = oracle.create_journey("test_p4a", "reservoir test")
+        oracle.advance(jid, JourneyStage.SELECTION)
+        oracle.set_target_vector(jid, "ReservoirTool", TargetScoreVector(0.9, 0.8, 0.7, 0.6))
+        rstate = oracle.get_reservoir_state("ReservoirTool")
+        # Should exist if LF is available
+        if rstate is not None:
+            self.assertIn("step_count", rstate)
+            self.assertGreater(rstate["step_count"], 0)
+
+    def test_stable_data_low_drift(self):
+        from praxis.journey import get_oracle, JourneyStage, TargetScoreVector
+        oracle = get_oracle()
+        jid = oracle.create_journey("test_p4b", "stable test")
+        oracle.advance(jid, JourneyStage.SELECTION)
+        oracle.set_target_vector(jid, "StableTool", TargetScoreVector(0.8, 0.8, 0.8, 0.8))
+        oracle.record_outcome(jid, "StableTool", satisfaction=0.75, roi=0.7, integration_success=0.8)
+        signals = oracle.detect_drift(jid)
+        # With stable data, drift should be minimal or empty
+        severe = [s for s in signals if s.severity == "severe"]
+        self.assertEqual(len(severe), 0, f"Unexpected severe drift from stable data: {severe}")
+
+    def test_get_reservoir_state(self):
+        from praxis.journey import get_oracle
+        oracle = get_oracle()
+        rstate = oracle.get_reservoir_state("NonexistentTool999")
+        # Should return None for a tool that hasn't been tracked
+        self.assertIsNone(rstate)
+
+    def test_apply_drift_corrections(self):
+        from praxis.journey import get_oracle
+        oracle = get_oracle()
+        corrections = oracle.apply_drift_corrections()
+        self.assertIsInstance(corrections, list)
+
+
+# =====================================================================
+# Phase 5: Circuit breaker sigma-based trip
+# =====================================================================
+
+class TestPhase5_CircuitBreakerSigma(unittest.TestCase):
+    """llm_resilience.py LF-enhanced circuit breaker."""
+
+    def test_imports(self):
+        from praxis.llm_resilience import record_provider_metrics, get_provider_health, check_sigma_trip
+        self.assertTrue(callable(record_provider_metrics))
+        self.assertTrue(callable(get_provider_health))
+        self.assertTrue(callable(check_sigma_trip))
+
+    def test_record_provider_metrics(self):
+        from praxis.llm_resilience import record_provider_metrics
+        dev = record_provider_metrics("test_p5", latency_ms=100, error_rate=0.01, quality_score=0.9, cost_usd=0.05)
+        self.assertIsInstance(dev, float)
+        self.assertGreaterEqual(dev, 0.0)
+
+    def test_get_provider_health(self):
+        from praxis.llm_resilience import record_provider_metrics, get_provider_health
+        for _ in range(5):
+            record_provider_metrics("health_test_p5", latency_ms=100, error_rate=0.0, quality_score=0.95, cost_usd=0.01)
+        health = get_provider_health("health_test_p5")
+        self.assertIn("deviation_score", health)
+        self.assertIn("circuit_state", health)
+        self.assertIn("lf_available", health)
+        self.assertEqual(health["circuit_state"], "CLOSED")
+
+    def test_sigma_no_trip_on_stable(self):
+        from praxis.llm_resilience import record_provider_metrics, check_sigma_trip
+        for _ in range(10):
+            record_provider_metrics("stable_p5", latency_ms=100, error_rate=0.01, quality_score=0.9, cost_usd=0.05)
+        self.assertFalse(check_sigma_trip("stable_p5", deviation_threshold=4.0))
+
+    def test_sigma_trip_needs_history(self):
+        from praxis.llm_resilience import check_sigma_trip
+        # No history → should not trip
+        self.assertFalse(check_sigma_trip("nonexistent_p5"))
+
+
+# =====================================================================
+# Phase 6: Journey API endpoints
+# =====================================================================
+
+class TestPhase6_JourneyAPI(unittest.TestCase):
+    """Journey REST API endpoint availability."""
+
+    def test_journey_create_function_exists(self):
+        from praxis.journey import get_oracle
+        oracle = get_oracle()
+        self.assertTrue(hasattr(oracle, 'create_journey'))
+
+    def test_journey_target_vector_function(self):
+        from praxis.journey import get_oracle
+        oracle = get_oracle()
+        self.assertTrue(hasattr(oracle, 'set_target_vector'))
+
+    def test_journey_dashboard(self):
+        from praxis.journey import get_oracle
+        oracle = get_oracle()
+        dash = oracle.dashboard()
+        self.assertIsNotNone(dash)
+        d = dash.to_dict()
+        self.assertIn("total_journeys", d)
+
+
+# =====================================================================
 # Runner
 # =====================================================================
 

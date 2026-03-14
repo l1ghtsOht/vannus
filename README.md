@@ -40,7 +40,8 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 - [Journey Oracle & Outcome Tracking](#journey-oracle--outcome-tracking)
 - [Multi-Model Ecosystem](#multi-model-ecosystem)
 - [Monetization Model & Gating Logic](#monetization-model--gating-logic)
-- [Latent Flux Integration Vision](#latent-flux-integration-vision)
+- [Strategic Positioning](#strategic-positioning)
+- [Latent Flux Integration](#latent-flux-integration)
 - [Engineering Principles](#engineering-principles)
 - [The 22 Versions — Build History](#the-22-versions--build-history)
 - [Complete Module Reference](#complete-module-reference)
@@ -658,20 +659,109 @@ PRICING_MODELS = [
 
 ---
 
-## Latent Flux Integration Vision
+## Strategic Positioning
 
-> **Status: Conceptual. No implementation exists yet.**
+### The Problem No One Else Is Solving
 
-The Latent Flux framework (FluxManifold, Commitment Sink, Spectral Resonance) represents a future integration path for Praxis routing decisions. The intended mapping:
+The AI tools market has 15,000+ products and is growing by hundreds per month. Every other company in this space is building another tool — another chatbot, another coding assistant, another writing helper. The market is drowning in supply.
 
-| Latent Flux Primitive | Praxis Application |
-|----------------------|-------------------|
-| **FluxManifold** | Route queries through multi-dimensional scoring spaces. Currently flat scoring; manifold would enable curved optimization landscapes. |
-| **Commitment Sink** | Decision-point where elimination becomes irreversible. Currently handled by `DifferentialResult`; Commitment Sink would add graduated finality. |
-| **Spectral Resonance** | Detect harmonic patterns between tool combinations. Currently handled by `graph.py` community detection; spectral analysis would add frequency-domain matching. |
-| **Phase Transitions** | Model state changes in user journey (INTAKE→OUTCOME). Currently handled by `journey.py` stage machine; phase transitions would add non-linear dynamics. |
+No one is building the layer that sits above all of them.
 
-These primitives would complement — not replace — the existing elimination-first pipeline. Praxis's philosophy remains: trust must be earned, measured, and verified. Latent Flux would provide richer mathematical frameworks for how that measurement operates.
+Enterprises and SMBs face the same problem: they adopt 3-7 AI tools, manually copy outputs between them, re-explain context at every step, and have no way to measure whether any individual tool is actually delivering value. The workflow looks like this:
+Human → AI Tool A → Human copies output → AI Tool B → Human explains context again → AI Tool C
+
+This is the gap Praxis occupies. Not another tool. The orchestration layer.
+
+### The Orchestra Model
+
+Praxis operates on a conductor metaphor that maps directly to the architecture:
+
+| Role | Entity | What It Does |
+|------|--------|-------------|
+| **Director** | The user | Defines intent, sets constraints, approves outcomes |
+| **Conductor** | Praxis | Understands the workflow, selects the right tools, coordinates execution, monitors quality |
+| **Musicians** | AI tools (253 in catalog) | Perform specialized tasks — writing, coding, analysis, research, automation |
+
+The user never manually routes work between AI systems. Praxis understands the workflow and coordinates the tools automatically. The key insight: Praxis gets stronger as more tools enter the market. Every new AI tool is another musician in the orchestra, not a competitor.
+
+### Why Praxis Is Defensible
+
+**1. Elimination-first methodology is a philosophical moat.**
+Every AI tool directory ranks by relevance. Praxis ranks by survival. The elimination pipeline — 253 tools reduced to 3-8 survivors with full audit trails — is a fundamentally different approach to recommendation. It's harder to build, harder to explain, and harder to replicate than a relevance sort. Competitors would need to rebuild the entire differential diagnosis engine, trust decay monitoring, and compliance verification stack.
+
+**2. Trust decay monitoring creates compounding intelligence.**
+Praxis monitors 11 signal types across every tool in the catalog: pricing changes, sentiment drops, SSL expiry, data breaches, PE acquisitions, free tier removals. This runs continuously. Every sweep makes the catalog more accurate. After 6 months of operation, Praxis has trust intelligence that no competitor can replicate without running the same monitoring infrastructure for the same period. Trust data is a time-locked moat.
+
+**3. Latent Flux gives Praxis behavioral intuition, not just metrics.**
+Most monitoring systems use threshold-based alerts: "if latency > 500ms, fire alert." Praxis uses geometric behavioral drift detection via Latent Flux — a per-tool Echo State Network that learns what "normal" looks like for each tool and detects when behavior deviates from the learned manifold before any single metric crosses a threshold. This catches the scenario every other system misses: gradual, multi-dimensional degradation that hasn't triggered any individual alert yet.
+
+**4. The feedback loop closes automatically.**
+Journey Oracle tracks the full lifecycle: what Praxis recommended → what the user adopted → how it actually performed → how that performance compared to predictions. Drift signals feed back into scoring automatically. This means Praxis's recommendations get measurably better with every completed journey. No competitor has this closed-loop outcome tracking for AI tool selection.
+
+**5. Zero external ML dependencies means universal deployment.**
+The entire system — NLP, scoring, graph traversal, retrieval, trust monitoring — runs on pure Python stdlib. No PyTorch, no NumPy (except in the optional Latent Flux repo), no model downloads. Praxis starts instantly, deploys anywhere Python runs, and produces fully auditable scoring decisions. This is an architectural choice that makes enterprise deployment trivially easy compared to ML-dependent competitors.
+
+### Competitive Landscape
+
+| Competitor | What They Do | Why Praxis Is Different |
+|-----------|-------------|----------------------|
+| **G2, Gartner** | Tool directories with reviews and rankings | Static rankings, no elimination reasoning, no trust monitoring, enterprise-optimized (not SMB) |
+| **Product Hunt, TAAFT** | Tool discovery via popularity and recency | No personalization, no elimination, no compliance checking, no outcome tracking |
+| **LangChain, CrewAI, AutoGen** | Developer frameworks for multi-agent orchestration | Developer-centric (requires code), no tool catalog, no trust monitoring, no UI for non-technical users |
+| **Zapier, Make** | Workflow automation between apps | Automate actions between tools but don't select which tools to use, no elimination reasoning |
+| **ChatGPT, Claude, Gemini** | General-purpose AI assistants | Can recommend tools but have no curated catalog, no trust decay data, no elimination pipeline, no outcome tracking |
+
+Praxis's position: the only platform that combines a curated tool catalog (253 tools), elimination-first reasoning (not relevance ranking), continuous trust monitoring (11 signals), behavioral drift detection (Latent Flux), and closed-loop outcome tracking (Journey Oracle) in a single system.
+
+### Where Praxis Is Going
+
+**Phase 1 (current): Curation** — "Which AI tools should I use?"
+Praxis evaluates 253 tools against the user's constraints and eliminates the unfit. The Room SPA is the product surface. Value: saves hours of research and avoids bad tool choices.
+
+**Phase 2 (next): Orchestration** — "Run these tools together on my project."
+Praxis doesn't just recommend tools — it executes multi-tool pipelines. The conductor coordinates Research AI → Analysis AI → Code AI → Testing AI as a single workflow. The Split Verdict layout evolves: the narrow verdict sidebar becomes the conductor status panel, the wide evidence panel becomes the live workspace.
+
+**Phase 3 (long-term): Marketplace** — "Publish your tool to the Praxis ecosystem."
+Like Steam for AI tools. Developers register tools with standardized input/output contracts. Praxis handles discovery, trust verification, orchestration, and revenue sharing. The marketplace layer monetizes once the workspace proves its value.
+
+Each phase builds on the previous. The curation data from Phase 1 trains the orchestration engine in Phase 2. The orchestration patterns from Phase 2 define the marketplace contracts in Phase 3.
+
+### Target Markets
+
+**Primary: SMBs adopting AI (5-50 employees)**
+These organizations are adopting AI tools faster than they can evaluate them. They don't have a CTO to vet tools, a compliance officer to check certifications, or a procurement team to negotiate pricing. Praxis is their AI procurement department.
+
+**Secondary: AI-native agencies**
+Agencies that deliver finished outcomes (marketing campaigns, analytics, content) using AI tool pipelines. These agencies need orchestration infrastructure — something to manage which tools run, in what order, with what quality checks. Praxis is their backend.
+
+**Tertiary: Enterprise AI governance**
+Large organizations that need to monitor and control which AI tools their teams use, track costs across tools, enforce compliance requirements, and maintain audit trails. The governance dashboard, trust badges, and compliance modules already serve this market.
+
+---
+
+## Latent Flux Integration
+
+> **Status: Implemented (v25.4/v25.5). Core primitives integrated as orchestration reliability monitor.**
+
+Latent Flux (LF) is a geometric computation library that provides behavioral drift detection for Praxis's tool monitoring and orchestration reliability. Three core primitives are integrated via a pure-Python adapter (`praxis/lf_monitor.py`) with zero NumPy dependency:
+
+| LF Primitive | Praxis Component | What It Does |
+|-------------|-----------------|-------------|
+| **ReservoirState** (Echo State Network with σ² tracking) | `ToolReservoir` | Builds a continuous behavioral baseline per tool — learns what "normal" looks like for latency, quality, token usage, error rate, cost. Detects when current behavior deviates from the learned manifold. The σ² (running variance) addition catches tools becoming erratic before the mean shifts. |
+| **AttractorCompetition** (3-basin geometric classifier) | `PipelineHealthCompetitor` | Classifies pipeline health into Healthy / Degrading / Failing basins using geometric attractor dynamics instead of hardcoded thresholds. The pipeline's combined state vector naturally falls into the correct basin. |
+| **RecursiveFlow** (fixed-point cycle detection) | `RetryLoopDetector` | Detects retry loops in tool execution — when a pipeline stage repeatedly fails and retries without converging. Combined with σ from the reservoir, triggers circuit breakers before resources are wasted. |
+
+### Integration Points
+
+| Module | How LF Is Used |
+|--------|---------------|
+| `trust_decay.py` | `lf_record_tool_call()` feeds per-invocation metrics into ToolReservoir. `lf_assess_severity()` uses basin competition for MILD/SEVERE classification instead of threshold comparison. |
+| `journey.py` | Per-tool reservoirs track TargetScoreVector predictions vs actual outcomes. `deviation_score()` replaces simple delta-based drift detection with manifold-aware measurement. |
+| `llm_resilience.py` | Per-provider reservoirs monitor LLM call patterns. Circuit breaker trips on `deviation_score ≥ 4.0` — catches erratic-but-not-fully-failing providers that consecutive-failure counting misses. |
+
+### Future: Conductor's Ear
+
+As Praxis evolves from curation (recommending tools) to orchestration (executing tool pipelines), Latent Flux becomes the conductor's ear — real-time behavioral monitoring across every tool in an active pipeline. The reservoir baselines, attractor basins, and cycle detectors are already built for this use case. The primitives that currently monitor individual tool calls will monitor inter-tool relationships: does the Research AI's output quality affect the Coding AI's performance? Is the testing stage's rejection rate rising because the coding stage degraded, or because the test criteria changed? These are manifold-level questions that threshold monitoring cannot answer.
 
 ---
 
@@ -1446,35 +1536,54 @@ _CONDUIT_OK = False  # set in except block
 
 ## Roadmap
 
-### Completed (v24 — March 2026)
+### Completed
+
+**v24 — Room & Design System (March 13, 2026)**
 - [x] Room SPA — React workspace at `/room` with SSE streaming, multi-query sessions
 - [x] Director experience — Pin/Pass tool actions, "Your Stack" panel, copy-to-clipboard
-- [x] Command card input — Floating frosted-glass card with mode buttons, constraint chips, circular submit
-- [x] Journey route — `/journey` serves guided wizard via FastAPI
-- [x] Room ID fix — `room_id` → `id` normalization, eliminated `/room/undefined/stream`
-- [x] Design system audit — Unified nav, colors, fonts across all 9+ pages
-- [x] Pipeline log UX — Auto-collapse after DONE, human-voice text, stripped internal reasoning
-- [x] Context panel fixes — Null filtering, reasoning bleed-through prevention, empty section hiding
-- [x] Room: click-to-expand tool card detail drawers (survival reasons, pricing, integrations, compliance, trust score, limitations, elimination reasoning)
-- [x] Home: search dropdown layout fixes (column overlap, z-index bleed, bottom stacking, overflow containment)
-- [x] Room: drag-and-drop stack reordering with role labels (Primary/Companion/Infrastructure)
+- [x] Command card input — Mode buttons, constraint chips, circular submit
+- [x] Click-to-expand tool card detail drawers (pricing, integrations, compliance, limitations)
+- [x] Drag-and-drop stack reordering with role labels (Primary/Companion/Infrastructure)
+- [x] Tool logo favicons via Google Favicon API with letter-circle fallback
+- [x] Canonical nav bar audit across all 28 static HTML pages
+- [x] Search dropdown layout fixes (z-index, overflow, bleed-through)
+- [x] 7 new tools added (Microsoft Agent Framework, MiroFish, Grok 4.20, Perplexity Computer, Replit Agent, Lindy.ai, ASCN.AI)
+- [x] 472 tool data quality fixes (skill levels, base models, keyword dedup, casing)
 
-### Near-term
-- [x] Wire `journey.py` endpoints into `api.py` for full REST access (v25.5)
-- [x] Add after-request middleware to automatically record journey stages (v25.5)
-- [x] Connect journey drift signals to `learning.py` for automatic scoring adjustment (v25.5)
+**v25 — Split Verdict + Latent Flux Integration (March 14, 2026)**
+- [x] Complete Room SPA rebuild — Split Verdict layout (narrow verdict sidebar + wide evidence panel)
+- [x] Hero search input with two-state design (centered hero → collapsed top bar)
+- [x] Shared Command Bar for homepage and Room (mode toggles, parameter chips, live elimination funnel, session history, explore grid)
+- [x] Latent Flux integration — pure-Python orchestration reliability monitor (ToolReservoir, PipelineHealthCompetitor, RetryLoopDetector, OrchestrationMonitor)
+- [x] σ² variance tracking in ReservoirState for early behavioral drift detection
+- [x] LF wired into trust_decay.py (basin-based severity replaces threshold comparison)
+- [x] LF wired into journey.py (reservoir-based drift detection replaces simple delta)
+- [x] LF wired into llm_resilience.py (σ-based circuit breaker trip at deviation ≥ 4.0)
+- [x] Journey Oracle REST API — 6 endpoints for lifecycle tracking and drift monitoring
+- [x] Auto-journey middleware — automatic stage recording from /search, /stack, /feedback requests
+- [x] Drift-to-learning feedback loop — MODERATE/SEVERE drift auto-corrects scoring in learning.py
+- [x] 38 LF integration tests + 51 wiring tests, all passing
 
-### Medium-term
-- [x] Deploy trust decay sweeps on schedule (72-hour cycle) — v25.6 `scheduler.py`
-- [x] Build real provider connections in `llm_provider.py` (dry-run gate: `PRAXIS_DRY_RUN`) — v25.6
-- [x] Room: real LLM cost tracking with per-model breakdown — v25.6 (TopBar shows "Dry run" / actual cost)
-- [x] Add WebSocket support for real-time dashboard updates — v25.6 `ws.py` BroadcastHub
-- [x] Activate `ingestion_engine.py` for live polling — v25.6 (scheduler + `PRAXIS_INGESTION_ENABLED`)
+### Near-term (next 2-4 weeks)
+- [ ] Background scheduler for trust decay sweeps (72-hour cycle) and journey drift corrections
+- [ ] Real LLM provider connections — remove dry-run gate when API keys present (OpenAI, Anthropic, Google, XAI, Ollama, DeepSeek, LiteLLM)
+- [ ] Room real cost tracking — per-model token breakdown in SSE stream, "Dry run" label when mocked
+- [ ] WebSocket broadcast hub for live dashboard updates (trust decay, journey, pipeline, provider health)
+- [ ] Activate ingestion_engine.py — scheduled polling with dry-run default, HITL approval queue
 
-### Long-term
-- [x] Latent Flux integration (FluxManifold routing, Commitment Sink decisions) — v25.4/v25.5
-- [ ] Distributed architecture (Redis state, Celery workers, horizontal scaling)
-- [ ] Migrate remaining static pages to React SPA
+### Medium-term (1-3 months)
+- [ ] Workflow definition language — extend ecosystem.py collaboration patterns to the full 253-tool catalog
+- [ ] Shared project artifacts layer — extend journey.py to hold documents, code, datasets, and decisions across pipeline stages
+- [ ] Tool execution adapters — move connectors.py from stub to live for top 10 tools (Slack, OpenAI, Google Sheets, Salesforce, Zapier)
+- [ ] Room tab infrastructure — Musicians (current evidence panel) | Artifacts | Pipeline views
+- [ ] Persistent user sessions — database-backed profiles, auth, onboarding flow
+
+### Long-term (3-12 months)
+- [ ] Full orchestration runtime — Praxis executes multi-tool pipelines, not just recommends them
+- [ ] Latent Flux as conductor's ear — real-time behavioral drift detection across live tool execution
+- [ ] Developer SDK — third-party tools register with Praxis via standardized input/output contracts
+- [ ] Marketplace — workflow templates, specialized agents, automation modules
+- [ ] Distributed architecture — Redis state, Celery workers, horizontal scaling
 - [ ] Public API with rate-limited free tier
 
 ---

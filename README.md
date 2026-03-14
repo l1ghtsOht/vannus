@@ -16,12 +16,12 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Python modules** | 114 files, ~63,300 lines |
 | **Tool catalog** | 253 curated AI tools with rich metadata |
 | **API endpoints** | 356 REST routes via FastAPI |
-| **Test coverage** | 645 tests across 13 test files, all passing |
+| **Test coverage** | 645 tests across 14 test files, all passing |
 | **Frontend** | 29 HTML + 4 JS files (~14,300 lines), Liquid Glass UI |
 | **Versions** | 17 major iterations (v1 → v17) |
 | **Total LOC** | ~77,600 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-14 16:44 UTC |
+| **Last auto-update** | 2026-03-14 16:45 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -1837,6 +1837,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+eaeb6b3 auto: 2026-03-14 11:45:12
+16486fe docs(auto): update README stats [skip ci]
 06bf41a auto: 2026-03-14 11:44:37
 0b1337c docs(auto): update README stats [skip ci]
 d0b0f9a v25.4: Latent Flux integration — orchestration reliability monitor
@@ -1855,8 +1857,6 @@ a7593a5 docs(auto): update README stats [skip ci]
 ca18add docs(auto): update README stats [skip ci]
 77b3d6a v24.7: Fix 472 tool data quality issues from audit
 e89b69b docs(auto): update README stats [skip ci]
-80e8348 v24.6: Canonical nav audit — unified 28 static pages
-4335b7b docs(auto): update README stats [skip ci]
 ```
 <!-- AUTO:GIT:END -->
 

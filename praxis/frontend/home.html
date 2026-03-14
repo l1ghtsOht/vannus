@@ -1583,7 +1583,7 @@
 
     queryInput.addEventListener('focus', () => {
       if (queryInput.value.trim().length >= 2 && acDropdown.children.length > 0) {
-        acDropdown.classList.add('open');
+        openAC();
       } else if (queryInput.value.trim().length < 2) {
         fetchFocusSuggestions();
       }
@@ -1732,7 +1732,7 @@
         acDropdown.appendChild(strip);
       }
 
-      if (hasContent) acDropdown.classList.add('open');
+      if (hasContent) openAC();
       else closeAC();
     }
 
@@ -1759,9 +1759,17 @@
       }
     }
 
+    function openAC() {
+      acDropdown.classList.add('open');
+      document.getElementById('ambient-footer').style.display = 'none';
+      document.getElementById('filter-bar').style.visibility = 'hidden';
+    }
+
     function closeAC() {
       acDropdown.classList.remove('open');
       acIndex = -1;
+      document.getElementById('ambient-footer').style.display = '';
+      document.getElementById('filter-bar').style.visibility = '';
     }
 
     /* ══════════════════════════════════════════════

@@ -1497,6 +1497,14 @@ These questions have no clean answers. They shape Praxis's design decisions.
 
 ## Changelog
 
+### v24.5 — Dropdown Overlap Fixes (2026-03-13)
+
+- Footer overlap: `#ambient-footer` now hidden (`display: none`) when dropdown is open, restored on close
+- Chip bleed-through: `#filter-bar` set to `visibility: hidden` when dropdown is open, restored on close
+- Centralized open/close logic into `openAC()`/`closeAC()` helpers — all 2 open sites and 1 close site use them
+
+---
+
 ### v24.4 — Search Bar & Dropdown Bug Fixes (2026-03-13)
 
 **BUG 1: Submit button moved to input row** — `#searchBtn` relocated from `.search-bottom-row` into `.search-main-row` next to the text input, with proper flex gap

@@ -1457,12 +1457,12 @@ _CONDUIT_OK = False  # set in except block
 - [x] Context panel fixes — Null filtering, reasoning bleed-through prevention, empty section hiding
 - [x] Room: click-to-expand tool card detail drawers (survival reasons, pricing, integrations, compliance, trust score, limitations, elimination reasoning)
 - [x] Home: search dropdown layout fixes (column overlap, z-index bleed, bottom stacking, overflow containment)
+- [x] Room: drag-and-drop stack reordering with role labels (Primary/Companion/Infrastructure)
 
 ### Near-term
 - [ ] Wire `journey.py` endpoints into `api.py` for full REST access
 - [ ] Add after-request middleware to automatically record journey stages
 - [ ] Connect journey drift signals to `learning.py` for automatic scoring adjustment
-- [ ] Room: drag-and-drop stack reordering
 
 ### Medium-term
 - [ ] Activate `ingestion_engine.py` for live polling (TAAFT/Toolify/Futurepedia)
@@ -1496,6 +1496,20 @@ These questions have no clean answers. They shape Praxis's design decisions.
 ---
 
 ## Changelog
+
+### v24.3 — Drag-and-Drop Stack Reordering (2026-03-13)
+
+**Room: Drag-and-drop "Your Stack" reordering**
+- Drag handle (6-dot grip icon) on each pinned tool — only the handle triggers drag (prevents accidental reorders)
+- Uses framer-motion `Reorder.Group`/`Reorder.Item` with `useDragControls` for native animated reordering
+- Items shift smoothly (200ms ease-out layout transition) during drag
+- Dragged item gets subtle scale-up + indigo border glow + elevated shadow
+- Stack role labels auto-assign by position: #1 = Primary (indigo), #2 = Companion (cyan), rest = Infrastructure (muted)
+- Copy-to-clipboard output now includes role labels (e.g. "Primary: ToolName")
+- Added `REORDER_PINNED_TOOLS` action to RoomContext reducer
+- Remove-from-stack still works after reordering
+
+---
 
 ### v24.2 — Dropdown Opacity & Prompt Assistance Cleanup (2026-03-13)
 

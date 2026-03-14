@@ -227,6 +227,8 @@ function roomReducer(state, action) {
     }
     case 'UNPIN_TOOL':
       return { ...state, pinnedTools: state.pinnedTools.filter(n => n !== action.payload) };
+    case 'REORDER_PINNED_TOOLS':
+      return { ...state, pinnedTools: action.payload };
     case 'PASS_TOOL': {
       const name = action.payload;
       if (state.passedTools.includes(name)) return state;

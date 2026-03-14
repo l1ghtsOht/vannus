@@ -1,27 +1,78 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder, useDragControls } from 'framer-motion';
 import { useRoomState, useRoomDispatch } from '../../context/RoomContext';
 
-function StackItem({ name, survivor, onUnpin }) {
+const ROLE_LABELS = ['Primary', 'Companion', 'Infrastructure'];
+
+function roleFor(index) {
+  if (index === 0) return ROLE_LABELS[0];
+  if (index === 1) return ROLE_LABELS[1];
+  return ROLE_LABELS[2];
+}
+
+const ROLE_STYLES = {
+  Primary:        'bg-indigo-500/15 text-indigo-400/80 border-indigo-500/20',
+  Companion:      'bg-cyan-500/12 text-cyan-400/70 border-cyan-500/15',
+  Infrastructure: 'bg-white/5 text-white/35 border-white/8',
+};
+
+function DragHandle({ controls }) {
+  return (
+    <button
+      className="shrink-0 cursor-grab active:cursor-grabbing text-white/15 hover:text-white/40 touch-none transition-colors"
+      onPointerDown={(e) => controls.start(e)}
+      tabIndex={-1}
+      aria-label="Drag to reorder"
+    >
+      <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor">
+        <circle cx="2.5" cy="2" r="1.2" />
+        <circle cx="7.5" cy="2" r="1.2" />
+        <circle cx="2.5" cy="7" r="1.2" />
+        <circle cx="7.5" cy="7" r="1.2" />
+        <circle cx="2.5" cy="12" r="1.2" />
+        <circle cx="7.5" cy="12" r="1.2" />
+      </svg>
+    </button>
+  );
+}
+
+function StackItem({ name, survivor, index, onUnpin }) {
+  const controls = useDragControls();
   const score = survivor?.final_score ?? survivor?.fit_score ?? null;
-  const categories = survivor?.categories || [];
-  const cat = categories[0] || '';
+  const role = roleFor(index);
 
   return (
-    <motion.div
+    <Reorder.Item
+      value={name}
+      dragListener={false}
+      dragControls={controls}
       initial={{ opacity: 0, x: 10 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -10 }}
-      className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-white/[0.03] transition-colors group"
+      whileDrag={{
+        scale: 1.02,
+        boxShadow: '0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(99,102,241,0.3)',
+        background: 'rgba(99,102,241,0.06)',
+        zIndex: 50,
+      }}
+      transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}
+      className="flex items-center gap-2 py-2 px-2 rounded-lg hover:bg-white/[0.03] transition-colors group relative"
+      style={{ listStyle: 'none' }}
     >
-      <span className="text-indigo-400/80 text-xs shrink-0">{'\u2713'}</span>
+      <DragHandle controls={controls} />
+
       <span className="text-sm text-white/80 font-medium flex-1 min-w-0 truncate">{name}</span>
-      {cat && <span className="text-[10px] text-white/30 shrink-0 truncate max-w-[70px]">{cat}</span>}
+
+      <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full border shrink-0 ${ROLE_STYLES[role]}`}>
+        {role}
+      </span>
+
       {score != null && (
         <span className="text-[11px] font-mono text-indigo-400/70 shrink-0">
           {Math.round(score <= 1 ? score * 100 : score)}%
         </span>
       )}
+
       <button
         onClick={() => onUnpin(name)}
         className="text-white/20 hover:text-red-400/70 opacity-0 group-hover:opacity-100 transition-all shrink-0"
@@ -29,9 +80,9 @@ function StackItem({ name, survivor, onUnpin }) {
       >
         <svg viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-        </svg>
+          </svg>
       </button>
-    </motion.div>
+    </Reorder.Item>
   );
 }
 
@@ -46,9 +97,13 @@ export default function RightPanel({ children }) {
 
   const handleUnpin = (name) => dispatch({ type: 'UNPIN_TOOL', payload: name });
 
+  const handleReorder = (newOrder) => {
+    dispatch({ type: 'REORDER_PINNED_TOOLS', payload: newOrder });
+  };
+
   const handleCopy = () => {
-    const text = pinnedTools.join('\n');
-    navigator.clipboard.writeText(text).then(() => {
+    const lines = pinnedTools.map((name, i) => `${roleFor(i)}: ${name}`);
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
@@ -91,17 +146,26 @@ export default function RightPanel({ children }) {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-0.5 mb-4">
-                  <AnimatePresence>
-                    {pinnedTools.map(name => (
-                      <StackItem
-                        key={name}
-                        name={name}
-                        survivor={survivorMap[name]}
-                        onUnpin={handleUnpin}
-                      />
-                    ))}
-                  </AnimatePresence>
+                <div className="mb-4">
+                  <Reorder.Group
+                    axis="y"
+                    values={pinnedTools}
+                    onReorder={handleReorder}
+                    className="space-y-0.5"
+                    style={{ listStyle: 'none', padding: 0, margin: 0 }}
+                  >
+                    <AnimatePresence>
+                      {pinnedTools.map((name, i) => (
+                        <StackItem
+                          key={name}
+                          name={name}
+                          index={i}
+                          survivor={survivorMap[name]}
+                          onUnpin={handleUnpin}
+                        />
+                      ))}
+                    </AnimatePresence>
+                  </Reorder.Group>
 
                   {/* Copy stack button */}
                   <div className="pt-3 mt-2 border-t border-white/[0.06]">

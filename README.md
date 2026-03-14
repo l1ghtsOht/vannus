@@ -21,7 +21,7 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Versions** | 17 major iterations (v1 → v17) |
 | **Total LOC** | ~77,100 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-14 06:10 UTC |
+| **Last auto-update** | 2026-03-14 06:37 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -1790,6 +1790,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+ab213b5 v25.1: Swap panel widths — verdict narrow, evidence wide
+55c937a docs(auto): update README stats [skip ci]
 4fcc952 v25: Split Verdict layout — complete Room SPA rebuild
 40f3608 docs(auto): update README stats [skip ci]
 3dfc469 v24.9: Replace tool card letter avatars with favicon logos
@@ -1808,8 +1810,6 @@ dc03c33 v24.5: Hide footer and chips when dropdown is open
 85833ab docs(auto): update README stats [skip ci]
 f2084ee v24.2: Fix dropdown bleed-through, remove dead Prompt Assistance JS
 5c7e0c6 docs(auto): update README stats [skip ci]
-a74bd24 v24.1: Tool detail drawers + search dropdown layout fixes
-865ed26 docs(auto): update README stats [skip ci]
 ```
 <!-- AUTO:GIT:END -->
 

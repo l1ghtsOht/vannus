@@ -17,11 +17,11 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Tool catalog** | 253 curated AI tools with rich metadata |
 | **API endpoints** | 372 REST routes via FastAPI |
 | **Test coverage** | 719 tests across 16 test files, all passing |
-| **Frontend** | 29 HTML + 4 JS files (~14,300 lines), Liquid Glass UI |
+| **Frontend** | 29 HTML + 4 JS files (~14,500 lines), Liquid Glass UI |
 | **Versions** | 17 major iterations (v1 → v17) |
-| **Total LOC** | ~78,400 (Python + Frontend) |
+| **Total LOC** | ~78,600 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-14 20:49 UTC |
+| **Last auto-update** | 2026-03-14 22:38 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -2042,6 +2042,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+272980b v25.8: Inline results — homepage becomes the full product experience
+9da3149 docs(auto): update README stats [skip ci]
 7111a69 LAUNCH BLOCKER FIX: 4 bugs resolved
 f836f5e docs(auto): update README stats [skip ci]
 319b8f0 v25.7: Homepage hero rebuild — task grid + constraint pills + paths
@@ -2060,8 +2062,6 @@ dcdcdc2 auto: 2026-03-14 11:47:52
 eaeb6b3 auto: 2026-03-14 11:45:12
 16486fe docs(auto): update README stats [skip ci]
 06bf41a auto: 2026-03-14 11:44:37
-0b1337c docs(auto): update README stats [skip ci]
-d0b0f9a v25.4: Latent Flux integration — orchestration reliability monitor
 ```
 <!-- AUTO:GIT:END -->
 
@@ -2096,7 +2096,7 @@ An **elimination-first AI tool curation engine** that evolved into a **cognitive
 - **372 API routes**, all functional
 - **719 tests passing**
 - **116 Python modules**, ~64,100 lines
-- **33 frontend files**, ~14,300 lines
+- **33 frontend files**, ~14,500 lines
 - All critical bugs fixed (alias collision, caveats reset, dead code)
 - Server runs on port 8000 via `uvicorn praxis.api:app --port 8000`
 <!-- AUTO:STATE:END -->

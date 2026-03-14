@@ -17,11 +17,11 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Tool catalog** | 253 curated AI tools with rich metadata |
 | **API endpoints** | 356 REST routes via FastAPI |
 | **Test coverage** | 645 tests across 13 test files, all passing |
-| **Frontend** | 29 HTML + 4 JS files (~14,200 lines), Liquid Glass UI |
+| **Frontend** | 29 HTML + 4 JS files (~14,300 lines), Liquid Glass UI |
 | **Versions** | 17 major iterations (v1 → v17) |
-| **Total LOC** | ~77,000 (Python + Frontend) |
+| **Total LOC** | ~77,100 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-14 04:51 UTC |
+| **Last auto-update** | 2026-03-14 04:58 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -1758,6 +1758,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+3dfc469 v24.9: Replace tool card letter avatars with favicon logos
+a7593a5 docs(auto): update README stats [skip ci]
 06602f6 v24.8: Add 7 new AI tools to catalog (246 -> 253)
 ca18add docs(auto): update README stats [skip ci]
 77b3d6a v24.7: Fix 472 tool data quality issues from audit
@@ -1776,8 +1778,6 @@ a74bd24 v24.1: Tool detail drawers + search dropdown layout fixes
 865ed26 docs(auto): update README stats [skip ci]
 580cfa4 Merge branch 'main' of https://github.com/2654-zed/praxis-ai
 4c7125f v24: Room SPA, command card input, director experience, design system audit
-8321d12 docs(auto): update README stats [skip ci]
-49f8319 Resolve merge conflict in Known Limitations section
 ```
 <!-- AUTO:GIT:END -->
 
@@ -1812,7 +1812,7 @@ An **elimination-first AI tool curation engine** that evolved into a **cognitive
 - **356 API routes**, all functional
 - **645 tests passing**
 - **113 Python modules**, ~62,800 lines
-- **33 frontend files**, ~14,200 lines
+- **33 frontend files**, ~14,300 lines
 - All critical bugs fixed (alias collision, caveats reset, dead code)
 - Server runs on port 8000 via `uvicorn praxis.api:app --port 8000`
 <!-- AUTO:STATE:END -->

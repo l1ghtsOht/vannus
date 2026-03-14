@@ -242,13 +242,12 @@
     .search-glass .search-main-row {
       display: flex;
       align-items: center;
-      gap: 0;
+      gap: 8px;
     }
 
     .search-glass .search-bottom-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 8px;
       margin-top: 8px;
       padding-top: 8px;
@@ -257,12 +256,10 @@
 
     .search-glass .search-chips-inline {
       display: flex;
+      flex-wrap: wrap;
       gap: 6px;
-      overflow-x: auto;
       flex: 1;
-      scrollbar-width: none;
     }
-    .search-glass .search-chips-inline::-webkit-scrollbar { display: none; }
 
     .search-glass .search-chips-inline .chip {
       margin: 0;
@@ -551,7 +548,6 @@
       margin: 0;
       opacity: 1;
       animation: none;
-      flex-wrap: nowrap;
       justify-content: flex-start;
     }
 
@@ -612,7 +608,7 @@
       transform: translateX(-50%);
       display: flex;
       gap: 2rem;
-      z-index: 10;
+      z-index: 1;
       opacity: 0;
       animation: fadeUp 0.8s ease forwards 1s;
       transition: opacity var(--transition-smooth);
@@ -1354,12 +1350,12 @@
             </div>
             <div class="ac-dropdown" id="ac-dropdown"></div>
           </div>
-        </div>
-        <div class="search-bottom-row">
-          <div class="search-chips-inline" id="filter-bar"></div>
           <button class="search-submit" id="searchBtn" onclick="doSearch()">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
+        </div>
+        <div class="search-bottom-row">
+          <div class="search-chips-inline" id="filter-bar"></div>
         </div>
       </div>
     </div>
@@ -1515,12 +1511,13 @@
 
     /* ── Nav visibility ── */
     function updateNav() {
-      if (document.body.classList.contains('has-results')) {
+      if (document.body.classList.contains('has-results') || window.scrollY > 100) {
         navBar.classList.add('visible');
       } else {
         navBar.classList.remove('visible');
       }
     }
+    window.addEventListener('scroll', updateNav, { passive: true });
 
     /* ── Load category chips ── */
     (async function loadChips() {
@@ -1592,8 +1589,11 @@
       }
     });
     document.addEventListener('click', e => {
-      if (!e.target.closest('.search-input-wrap')) closeAC();
+      if (!e.target.closest('.search-container')) closeAC();
     });
+    window.addEventListener('scroll', () => {
+      if (acDropdown.classList.contains('open') && window.scrollY > 100) closeAC();
+    }, { passive: true });
 
     async function fetchFocusSuggestions() {
       try {

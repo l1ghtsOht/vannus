@@ -1497,6 +1497,20 @@ These questions have no clean answers. They shape Praxis's design decisions.
 
 ## Changelog
 
+### v24.4 — Search Bar & Dropdown Bug Fixes (2026-03-13)
+
+**BUG 1: Submit button moved to input row** — `#searchBtn` relocated from `.search-bottom-row` into `.search-main-row` next to the text input, with proper flex gap
+
+**BUG 2: Category chips wrap to two rows** — Removed `overflow-x: auto` and `flex-wrap: nowrap` from `.search-chips-inline`, chips now wrap naturally
+
+**BUG 3: Footer z-index fix** — Lowered `.ambient-footer` from `z-index: 10` to `z-index: 1` so it no longer renders above the dropdown (which lives inside `.hero` at `z-index: 2`)
+
+**BUG 4: Dropdown closes on outside click/scroll** — Widened click handler from `.search-input-wrap` to `.search-container`, added scroll listener that closes dropdown when `scrollY > 100`
+
+**BUG 5: Nav bar scroll reveal** — Added `window.scroll` listener to `updateNav()` — nav now appears when `scrollY > 100` even before a search is performed
+
+---
+
 ### v24.3 — Drag-and-Drop Stack Reordering (2026-03-13)
 
 **Room: Drag-and-drop "Your Stack" reordering**

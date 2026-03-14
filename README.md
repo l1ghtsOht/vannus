@@ -1497,6 +1497,20 @@ These questions have no clean answers. They shape Praxis's design decisions.
 
 ## Changelog
 
+### v24.2 — Dropdown Opacity & Prompt Assistance Cleanup (2026-03-13)
+
+**Home: Search dropdown bleed-through fix**
+- Replaced `rgba(16,16,28,1)` with solid `#10101c` background on `.ac-dropdown`
+- Removed `backdrop-filter: blur(36px)` from dropdown — was causing compositing artifacts when nested inside `.search-glass`'s own `backdrop-filter`
+- Removed `opacity` from `acReveal` animation to prevent brief transparency during open
+- Changed `overflow-y: auto` to `overflow: hidden auto` for full containment
+
+**Prompt Assistance cleanup**
+- Removed dead JS (`loadModels()` IIFE and `generatePrompt()` function) that referenced elements deleted in v24
+- Removed leftover HTML/CSS comments about removed section
+
+---
+
 ### v24.1 — Tool Detail Drawers & Dropdown Fix (2026-03-13)
 
 **Room: Click-to-expand detail drawers** — Tool cards now expand to reveal full details

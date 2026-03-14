@@ -368,14 +368,12 @@
       position: absolute;
       top: calc(100% + 8px);
       left: -0.35rem; right: -0.35rem;
-      background: rgba(16,16,28,1);
-      backdrop-filter: blur(36px);
-      -webkit-backdrop-filter: blur(36px);
+      background: #10101c;
       border: 1px solid var(--border-glass-hover);
       border-radius: var(--radius-sm);
       box-shadow: 0 20px 72px rgba(0,0,0,0.55), 0 0 0 1px rgba(99,102,241,0.08);
       max-height: 480px;
-      overflow-y: auto;
+      overflow: hidden auto;
       z-index: 200;
       display: none;
       animation: acReveal 0.22s ease;
@@ -383,8 +381,8 @@
     }
     .ac-dropdown.open { display: block; }
     @keyframes acReveal {
-      from { opacity: 0; transform: translateY(-8px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      from { transform: translateY(-8px) scale(0.98); }
+      to { transform: translateY(0) scale(1); }
     }
     .ac-dropdown::-webkit-scrollbar { width: 5px; }
     .ac-dropdown::-webkit-scrollbar-track { background: transparent; }
@@ -1016,8 +1014,6 @@
     .pulse { animation: pulse 1.8s ease-in-out infinite; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-    /* (Prompt Assistance section removed — see Fix 9) */
-
     /* ══════════════════════════════════════════════
        EXECUTIVE BENTO HUB — Strategic Command Center
        ══════════════════════════════════════════════ */
@@ -1372,8 +1368,6 @@
       <a href="/static/journey.html">Not sure what you need? Take the guided quiz →</a>
     </div>
   </section>
-
-  <!-- (Prompt Assistance section removed) -->
 
   <!-- Intelligence Banners -->
   <div class="intel-banner" id="intel-banner"></div>
@@ -2051,42 +2045,6 @@
       btn.textContent = '✓';
       btn.disabled = true;
       setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2000);
-    }
-
-    /* ── Prompt Assistance ── */
-    (async function loadModels() {
-      try {
-        const res = await fetch('/prompt-assist/models');
-        if (!res.ok) return;
-        const data = await res.json();
-        const sel = document.getElementById('model-select');
-        (data.models || []).forEach(m => {
-          const opt = document.createElement('option');
-          opt.value = m.id;
-          opt.textContent = m.name;
-          sel.appendChild(opt);
-        });
-      } catch (e) { /* silent */ }
-    })();
-
-    async function generatePrompt() {
-      const query = document.getElementById('prompt-input').value.trim();
-      if (!query) return;
-      const model = document.getElementById('model-select').value;
-      const result = document.getElementById('prompt-result');
-      result.style.display = 'block';
-      result.textContent = 'Generating…';
-      try {
-        const res = await fetch('/prompt-assist/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, target_model: model || null }),
-        });
-        const data = await res.json();
-        result.textContent = data.optimized_prompt || JSON.stringify(data, null, 2);
-      } catch (e) {
-        result.textContent = `Error: ${e.message}`;
-      }
     }
 
     /* ── Subtle mouse parallax on aurora ── */

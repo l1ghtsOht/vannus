@@ -1606,6 +1606,18 @@ These questions have no clean answers. They shape Praxis's design decisions.
 
 ## Changelog
 
+### v25.7 — Homepage Hero Rebuild (2026-03-14)
+
+Replaced the homepage hero section with a task-builder + path-card layout:
+- **Task grid** (3x2): Write content, Write code, Analyze data, Automate work, Serve customers, Build an app. Radio selection fills the search input.
+- **Constraint pills** (9 toggles): Free tier, Under $50, Under $100, HIPAA, SOC2, GDPR, Beginner, Open source, API access. Simple on/off toggles — no prompt() dialogs.
+- **Live summary sentence**: Updates on every task/constraint/keystroke change. Shows "Find {task} that are {constraints} — then eliminate the rest." with an "Evaluate 253 →" submit button.
+- **Path cards** (4): Guided journey, Browse catalog, Compare tools, ROI calculator.
+- **Footer line**: "253 tools · 11 trust signals · elimination-first methodology"
+- Removed: old prompt()-based chip row, explore grid, elimination funnel bars, journey link, static subtitle.
+
+---
+
 ### v25.6 — Medium-Term Roadmap: All 5 Items (2026-03-14)
 
 **Item 1: Background Scheduler** — New `praxis/scheduler.py` (pure stdlib `threading.Timer`).

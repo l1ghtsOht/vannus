@@ -21,7 +21,7 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Versions** | 17 major iterations (v1 → v17) |
 | **Total LOC** | ~78,700 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-15 21:22 UTC |
+| **Last auto-update** | 2026-03-15 21:50 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -2088,6 +2088,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+abedcb5 Add React Bits LogoLoop as TrustedTools section below HowItWorks
+8d58ccd docs(auto): update README stats [skip ci]
 cd1e21d Add paginated MagicBento: 3 pages x 6 cards with auto-rotate
 3931c4d docs(auto): update README stats [skip ci]
 4beaa63 Convert MagicBento to clickable task shortcuts that trigger search
@@ -2106,8 +2108,6 @@ e2f8b19 feat: Add React Bits MagicBento as "Why Praxis" section
 bf0aa02 docs(auto): update README stats [skip ci]
 eb1db3d fix: Use resolved absolute paths for home SPA serving
 b38a237 docs(auto): update README stats [skip ci]
-412a476 fix: Mount home-assets at dist/ root, not dist/assets/
-cbf24b3 docs(auto): update README stats [skip ci]
 ```
 <!-- AUTO:GIT:END -->
 

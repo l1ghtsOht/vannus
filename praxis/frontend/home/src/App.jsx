@@ -10,6 +10,7 @@ import LiveSummary from './components/LiveSummary';
 import PathCards from './components/PathCards';
 import InlineResults from './components/InlineResults';
 import FeedbackCapture from './components/FeedbackCapture';
+import WhyPraxis from './components/WhyPraxis';
 import HowItWorks from './components/HowItWorks';
 import Footer from './components/Footer';
 import useSearch from './hooks/useSearch';
@@ -122,6 +123,7 @@ export default function App() {
           </div>
         )}
 
+        <WhyPraxis />
         <HowItWorks />
         <Footer />
       </div>

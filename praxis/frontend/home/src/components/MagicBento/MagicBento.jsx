@@ -8,58 +8,36 @@ const DEFAULT_GLOW_COLOR = '99, 102, 241';
 const MOBILE_BREAKPOINT = 768;
 
 const cardData = [
-  { color: 'rgba(255,255,255,0.03)', title: 'Elimination Engine', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>' },
-  { color: 'rgba(255,255,255,0.03)', title: 'Trust Scoring', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>' },
-  { color: 'rgba(255,255,255,0.03)', title: 'Tuesday Test', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>' },
-  { color: 'rgba(255,255,255,0.03)', title: 'Guided Journey', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>' },
-  { color: 'rgba(255,255,255,0.03)', title: '253 Tools Scored', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>' },
-  { color: 'rgba(255,255,255,0.03)', title: 'Built for Teams', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' },
+  { color: 'rgba(255,255,255,0.03)', title: 'Write content', searchQuery: 'I need tools to write blog posts, emails, and marketing copy', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>' },
+  { color: 'rgba(255,255,255,0.03)', title: 'Write code', searchQuery: 'I need AI coding assistants for writing and debugging code', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>' },
+  { color: 'rgba(255,255,255,0.03)', title: 'Analyze data', searchQuery: 'I need tools to analyze spreadsheets, dashboards, and business data', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>' },
+  { color: 'rgba(255,255,255,0.03)', title: 'Automate work', searchQuery: 'I need workflow automation tools to save time on repetitive tasks', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' },
+  { color: 'rgba(255,255,255,0.03)', title: 'Serve customers', searchQuery: 'I need customer support tools for chat, tickets, and helpdesk', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>' },
+  { color: 'rgba(255,255,255,0.03)', title: 'Build an app', searchQuery: 'I need no-code or low-code tools to build web and mobile apps', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>' },
 ];
 
 const createParticleElement = (x, y, color = DEFAULT_GLOW_COLOR) => {
   const el = document.createElement('div');
   el.className = 'particle';
-  el.style.cssText = `
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: rgba(${color}, 1);
-    box-shadow: 0 0 6px rgba(${color}, 0.6);
-    pointer-events: none;
-    z-index: 100;
-    left: ${x}px;
-    top: ${y}px;
-  `;
+  el.style.cssText = `position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(${color},1);box-shadow:0 0 6px rgba(${color},0.6);pointer-events:none;z-index:100;left:${x}px;top:${y}px;`;
   return el;
 };
 
-const calculateSpotlightValues = radius => ({
-  proximity: radius * 0.5,
-  fadeDistance: radius * 0.75
-});
+const calculateSpotlightValues = radius => ({ proximity: radius * 0.5, fadeDistance: radius * 0.75 });
 
 const updateCardGlowProperties = (card, mouseX, mouseY, glow, radius) => {
   const rect = card.getBoundingClientRect();
-  const relativeX = ((mouseX - rect.left) / rect.width) * 100;
-  const relativeY = ((mouseY - rect.top) / rect.height) * 100;
-
-  card.style.setProperty('--glow-x', `${relativeX}%`);
-  card.style.setProperty('--glow-y', `${relativeY}%`);
+  card.style.setProperty('--glow-x', `${((mouseX - rect.left) / rect.width) * 100}%`);
+  card.style.setProperty('--glow-y', `${((mouseY - rect.top) / rect.height) * 100}%`);
   card.style.setProperty('--glow-intensity', glow.toString());
   card.style.setProperty('--glow-radius', `${radius}px`);
 };
 
 const ParticleCard = ({
-  children,
-  className = '',
-  disableAnimations = false,
-  style,
-  particleCount = DEFAULT_PARTICLE_COUNT,
-  glowColor = DEFAULT_GLOW_COLOR,
-  enableTilt = true,
-  clickEffect = false,
-  enableMagnetism = false
+  children, className = '', disableAnimations = false, style,
+  particleCount = DEFAULT_PARTICLE_COUNT, glowColor = DEFAULT_GLOW_COLOR,
+  enableTilt = true, clickEffect = false, enableMagnetism = false,
+  onClick = null
 }) => {
   const cardRef = useRef(null);
   const particlesRef = useRef([]);
@@ -83,10 +61,7 @@ const ParticleCard = ({
     timeoutsRef.current = [];
     magnetismAnimationRef.current?.kill();
     particlesRef.current.forEach(particle => {
-      gsap.to(particle, {
-        scale: 0, opacity: 0, duration: 0.3, ease: 'back.in(1.7)',
-        onComplete: () => { particle.parentNode?.removeChild(particle); }
-      });
+      gsap.to(particle, { scale: 0, opacity: 0, duration: 0.3, ease: 'back.in(1.7)', onComplete: () => { particle.parentNode?.removeChild(particle); } });
     });
     particlesRef.current = [];
   }, []);
@@ -122,14 +97,15 @@ const ParticleCard = ({
       if (enableMagnetism) magnetismAnimationRef.current = gsap.to(element, { x: (x - centerX) * 0.05, y: (y - centerY) * 0.05, duration: 0.3, ease: 'power2.out' });
     };
     const handleClick = e => {
-      if (!clickEffect) return;
-      const rect = element.getBoundingClientRect();
-      const x = e.clientX - rect.left, y = e.clientY - rect.top;
-      const maxDistance = Math.max(Math.hypot(x, y), Math.hypot(x - rect.width, y), Math.hypot(x, y - rect.height), Math.hypot(x - rect.width, y - rect.height));
-      const ripple = document.createElement('div');
-      ripple.style.cssText = `position:absolute;width:${maxDistance * 2}px;height:${maxDistance * 2}px;border-radius:50%;background:radial-gradient(circle,rgba(${glowColor},0.4) 0%,rgba(${glowColor},0.2) 30%,transparent 70%);left:${x - maxDistance}px;top:${y - maxDistance}px;pointer-events:none;z-index:1000;`;
-      element.appendChild(ripple);
-      gsap.fromTo(ripple, { scale: 0, opacity: 1 }, { scale: 1, opacity: 0, duration: 0.8, ease: 'power2.out', onComplete: () => ripple.remove() });
+      if (clickEffect) {
+        const rect = element.getBoundingClientRect();
+        const x = e.clientX - rect.left, y = e.clientY - rect.top;
+        const maxDistance = Math.max(Math.hypot(x, y), Math.hypot(x - rect.width, y), Math.hypot(x, y - rect.height), Math.hypot(x - rect.width, y - rect.height));
+        const ripple = document.createElement('div');
+        ripple.style.cssText = `position:absolute;width:${maxDistance * 2}px;height:${maxDistance * 2}px;border-radius:50%;background:radial-gradient(circle,rgba(${glowColor},0.4) 0%,rgba(${glowColor},0.2) 30%,transparent 70%);left:${x - maxDistance}px;top:${y - maxDistance}px;pointer-events:none;z-index:1000;`;
+        element.appendChild(ripple);
+        gsap.fromTo(ripple, { scale: 0, opacity: 1 }, { scale: 1, opacity: 0, duration: 0.8, ease: 'power2.out', onComplete: () => ripple.remove() });
+      }
     };
     element.addEventListener('mouseenter', handleMouseEnter);
     element.addEventListener('mouseleave', handleMouseLeave);
@@ -139,7 +115,7 @@ const ParticleCard = ({
   }, [animateParticles, clearAllParticles, disableAnimations, enableTilt, enableMagnetism, clickEffect, glowColor]);
 
   return (
-    <div ref={cardRef} className={`${className} particle-container`} style={{ ...style, position: 'relative', overflow: 'hidden' }}>
+    <div ref={cardRef} className={`${className} particle-container`} style={{ ...style, position: 'relative', overflow: 'hidden' }} onClick={onClick}>
       {children}
     </div>
   );
@@ -147,8 +123,6 @@ const ParticleCard = ({
 
 const GlobalSpotlight = ({ gridRef, disableAnimations = false, enabled = true, spotlightRadius = DEFAULT_SPOTLIGHT_RADIUS, glowColor = DEFAULT_GLOW_COLOR }) => {
   const spotlightRef = useRef(null);
-  const isInsideSection = useRef(false);
-
   useEffect(() => {
     if (disableAnimations || !gridRef?.current || !enabled) return;
     const spotlight = document.createElement('div');
@@ -156,30 +130,21 @@ const GlobalSpotlight = ({ gridRef, disableAnimations = false, enabled = true, s
     spotlight.style.cssText = `position:fixed;width:800px;height:800px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(${glowColor},0.15) 0%,rgba(${glowColor},0.08) 15%,rgba(${glowColor},0.04) 25%,rgba(${glowColor},0.02) 40%,rgba(${glowColor},0.01) 65%,transparent 70%);z-index:200;opacity:0;transform:translate(-50%,-50%);mix-blend-mode:screen;`;
     document.body.appendChild(spotlight);
     spotlightRef.current = spotlight;
-
     const handleMouseMove = e => {
       if (!spotlightRef.current || !gridRef.current) return;
       const section = gridRef.current.closest('.bento-section');
       const rect = section?.getBoundingClientRect();
       const mouseInside = rect && e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-      isInsideSection.current = mouseInside || false;
       const cards = gridRef.current.querySelectorAll('.magic-bento-card');
-      if (!mouseInside) {
-        gsap.to(spotlightRef.current, { opacity: 0, duration: 0.3, ease: 'power2.out' });
-        cards.forEach(card => { card.style.setProperty('--glow-intensity', '0'); });
-        return;
-      }
+      if (!mouseInside) { gsap.to(spotlightRef.current, { opacity: 0, duration: 0.3, ease: 'power2.out' }); cards.forEach(card => { card.style.setProperty('--glow-intensity', '0'); }); return; }
       const { proximity, fadeDistance } = calculateSpotlightValues(spotlightRadius);
       let minDistance = Infinity;
       cards.forEach(card => {
         const cardRect = card.getBoundingClientRect();
         const centerX = cardRect.left + cardRect.width / 2, centerY = cardRect.top + cardRect.height / 2;
-        const distance = Math.hypot(e.clientX - centerX, e.clientY - centerY) - Math.max(cardRect.width, cardRect.height) / 2;
-        const effectiveDistance = Math.max(0, distance);
+        const effectiveDistance = Math.max(0, Math.hypot(e.clientX - centerX, e.clientY - centerY) - Math.max(cardRect.width, cardRect.height) / 2);
         minDistance = Math.min(minDistance, effectiveDistance);
-        let glowIntensity = 0;
-        if (effectiveDistance <= proximity) glowIntensity = 1;
-        else if (effectiveDistance <= fadeDistance) glowIntensity = (fadeDistance - effectiveDistance) / (fadeDistance - proximity);
+        let glowIntensity = effectiveDistance <= proximity ? 1 : effectiveDistance <= fadeDistance ? (fadeDistance - effectiveDistance) / (fadeDistance - proximity) : 0;
         updateCardGlowProperties(card, e.clientX, e.clientY, glowIntensity, spotlightRadius);
       });
       gsap.to(spotlightRef.current, { left: e.clientX, top: e.clientY, duration: 0.1, ease: 'power2.out' });
@@ -187,7 +152,6 @@ const GlobalSpotlight = ({ gridRef, disableAnimations = false, enabled = true, s
       gsap.to(spotlightRef.current, { opacity: targetOpacity, duration: targetOpacity > 0 ? 0.2 : 0.5, ease: 'power2.out' });
     };
     const handleMouseLeave = () => {
-      isInsideSection.current = false;
       gridRef.current?.querySelectorAll('.magic-bento-card').forEach(card => { card.style.setProperty('--glow-intensity', '0'); });
       if (spotlightRef.current) gsap.to(spotlightRef.current, { opacity: 0, duration: 0.3, ease: 'power2.out' });
     };
@@ -195,7 +159,6 @@ const GlobalSpotlight = ({ gridRef, disableAnimations = false, enabled = true, s
     document.addEventListener('mouseleave', handleMouseLeave);
     return () => { document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseleave', handleMouseLeave); spotlightRef.current?.parentNode?.removeChild(spotlightRef.current); };
   }, [gridRef, disableAnimations, enabled, spotlightRadius, glowColor]);
-
   return null;
 };
 
@@ -218,7 +181,8 @@ const MagicBento = ({
   textAutoHide = true, enableStars = true, enableSpotlight = true, enableBorderGlow = true,
   disableAnimations = false, spotlightRadius = DEFAULT_SPOTLIGHT_RADIUS,
   particleCount = DEFAULT_PARTICLE_COUNT, enableTilt = false, glowColor = DEFAULT_GLOW_COLOR,
-  clickEffect = true, enableMagnetism = true
+  clickEffect = true, enableMagnetism = true,
+  onCardClick = null
 }) => {
   const gridRef = useRef(null);
   const isMobile = useMobileDetection();
@@ -233,6 +197,7 @@ const MagicBento = ({
         {cardData.map((card, index) => {
           const baseClassName = `magic-bento-card ${enableBorderGlow ? 'magic-bento-card--border-glow' : ''}`;
           const cardProps = { className: baseClassName, style: { backgroundColor: card.color, '--glow-color': glowColor } };
+          const handleCardClick = () => onCardClick?.(card.searchQuery);
           const cardInner = (
             <div className="magic-bento-card__inner">
               <div className="magic-bento-card__icon" dangerouslySetInnerHTML={{ __html: card.icon }} />
@@ -241,12 +206,12 @@ const MagicBento = ({
           );
           if (enableStars) {
             return (
-              <ParticleCard key={index} {...cardProps} disableAnimations={shouldDisableAnimations} particleCount={particleCount} glowColor={glowColor} enableTilt={enableTilt} clickEffect={clickEffect} enableMagnetism={enableMagnetism}>
+              <ParticleCard key={index} {...cardProps} disableAnimations={shouldDisableAnimations} particleCount={particleCount} glowColor={glowColor} enableTilt={enableTilt} clickEffect={clickEffect} enableMagnetism={enableMagnetism} onClick={handleCardClick}>
                 {cardInner}
               </ParticleCard>
             );
           }
-          return <div key={index} {...cardProps}>{cardInner}</div>;
+          return <div key={index} {...cardProps} onClick={handleCardClick}>{cardInner}</div>;
         })}
       </BentoCardGrid>
     </>

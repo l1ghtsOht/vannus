@@ -52,6 +52,11 @@ export default function App() {
     commandBarRef.current?.focus();
   }, []);
 
+  const handleBentoClick = useCallback((searchQuery) => {
+    setQuery(searchQuery);
+    handleSubmit(searchQuery);
+  }, [handleSubmit]);
+
   const hasResults = !!results;
   const showExplore = !hasResults && !loading;
 
@@ -89,6 +94,7 @@ export default function App() {
                     particleCount={12}
                     glowColor="99, 102, 241"
                     disableAnimations={false}
+                    onCardClick={handleBentoClick}
                   />
                 </div>
               </div>

@@ -1606,6 +1606,34 @@ These questions have no clean answers. They shape Praxis's design decisions.
 
 ## Changelog
 
+### v26 — React Homepage SPA (2026-03-14)
+
+Converted the homepage from static HTML to a React SPA with Framer Motion animations.
+
+**Architecture:** `praxis/frontend/home/` — Vite + React + Tailwind + Framer Motion, same pattern as Room SPA. Builds to `home/dist/`, served at `/` by FastAPI. Falls back to static `home.html` if build doesn't exist.
+
+**12 components:**
+- `Nav` — 5-item fixed nav with glassmorphism
+- `Hero` — Animated gradient title + subtitle (framer-motion entrance)
+- `CommandBar` — Mode toggles (Find/Compare/Analyze) + input + submit (forwardRef for external control)
+- `TaskGrid` — 3x2 grid with hover scale animation, radio selection fills input
+- `ConstraintPills` — 9 toggle pills with framer-motion layout transitions
+- `LiveSummary` — Reactive sentence + "Evaluate 253 →" button
+- `PathCards` — 4 action cards (Journey, Catalog, Compare, ROI)
+- `InlineResults` — Staggered card entrance via AnimatePresence
+- `ToolCard` — Favicon + score + badges + hover lift effect
+- `FeedbackCapture` — Yes/No rating + copy results
+- `HowItWorks` — 3-step section with whileInView scroll animation
+- `Footer` — 3-column Product/Resources/Company
+
+**Animated background:** Three framer-motion aurora blobs (indigo, teal, amber) with continuous float animation — replaces CSS-only aurora from static page.
+
+**Hook:** `useSearch` — POST /search, normalize scores, loading/error/reset state
+
+**Build:** 285KB JS (91KB gzipped), 18KB CSS. Builds in 6s.
+
+---
+
 ### v25.9 — Nav Simplification + Pricing + Footer (2026-03-14)
 
 **Nav simplified from 9 items to 5:** Praxis | Tools | How it works | ROI Calculator | Pricing

@@ -1583,10 +1583,17 @@ def create_app():
             if room_dist.exists():
                 app.mount("/room-app", StaticFiles(directory=str(room_dist), html=True), name="room-spa")
 
+            # Home SPA — serve built React app (fallback to static HTML)
+            home_dist = frontend_dir / "home" / "dist"
+            if home_dist.exists() and (home_dist / "assets").exists():
+                app.mount("/home-assets", StaticFiles(directory=str(home_dist / "assets")), name="home-assets")
+
             app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
 
             @app.get("/")
             def index():
+                if home_dist.exists() and (home_dist / "index.html").exists():
+                    return FileResponse(home_dist / "index.html")
                 return FileResponse(frontend_dir / "home.html")
 
             @app.get("/journey", tags=["Product"])

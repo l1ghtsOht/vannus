@@ -4,13 +4,12 @@ import Aurora from './components/Aurora';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
 import CommandBar from './components/CommandBar';
-import TaskGrid from './components/TaskGrid';
+import MagicBento from './components/MagicBento/MagicBento';
 import ConstraintPills, { CONSTRAINTS } from './components/ConstraintPills';
 import LiveSummary from './components/LiveSummary';
 import PathCards from './components/PathCards';
 import InlineResults from './components/InlineResults';
 import FeedbackCapture from './components/FeedbackCapture';
-import WhyPraxis from './components/WhyPraxis';
 import HowItWorks from './components/HowItWorks';
 import Footer from './components/Footer';
 import useSearch from './hooks/useSearch';
@@ -24,19 +23,8 @@ const CONSTRAINT_LABELS = {
 export default function App() {
   const { results, loading, error, lastQuery, search, reset } = useSearch();
   const [query, setQuery] = useState('');
-  const [selectedTask, setSelectedTask] = useState(null);
   const [activeConstraints, setActiveConstraints] = useState(new Set());
   const commandBarRef = useRef(null);
-
-  const handleTaskSelect = useCallback((task) => {
-    if (selectedTask === task.id) {
-      setSelectedTask(null);
-    } else {
-      setSelectedTask(task.id);
-      setQuery(task.query);
-      commandBarRef.current?.focus();
-    }
-  }, [selectedTask]);
 
   const toggleConstraint = useCallback((id) => {
     setActiveConstraints(prev => {
@@ -87,9 +75,25 @@ export default function App() {
         <AnimatePresence mode="wait">
           {showExplore && (
             <motion.div key="explore" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-              <TaskGrid selected={selectedTask} onSelect={handleTaskSelect} />
+              <div className="relative py-8 px-6">
+                <div className="max-w-4xl mx-auto">
+                  <MagicBento
+                    textAutoHide={true}
+                    enableStars={true}
+                    enableSpotlight={true}
+                    enableBorderGlow={true}
+                    enableTilt={false}
+                    enableMagnetism={false}
+                    clickEffect={true}
+                    spotlightRadius={400}
+                    particleCount={12}
+                    glowColor="99, 102, 241"
+                    disableAnimations={false}
+                  />
+                </div>
+              </div>
               <ConstraintPills active={activeConstraints} onToggle={toggleConstraint} />
-              <LiveSummary task={selectedTask} constraints={activeConstraints} query={query} onSubmit={() => handleSubmit(query)} />
+              <LiveSummary task={null} constraints={activeConstraints} query={query} onSubmit={() => handleSubmit(query)} />
               <PathCards onCompare={handleCompare} />
               <div className="text-center text-[11px] text-white/30 mt-5 mb-8">
                 253 tools · 11 trust signals · elimination-first methodology
@@ -123,7 +127,6 @@ export default function App() {
           </div>
         )}
 
-        <WhyPraxis />
         <HowItWorks />
         <Footer />
       </div>

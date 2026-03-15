@@ -11,6 +11,7 @@ import PathCards from './components/PathCards';
 import InlineResults from './components/InlineResults';
 import FeedbackCapture from './components/FeedbackCapture';
 import HowItWorks from './components/HowItWorks';
+import TrustedTools from './components/TrustedTools';
 import Footer from './components/Footer';
 import useSearch from './hooks/useSearch';
 
@@ -134,6 +135,7 @@ export default function App() {
         )}
 
         <HowItWorks />
+        <TrustedTools />
         <Footer />
       </div>
     </div>

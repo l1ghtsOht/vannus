@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import Aurora from './components/Aurora';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
 import CommandBar from './components/CommandBar';
@@ -67,25 +68,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen relative overflow-x-hidden">
-      {/* Animated aurora background */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <motion.div
-          animate={{ x: [0, 40, -30, 20], y: [0, -30, 20, -10], scale: [1, 1.1, 0.95, 1.05] }}
-          transition={{ duration: 18, repeat: Infinity, repeatType: 'reverse' }}
-          className="absolute rounded-full"
-          style={{ width: 700, height: 700, top: '-15%', left: '-10%', background: 'radial-gradient(circle, #6366f1 0%, transparent 70%)', filter: 'blur(120px)', opacity: 0.35 }}
-        />
-        <motion.div
-          animate={{ x: [0, -30, 20, -20], y: [0, 20, -30, 10], scale: [1, 0.95, 1.1, 1] }}
-          transition={{ duration: 22, repeat: Infinity, repeatType: 'reverse', delay: 8 }}
-          className="absolute rounded-full"
-          style={{ width: 600, height: 600, bottom: '-20%', right: '-10%', background: 'radial-gradient(circle, #50e3c2 0%, transparent 70%)', filter: 'blur(120px)', opacity: 0.35 }}
-        />
-        <motion.div
-          animate={{ x: [-20, 20, -10], y: [0, -20, 10], scale: [1, 1.05, 0.98] }}
-          transition={{ duration: 25, repeat: Infinity, repeatType: 'reverse' }}
-          className="absolute rounded-full"
-          style={{ width: 500, height: 500, top: '40%', left: '50%', transform: 'translateX(-50%)', background: 'radial-gradient(circle, #f5a623 0%, transparent 70%)', filter: 'blur(100px)', opacity: 0.15 }}
+      {/* React Bits Aurora background */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <Aurora
+          colorStops={["#6366f1", "#e0e0ff", "#6366f1"]}
+          amplitude={1.2}
+          blend={0.6}
+          speed={0.5}
         />
       </div>
 

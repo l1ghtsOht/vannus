@@ -21,7 +21,7 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Versions** | 17 major iterations (v1 → v17) |
 | **Total LOC** | ~78,700 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-15 02:45 UTC |
+| **Last auto-update** | 2026-03-15 03:25 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -2088,6 +2088,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+104ca2e v26: React homepage SPA with Framer Motion animations
+bfaf117 docs(auto): update README stats [skip ci]
 9d144ec v25.9: Nav simplification (9->5), pricing page, footer, how-it-works
 a8b66d8 docs(auto): update README stats [skip ci]
 272980b v25.8: Inline results — homepage becomes the full product experience
@@ -2106,8 +2108,6 @@ faebedd Add LF integration test suite (38 tests, all pass)
 dcdcdc2 auto: 2026-03-14 11:47:52
 06c377b docs(auto): update README stats [skip ci]
 046ccc1 auto: 2026-03-14 11:45:45
-23e3a44 docs(auto): update README stats [skip ci]
-eaeb6b3 auto: 2026-03-14 11:45:12
 ```
 <!-- AUTO:GIT:END -->
 

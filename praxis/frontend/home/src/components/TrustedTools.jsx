@@ -34,7 +34,7 @@ export default function TrustedTools() {
         speed={60}
         direction="left"
         logoHeight={32}
-        gap={64}
+        gap={85}
         hoverSpeed={0}
         fadeOut={true}
         fadeOutColor="#0a0a0f"

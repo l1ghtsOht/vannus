@@ -1584,17 +1584,21 @@ def create_app():
                 app.mount("/room-app", StaticFiles(directory=str(room_dist), html=True), name="room-spa")
 
             # Home SPA — serve built React app (fallback to static HTML)
-            home_dist = frontend_dir / "home" / "dist"
-            if home_dist.exists() and (home_dist / "assets").exists():
-                app.mount("/home-assets", StaticFiles(directory=str(home_dist)), name="home-assets")
+            home_dist = (frontend_dir / "home" / "dist").resolve()
+            _react_index = str((home_dist / "index.html").resolve())
+            _static_index = str((frontend_dir / "home.html").resolve())
 
-            app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
+            if home_dist.exists() and (home_dist / "assets").exists():
+                app.mount("/home-assets", StaticFiles(directory=str(home_dist.resolve())), name="home-assets")
+
+            app.mount("/static", StaticFiles(directory=str(frontend_dir.resolve())), name="static")
 
             @app.get("/")
-            def index():
-                if home_dist.exists() and (home_dist / "index.html").exists():
-                    return FileResponse(home_dist / "index.html")
-                return FileResponse(frontend_dir / "home.html")
+            async def index():
+                import os as _os_idx
+                if _os_idx.path.isfile(_react_index):
+                    return FileResponse(_react_index, media_type="text/html")
+                return FileResponse(_static_index, media_type="text/html")
 
             @app.get("/journey", tags=["Product"])
             def journey_wizard():

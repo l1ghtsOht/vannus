@@ -13,15 +13,15 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 <!-- AUTO:STATS:START -->
 | Metric | Value |
 |--------|-------|
-| **Python modules** | 117 files, ~64,300 lines |
+| **Python modules** | 118 files, ~64,600 lines |
 | **Tool catalog** | 253 curated AI tools with rich metadata |
-| **API endpoints** | 377 REST routes via FastAPI |
+| **API endpoints** | 378 REST routes via FastAPI |
 | **Test coverage** | 719 tests across 16 test files, all passing |
 | **Frontend** | 30 HTML + 4 JS files (~14,700 lines), Liquid Glass UI |
 | **Versions** | 17 major iterations (v1 → v17) |
-| **Total LOC** | ~79,000 (Python + Frontend) |
+| **Total LOC** | ~79,200 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-16 03:31 UTC |
+| **Last auto-update** | 2026-03-16 19:46 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -2088,6 +2088,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+667e7e4 Add Railway deployment config, feedback dashboard, and input validation
+037c63c docs(auto): update README stats [skip ci]
 688f5a2 Add feedback UI: SearchFeedback, ToolFlag, event tracking
 a1f99be docs(auto): update README stats [skip ci]
 ddff2e7 Add SQLite-backed feedback collection (3 tables, 4 endpoints)
@@ -2106,8 +2108,6 @@ cca573c Fix LogoLoop: wider gap, larger logos, mix-blend-mode kills bg squares
 8415f60 docs(auto): update README stats [skip ci]
 abedcb5 Add React Bits LogoLoop as TrustedTools section below HowItWorks
 8d58ccd docs(auto): update README stats [skip ci]
-cd1e21d Add paginated MagicBento: 3 pages x 6 cards with auto-rotate
-3931c4d docs(auto): update README stats [skip ci]
 ```
 <!-- AUTO:GIT:END -->
 
@@ -2139,9 +2139,9 @@ An **elimination-first AI tool curation engine** that evolved into a **cognitive
 ### Current State
 <!-- AUTO:STATE:START -->
 - **253 tools**, zero duplicates, clean tag casing
-- **377 API routes**, all functional
+- **378 API routes**, all functional
 - **719 tests passing**
-- **117 Python modules**, ~64,300 lines
+- **118 Python modules**, ~64,600 lines
 - **34 frontend files**, ~14,700 lines
 - All critical bugs fixed (alias collision, caveats reset, dead code)
 - Server runs on port 8000 via `uvicorn praxis.api:app --port 8000`

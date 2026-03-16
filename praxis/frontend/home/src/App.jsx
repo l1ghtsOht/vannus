@@ -9,11 +9,12 @@ import ConstraintPills, { CONSTRAINTS } from './components/ConstraintPills';
 import LiveSummary from './components/LiveSummary';
 import PathCards from './components/PathCards';
 import InlineResults from './components/InlineResults';
-import FeedbackCapture from './components/FeedbackCapture';
+import SearchFeedback from './components/SearchFeedback';
 import HowItWorks from './components/HowItWorks';
 import TrustedTools from './components/TrustedTools';
 import Footer from './components/Footer';
 import useSearch from './hooks/useSearch';
+import { generateSessionId, trackEvent } from './utils/feedback';
 
 const CONSTRAINT_LABELS = {
   free_tier: 'free', budget_50: 'under $50/mo', budget_100: 'under $100/mo',
@@ -26,6 +27,7 @@ export default function App() {
   const [query, setQuery] = useState('');
   const [activeConstraints, setActiveConstraints] = useState(new Set());
   const commandBarRef = useRef(null);
+  const [sessionId] = useState(() => generateSessionId());
 
   const toggleConstraint = useCallback((id) => {
     setActiveConstraints(prev => {
@@ -41,8 +43,9 @@ export default function App() {
     if (!text.trim()) return;
     const cLabels = [...activeConstraints].map(c => CONSTRAINT_LABELS[c] || c);
     const fullQuery = cLabels.length ? text + ', ' + cLabels.join(', ') : text;
+    trackEvent(sessionId, 'search', { query: fullQuery });
     search(fullQuery);
-  }, [query, activeConstraints, search]);
+  }, [query, activeConstraints, search, sessionId]);
 
   const handleReset = useCallback(() => {
     reset();
@@ -54,9 +57,10 @@ export default function App() {
   }, []);
 
   const handleBentoClick = useCallback((searchQuery) => {
+    trackEvent(sessionId, 'result_click', { query: searchQuery });
     setQuery(searchQuery);
     handleSubmit(searchQuery);
-  }, [handleSubmit]);
+  }, [handleSubmit, sessionId]);
 
   const hasResults = !!results;
   const showExplore = !hasResults && !loading;
@@ -122,7 +126,13 @@ export default function App() {
           {hasResults && (
             <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <InlineResults results={results} onReset={handleReset} />
-              <FeedbackCapture query={lastQuery} results={results} />
+              <SearchFeedback
+                sessionId={sessionId}
+                queryText={lastQuery}
+                constraints={[...activeConstraints]}
+                survivors={results?.tools?.map(t => t.name) || []}
+                eliminatedCount={results?.eliminatedCount || 0}
+              />
             </motion.div>
           )}
         </AnimatePresence>

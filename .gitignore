@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.egg-info/
-dist/
+/dist/
 build/
 *.egg
 
@@ -32,8 +32,7 @@ praxis/data/feedback.db
 # Node
 node_modules/
 
-# Build artifacts
-praxis/frontend/room/dist/
+# Build artifacts (none — frontend dist/ committed for Railway)
 
 # Screenshots (test artifacts)
 *.png

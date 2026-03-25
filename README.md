@@ -21,7 +21,7 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Versions** | 17 major iterations (v1 → v17) |
 | **Total LOC** | ~79,200 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-17 03:43 UTC |
+| **Last auto-update** | 2026-03-25 16:31 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -2088,6 +2088,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+bf0f073 Fix search scoring: relevance over popularity
+eeaaf7f docs(auto): update README stats [skip ci]
 b5c81e7 Commit React dist builds for Railway deployment
 16ca75c docs(auto): update README stats [skip ci]
 bf03e5a Fix missing Any import in praxis/profile.py
@@ -2106,8 +2108,6 @@ a9d0926 Add React Tools SPA at /tools-app with glass design system
 5ad62bd docs(auto): update README stats [skip ci]
 5bf8cee LogoLoop height: 24px -> 55px
 f1a13a9 docs(auto): update README stats [skip ci]
-a7c1b94 Fix LogoLoop: remove @layer wrapper, reduce logo size to 24px
-251ef0d docs(auto): update README stats [skip ci]
 ```
 <!-- AUTO:GIT:END -->
 

@@ -21,7 +21,7 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Versions** | 17 major iterations (v1 → v17) |
 | **Total LOC** | ~74,500 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-27 21:26 UTC |
+| **Last auto-update** | 2026-03-27 21:56 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -2088,6 +2088,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+2dfc1b6 Fix claims-vs-reality gaps across frontend
+74c2940 docs(auto): update README stats [skip ci]
 45e2f8d Add affiliate transparency: partners page, methodology update, footer links
 3a29019 docs(auto): update README stats [skip ci]
 0dd83a4 Remove 15 vibe-coded pages, unify nav/footer, kill AI Dashboard brand
@@ -2106,8 +2108,6 @@ bf03e5a Fix missing Any import in praxis/profile.py
 5c985ce docs(auto): update README stats [skip ci]
 2fdfcc2 Fix bare imports for Railway deployment
 0448aad docs(auto): update README stats [skip ci]
-667e7e4 Add Railway deployment config, feedback dashboard, and input validation
-037c63c docs(auto): update README stats [skip ci]
 ```
 <!-- AUTO:GIT:END -->
 

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Partners & Transparency — Praxis</title>
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-dim: rgba(255,255,255,0.35);
+      --accent: #6366f1;
+      --border-glass: rgba(255,255,255,0.08);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg-primary); color: var(--text-primary);
+      min-height: 100vh; line-height: 1.7;
+    }
+
+    /* Nav */
+    .nav-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0.65rem 1.5rem; display: flex; align-items: center; justify-content: center; gap: 2rem;
+      background: rgba(6,6,14,0.75); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-bar a { color: rgba(255,255,255,0.55); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px; transition: color 0.18s; }
+    .nav-bar a:hover { color: #f0f0f5; }
+    .nav-logo { font-weight: 700; font-size: 0.95rem; color: #f0f0f5 !important; letter-spacing: -0.5px; }
+
+    /* Content */
+    .container { max-width: 680px; margin: 0 auto; padding: 100px 24px 60px; }
+    h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { font-size: 14px; color: var(--text-dim); margin-bottom: 40px; }
+    h2 { font-size: 17px; font-weight: 700; margin: 36px 0 12px; color: var(--text-primary); }
+    h3 { font-size: 14px; font-weight: 600; margin: 24px 0 8px; color: var(--text-primary); }
+    p { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
+    ul { margin: 0 0 16px 0; padding-left: 0; list-style: none; }
+    ul li { font-size: 14px; color: var(--text-secondary); padding: 6px 0; padding-left: 20px; position: relative; }
+    ul li::before { content: "—"; position: absolute; left: 0; color: var(--text-dim); }
+    strong { color: var(--text-primary); font-weight: 600; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .divider {
+      border: none; border-top: 1px solid rgba(255,255,255,0.06);
+      margin: 32px 0;
+    }
+
+    .partner-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 20px 24px; margin: 16px 0;
+    }
+    .partner-name { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .partner-desc { font-size: 13px; color: var(--text-dim); }
+    .partner-disclosure { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 8px; font-style: italic; }
+
+    .commitment {
+      background: rgba(99,102,241,0.05); border: 1px solid rgba(99,102,241,0.15);
+      border-radius: 12px; padding: 20px 24px; margin: 24px 0;
+    }
+    .commitment p { color: rgba(255,255,255,0.5); }
+
+    /* Footer */
+    .site-footer { background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.06); padding: 48px 40px 24px; margin-top: 60px; }
+    .footer-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; max-width: 800px; margin: 0 auto; }
+    .footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; line-height: 2; }
+    .footer-col a:hover { color: rgba(255,255,255,0.7); }
+    .footer-heading { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .footer-bottom { max-width: 800px; margin: 32px auto 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 11px; color: rgba(255,255,255,0.25); text-align: center; }
+
+    @media (max-width: 600px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .container { padding: 80px 16px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav-bar" id="nav-bar">
+    <a href="/" class="nav-logo">Praxis</a>
+    <a href="/static/tools.html">Tools</a>
+    <a href="/static/differential.html">Diagnosis</a>
+    <a href="/journey">Build My Stack</a>
+    <a href="/static/manifesto.html">Methodology</a>
+    <a href="/static/pricing.html">Pricing</a>
+  </nav>
+
+  <div class="container">
+
+    <h1>Partners &amp; Transparency</h1>
+    <p class="subtitle">How Praxis makes money — and what it never touches.</p>
+
+    <h2>How Praxis Makes Money</h2>
+    <p>Praxis offers affiliate links to tools that survive our evaluation process. When you sign up for a tool through a partner link on this site, we may earn a commission.</p>
+    <p>Here's what that means and — more importantly — what it doesn't mean.</p>
+
+    <hr class="divider">
+
+    <h2>What Affiliate Partnerships DO NOT Affect</h2>
+    <ul>
+      <li><strong>Scores.</strong> Every tool in our database is scored by the same elimination engine using the same criteria. Partner tools receive no scoring bonus, no weight adjustment, and no favorable treatment. A partner tool that scores poorly is eliminated the same as any other tool.</li>
+      <li><strong>Rankings.</strong> Search results, elimination outcomes, and diagnosis recommendations are computed independently of commercial relationships. The algorithm does not know which tools have affiliate agreements.</li>
+      <li><strong>Inclusion.</strong> Tools are not added to our database because they offer affiliate programs. Tools are added based on market relevance and user demand.</li>
+      <li><strong>Visibility.</strong> Partner tools do not receive preferential placement in search results, category pages, or the elimination pipeline. The evaluation surfaces are commercially neutral.</li>
+    </ul>
+
+    <h2>What Affiliate Partnerships DO Affect</h2>
+    <ul>
+      <li><strong>"Try This Tool" links.</strong> On a tool's detail page, below the evaluation scores, you may see a "Try [Tool Name]" button. If we have an affiliate agreement with that tool, the link includes our tracking code. This is always labeled.</li>
+      <li><strong>Revenue.</strong> Affiliate commissions help fund Praxis's continued development and keep the free tier available.</li>
+    </ul>
+
+    <hr class="divider">
+
+    <h2>How to Verify Our Independence</h2>
+    <p>Every evaluation Praxis produces is reproducible. The <a href="/static/manifesto.html">methodology page</a> explains our 6 scoring dimensions and elimination logic. If a partner tool receives a score you question, you can see exactly which criteria produced that score and verify it yourself. We publish the framework specifically so our evaluations can be audited.</p>
+
+    <hr class="divider">
+
+    <h2>Current Partners</h2>
+
+    <div class="partner-card">
+      <div class="partner-name">Semrush</div>
+      <div class="partner-desc">SEO and digital marketing platform.</div>
+      <div class="partner-disclosure">Affiliate disclosure: Praxis earns a commission on signups through our link.</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="commitment">
+      <h2 style="margin-top:0">Our Commitment</h2>
+      <p>If we ever discover that an affiliate relationship has influenced an evaluation — through a bug, a bias in the data, or a human error — we will disclose it publicly on this page, correct the evaluation, and terminate the partnership if the conflict cannot be resolved.</p>
+      <p>The wall between evaluation and monetization is the reason Praxis exists. Every recommendation engine that monetizes through vendor relationships eventually optimizes for vendor revenue over user outcomes. We built Praxis to be the alternative. This transparency page is our commitment to staying that way.</p>
+    </div>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-heading">Product</div>
+        <a href="/static/tools.html">All Tools</a>
+        <a href="/static/differential.html">Diagnosis</a>
+        <a href="/journey">Build My Stack</a>
+        <a href="/room">Room</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Resources</div>
+        <a href="/static/tuesday-test.html">ROI Calculator</a>
+        <a href="/static/rfp.html">RFP Builder</a>
+        <a href="/static/stack-advisor.html">Stack Advisor</a>
+        <a href="/static/trust_badges.html">Trust Badges</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Company</div>
+        <a href="/static/pricing.html">Pricing</a>
+        <a href="/static/manifesto.html">Methodology</a>
+        <a href="/static/partners.html">Partners</a>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Praxis AI</div>
+  </footer>
+
+</body>
+</html>

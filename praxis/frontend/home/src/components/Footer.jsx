@@ -20,6 +20,7 @@ export default function Footer() {
           <div className="text-[12px] font-medium text-white/50 uppercase tracking-wider mb-3">Company</div>
           <a href="/static/pricing.html" className="block text-[13px] text-white/35 no-underline leading-8 hover:text-white/70 transition-colors">Pricing</a>
           <a href="/static/manifesto.html" className="block text-[13px] text-white/35 no-underline leading-8 hover:text-white/70 transition-colors">Methodology</a>
+          <a href="/static/partners.html" className="block text-[13px] text-white/35 no-underline leading-8 hover:text-white/70 transition-colors">Partners</a>
         </div>
       </div>
       <div className="max-w-[800px] mx-auto mt-8 pt-5 text-center text-[11px] text-white/25" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>

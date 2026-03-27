@@ -107,6 +107,13 @@ def normalize(text: str) -> str:
 # every tool in the catalog and add noise instead of relevance.
 _SCORING_STOP_WORDS = {"ai", "tool", "tools", "app", "apps", "software", "platform", "best", "good", "e"}
 
+# Keyword aliases: normalize variant spellings for scoring matches.
+# Applied to both the search keyword and the tool's category/tag/keyword fields.
+_KEYWORD_ALIASES = {
+    "nocode": "no-code", "lowcode": "low-code", "ecommerce": "e-commerce",
+    "cicd": "ci/cd", "devops": "dev-ops",
+}
+
 
 def score_tool(tool, keywords):
     """
@@ -140,6 +147,8 @@ def score_tool(tool, keywords):
         w = str(word).lower()
         if w in _SCORING_STOP_WORDS:
             continue
+        # Resolve aliases (nocode→no-code, ecommerce→e-commerce, etc.)
+        w = _KEYWORD_ALIASES.get(w, w)
         if w in cat_set:
             relevance += w_cat
         elif w in tag_set:

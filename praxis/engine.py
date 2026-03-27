@@ -103,6 +103,11 @@ def normalize(text: str) -> str:
 # Tool scoring
 # ======================================================================
 
+# Words too generic to be useful scoring signals — they match nearly
+# every tool in the catalog and add noise instead of relevance.
+_SCORING_STOP_WORDS = {"ai", "tool", "tools", "app", "apps", "software", "platform", "best", "good", "e"}
+
+
 def score_tool(tool, keywords):
     """
     Score a tool against a list of search keywords.
@@ -133,6 +138,8 @@ def score_tool(tool, keywords):
 
     for word in keywords:
         w = str(word).lower()
+        if w in _SCORING_STOP_WORDS:
+            continue
         if w in cat_set:
             relevance += w_cat
         elif w in tag_set:
@@ -317,10 +324,12 @@ def find_tools(user_input, top_n: int = 5, categories_filter: list = None, profi
     scored = []
 
     for tool in TOOLS:
-        # ── Negative filter: exclude tools matching negative terms ──
+        # ── Negative filter: exclude tools whose NAME matches a negative term ──
+        # Only match on tool names, not descriptions. "without coding" means
+        # the user wants no-code tools, not "exclude every tool that mentions code".
         if negatives:
-            tool_text = (tool.name + " " + (tool.description or "")).lower()
-            if any(neg in tool_text or neg == tool.name.lower() for neg in negatives):
+            tool_name_lower = tool.name.lower()
+            if any(neg == tool_name_lower or neg in tool_name_lower.split() for neg in negatives):
                 continue
 
         # Category filter gate

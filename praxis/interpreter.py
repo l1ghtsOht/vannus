@@ -179,7 +179,7 @@ _INTENTS = {
     "marketing", "design", "automation", "coding", "research",
     "writing", "planning", "organization", "analytics", "data",
     "devops", "support", "communication", "ml", "video", "audio",
-    "sales", "email", "social media", "seo", "no-code", "security",
+    "sales", "email", "social media", "seo", "no-code", "nocode", "security",
     "productivity", "images", "forms", "payments", "recruiting",
     "legal", "accounting", "presentations",
 }
@@ -187,7 +187,7 @@ _INTENTS = {
 # Extended intents reachable via synonym expansion
 _SYNONYM_LIKE_INTENTS = _INTENTS | {
     "video", "audio", "sales", "email", "social media", "seo",
-    "no-code", "security", "productivity", "images", "forms",
+    "no-code", "nocode", "security", "productivity", "images", "forms",
     "payments", "recruiting", "legal", "accounting", "presentations",
 }
 
@@ -255,10 +255,29 @@ _KNOWN_TOOLS = {
 def _rule_based_interpret(raw: str) -> dict:
     cleaned = raw.lower()
 
+    # Rewrite "without coding" / "no coding" → "no-code" BEFORE negative
+    # extraction, so these phrases are treated as intent, not negation.
+    _NOCODE_PATTERNS = [
+        ("without coding", "nocode"), ("without code", "nocode"),
+        ("no coding", "nocode"), ("don't code", "nocode"),
+        ("dont code", "nocode"), ("can't code", "nocode"),
+    ]
+    for pattern, replacement in _NOCODE_PATTERNS:
+        if pattern in cleaned:
+            cleaned = cleaned.replace(pattern, replacement)
+
     # ── Intelligence Layer: negatives ──
     negatives = []
     if _INTEL_AVAILABLE:
         cleaned, negatives = extract_negatives(cleaned)
+
+    # Preserve hyphenated compounds (e-commerce, no-code, etc.) before splitting
+    _COMPOUND_WORDS = {
+        "e-commerce": "ecommerce", "no-code": "nocode", "low-code": "lowcode",
+        "ci-cd": "cicd", "co-pilot": "copilot", "text-to-speech": "texttospeech",
+    }
+    for compound, canonical in _COMPOUND_WORDS.items():
+        cleaned = cleaned.replace(compound, canonical)
 
     words = [w for w in re.split(r'\W+', cleaned) if w and w not in _STOP_WORDS]
 

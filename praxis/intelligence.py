@@ -68,7 +68,13 @@ for canonical, synonyms in _SYNONYM_MAP.items():
 
 
 def expand_synonyms(terms: List[str]) -> List[str]:
-    """Expand a list of terms with their canonical forms and related synonyms."""
+    """Expand a list of terms with their canonical forms.
+
+    Only maps synonyms → canonical (e.g. "blog" → "writing").
+    Does NOT add extra synonyms from the canonical's synonym set,
+    as that introduces noise (e.g. "marketing" → "leads" → matches CRMs
+    when the user asked about blog writing).
+    """
     expanded = list(terms)
     for term in terms:
         t = term.lower()
@@ -77,11 +83,6 @@ def expand_synonyms(terms: List[str]) -> List[str]:
             canonical = _REVERSE_SYNONYMS[t]
             if canonical not in expanded:
                 expanded.append(canonical)
-        # canonical → add some synonyms as keywords
-        if t in _SYNONYM_MAP:
-            for syn in list(_SYNONYM_MAP[t])[:3]:  # don't over-expand
-                if syn not in expanded:
-                    expanded.append(syn)
     return expanded
 
 
@@ -109,7 +110,7 @@ def _build_vocabulary(tools_list):
         _VOCABULARY.update(s.lower() for s in synonyms)
     # Add common English words that should NOT be "corrected" to tool names
     _COMMON_WORDS = {
-        "post", "posts", "blog", "need", "help", "make", "best", "good",
+        "post", "posts", "blog", "need", "help", "make", "making", "best", "good",
         "great", "tool", "tools", "want", "like", "find", "use", "using",
         "work", "working", "team", "small", "large", "free", "paid",
         "fast", "easy", "simple", "complex", "new", "old", "list",
@@ -119,6 +120,11 @@ def _build_vocabulary(tools_list):
         "our", "your", "their", "can", "will", "should", "could",
         "content", "project", "business", "company", "customer",
         "product", "service", "market", "website", "app", "page",
+        "whats", "what", "hows", "how", "whos", "who", "wheres", "where",
+        "edit", "editor", "editing", "record", "recording", "video",
+        "write", "writing", "read", "reading", "automate", "generate",
+        "analyze", "analyse", "design", "code", "coding", "chat",
+        "resume", "builder", "assistant", "scheduling", "software",
     }
     _VOCABULARY.update(_COMMON_WORDS)
 
@@ -293,7 +299,7 @@ _NEGATIVE_PATTERNS = [
     r'\bexclude\s+(\w+)',
     r'\bexcluding\s+(\w+)',
     r'\bno\s+(\w+)',
-    r'\b-(\w+)',
+    r'(?<=\s)-(\w+)',  # hyphen-word only after whitespace (not in e-commerce, no-code)
 ]
 
 def extract_negatives(text: str) -> Tuple[str, List[str]]:
@@ -369,7 +375,7 @@ def diversity_rerank(scored_tools: List[tuple], top_n: int = 5) -> List[tuple]:
 
     result = []
     seen_categories: Dict[str, int] = defaultdict(int)
-    MAX_PER_CATEGORY = max(2, top_n // 2)
+    MAX_PER_CATEGORY = max(3, top_n - 1)
 
     # First pass: pick top tools with diversity constraint
     for score, tool in scored_tools:

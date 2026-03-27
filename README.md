@@ -21,7 +21,7 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Versions** | 17 major iterations (v1 → v17) |
 | **Total LOC** | ~79,300 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-27 20:07 UTC |
+| **Last auto-update** | 2026-03-27 20:17 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -2088,6 +2088,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+35765a5 Fix audit findings: hardcoded counts, fake data, dead buttons
+f213f05 docs(auto): update README stats [skip ci]
 82ff478 Add keyword aliases for compound word scoring (nocode→no-code)
 b71d791 docs(auto): update README stats [skip ci]
 97adeee Fix interpreter and scoring for real user queries
@@ -2106,8 +2108,6 @@ bf03e5a Fix missing Any import in praxis/profile.py
 a1f99be docs(auto): update README stats [skip ci]
 ddff2e7 Add SQLite-backed feedback collection (3 tables, 4 endpoints)
 88d05a6 docs(auto): update README stats [skip ci]
-a9d0926 Add React Tools SPA at /tools-app with glass design system
-2dd223d docs(auto): update README stats [skip ci]
 ```
 <!-- AUTO:GIT:END -->
 

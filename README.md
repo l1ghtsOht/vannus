@@ -17,11 +17,11 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 | **Tool catalog** | 253 curated AI tools with rich metadata |
 | **API endpoints** | 378 REST routes via FastAPI |
 | **Test coverage** | 719 tests across 16 test files, all passing |
-| **Frontend** | 15 HTML + 2 JS files (~9,800 lines), Liquid Glass UI |
+| **Frontend** | 16 HTML + 2 JS files (~9,900 lines), Liquid Glass UI |
 | **Versions** | 17 major iterations (v1 → v17) |
-| **Total LOC** | ~74,400 (Python + Frontend) |
+| **Total LOC** | ~74,500 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-27 20:26 UTC |
+| **Last auto-update** | 2026-03-27 21:26 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -2088,6 +2088,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+45e2f8d Add affiliate transparency: partners page, methodology update, footer links
+3a29019 docs(auto): update README stats [skip ci]
 0dd83a4 Remove 15 vibe-coded pages, unify nav/footer, kill AI Dashboard brand
 47a6ca2 docs(auto): update README stats [skip ci]
 35765a5 Fix audit findings: hardcoded counts, fake data, dead buttons
@@ -2106,8 +2108,6 @@ bf03e5a Fix missing Any import in praxis/profile.py
 0448aad docs(auto): update README stats [skip ci]
 667e7e4 Add Railway deployment config, feedback dashboard, and input validation
 037c63c docs(auto): update README stats [skip ci]
-688f5a2 Add feedback UI: SearchFeedback, ToolFlag, event tracking
-a1f99be docs(auto): update README stats [skip ci]
 ```
 <!-- AUTO:GIT:END -->
 
@@ -2142,7 +2142,7 @@ An **elimination-first AI tool curation engine** that evolved into a **cognitive
 - **378 API routes**, all functional
 - **719 tests passing**
 - **118 Python modules**, ~64,600 lines
-- **17 frontend files**, ~9,800 lines
+- **18 frontend files**, ~9,900 lines
 - All critical bugs fixed (alias collision, caveats reset, dead code)
 - Server runs on port 8000 via `uvicorn praxis.api:app --port 8000`
 <!-- AUTO:STATE:END -->

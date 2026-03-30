@@ -15,7 +15,10 @@ import os
 import sqlite3
 from typing import Any, Dict, List, Optional
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "feedback.db")
+# Use PRAXIS_DATA_DIR env var for persistent storage (Railway volume mount).
+# Falls back to praxis/data/ for local development.
+_DATA_DIR = os.environ.get("PRAXIS_DATA_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "data"))
+DB_PATH = os.path.join(_DATA_DIR, "feedback.db")
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS search_feedback (

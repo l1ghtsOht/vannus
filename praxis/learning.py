@@ -29,7 +29,8 @@ except Exception:
     from praxis.usage import _load_usage, _save_usage
     from praxis.data import TOOLS
 
-LEARNING_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "learned_signals.json")
+_DATA_DIR = os.environ.get("PRAXIS_DATA_DIR", "")
+LEARNING_FILE = os.path.join(_DATA_DIR, "learned_signals.json") if _DATA_DIR else os.path.join(os.path.dirname(os.path.abspath(__file__)), "learned_signals.json")
 
 
 # ======================================================================

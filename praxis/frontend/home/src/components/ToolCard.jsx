@@ -63,8 +63,15 @@ export default function ToolCard({ tool, index, isTopPick, sessionId }) {
             {!pricing.free_tier && pricing.starter && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.08)' }}>From ${pricing.starter}/mo</span>}
             {skill && <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.08)' }}>{skill}</span>}
           </div>
-          {url && <a href={url} target="_blank" rel="noreferrer" className="text-[12px] text-white/30 hover:text-[#6366f1] transition-colors shrink-0 no-underline">Visit site →</a>}
+          {url && !tool.affiliate && <a href={url} target="_blank" rel="noreferrer" className="text-[12px] text-white/30 hover:text-[#6366f1] transition-colors shrink-0 no-underline">Visit site →</a>}
+          {tool.affiliate && <a href={tool.affiliate.url} target="_blank" rel="sponsored noreferrer" className="text-[12px] text-white/30 hover:text-[#6366f1] transition-colors shrink-0 no-underline">{tool.affiliate.label || 'Try ' + name} →</a>}
         </div>
+        {tool.affiliate && (
+          <div className="mt-1.5" style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)' }}>
+            <span style={{ background: 'rgba(255,255,255,0.06)', padding: '1px 6px', borderRadius: '3px', marginRight: '4px', fontSize: '9px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Partner</span>
+            {tool.affiliate.disclosure} · <a href="/static/partners.html" style={{ color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>Learn more</a>
+          </div>
+        )}
         {sessionId && (
           <div className="flex justify-end mt-1.5">
             <ToolFlag sessionId={sessionId} toolName={name} currentTier={skill || 'Unknown'} />

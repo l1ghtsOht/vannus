@@ -408,7 +408,13 @@ class JourneyOracle:
 
     def __init__(self, data_dir: Optional[str] = None):
         self._lock = threading.Lock()
-        self._data_dir = Path(data_dir) if data_dir else Path(__file__).parent / "journey_data"
+        _env_dir = os.environ.get("PRAXIS_DATA_DIR", "")
+        if data_dir:
+            self._data_dir = Path(data_dir)
+        elif _env_dir:
+            self._data_dir = Path(_env_dir) / "journey_data"
+        else:
+            self._data_dir = Path(__file__).parent / "journey_data"
         self._journeys: Dict[str, JourneyState] = {}
         self._loaded = False
         # Per-tool LF reservoirs for drift detection (d=4: relevance, budget_fit, skill_fit, integration_ease)

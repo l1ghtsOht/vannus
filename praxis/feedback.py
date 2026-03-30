@@ -13,7 +13,8 @@ except Exception:
             # fallback no-op if usage module isn't available
             return None
 
-FEEDBACK_FILE = "feedback.json"
+_DATA_DIR = os.environ.get("PRAXIS_DATA_DIR", "")
+FEEDBACK_FILE = os.path.join(_DATA_DIR, "feedback.json") if _DATA_DIR else "feedback.json"
 
 
 def _load_feedback():

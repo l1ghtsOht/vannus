@@ -131,6 +131,15 @@ def register_core_routes(app, deps):
 
         results = find_tools(struct, top_n=req.top_n, categories_filter=req.filters, profile=profile)
 
+        # Affiliate annotation (presentation layer — never touches scoring)
+        try:
+            from .affiliates import get_affiliate as _get_aff
+        except ImportError:
+            try:
+                from praxis.affiliates import get_affiliate as _get_aff
+            except ImportError:
+                _get_aff = lambda n: None
+
         out = []
         for idx, t in enumerate(results):
             expl = explain_tool(t, struct, profile)
@@ -157,6 +166,7 @@ def register_core_routes(app, deps):
                 transparency_grade=expl.get("transparency_grade"),
                 flexibility_score=expl.get("freedom_score"),
                 flexibility_grade=expl.get("freedom_grade"),
+                affiliate=_get_aff(t.name),
             ))
 
         meta = {

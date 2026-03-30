@@ -1,7 +1,8 @@
 import json
 import os
 
-USAGE_FILE = "usage.json"
+_DATA_DIR = os.environ.get("PRAXIS_DATA_DIR", "")
+USAGE_FILE = os.path.join(_DATA_DIR, "usage.json") if _DATA_DIR else "usage.json"
 
 
 def _load_usage():

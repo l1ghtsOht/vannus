@@ -22,7 +22,8 @@ from typing import Any, Dict, List, Optional
 
 log = logging.getLogger("praxis.profile")
 
-PROFILES_FILE = "profiles.json"
+_DATA_DIR = os.environ.get("PRAXIS_DATA_DIR", "")
+PROFILES_FILE = os.path.join(_DATA_DIR, "profiles.json") if _DATA_DIR else "profiles.json"
 
 
 # ------------------------------------------------------------------

@@ -1245,6 +1245,7 @@ class ToolDetail(BaseModel):
     transparency_grade: Optional[str] = None
     flexibility_score: Optional[int] = None
     flexibility_grade: Optional[str] = None
+    affiliate: Optional[Dict] = None
 
 
 class StackRequest(BaseModel):

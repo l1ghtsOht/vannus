@@ -15,13 +15,13 @@ Praxis is a backend orchestration engine that plans, evaluates, and eliminates A
 |--------|-------|
 | **Python modules** | 118 files, ~64,700 lines |
 | **Tool catalog** | 253 curated AI tools with rich metadata |
-| **API endpoints** | 378 REST routes via FastAPI |
+| **API endpoints** | 381 REST routes via FastAPI |
 | **Test coverage** | 719 tests across 16 test files, all passing |
 | **Frontend** | 16 HTML + 2 JS files (~10,000 lines), Liquid Glass UI |
 | **Versions** | 17 major iterations (v1 → v17) |
-| **Total LOC** | ~74,600 (Python + Frontend) |
+| **Total LOC** | ~74,800 (Python + Frontend) |
 | **Zero external ML deps** | All NLP, scoring, graph, and retrieval are zero-dependency |
-| **Last auto-update** | 2026-03-27 23:13 UTC |
+| **Last auto-update** | 2026-03-30 20:51 UTC |
 <!-- AUTO:STATS:END -->
 
 ---
@@ -2088,6 +2088,8 @@ Praxis applies clinical differential diagnosis to AI tool selection: generate a 
 
 <!-- AUTO:GIT:START -->
 ```
+ac04112 Add SEO, analytics, and relevance floor
+5b45292 docs(auto): update README stats [skip ci]
 2ab47be Budget hard-filter + elimination funnel for Build My Stack
 7010342 docs(auto): update README stats [skip ci]
 2dfc1b6 Fix claims-vs-reality gaps across frontend
@@ -2106,8 +2108,6 @@ bf0f073 Fix search scoring: relevance over popularity
 eeaaf7f docs(auto): update README stats [skip ci]
 b5c81e7 Commit React dist builds for Railway deployment
 16ca75c docs(auto): update README stats [skip ci]
-bf03e5a Fix missing Any import in praxis/profile.py
-5c985ce docs(auto): update README stats [skip ci]
 ```
 <!-- AUTO:GIT:END -->
 
@@ -2139,7 +2139,7 @@ An **elimination-first AI tool curation engine** that evolved into a **cognitive
 ### Current State
 <!-- AUTO:STATE:START -->
 - **253 tools**, zero duplicates, clean tag casing
-- **378 API routes**, all functional
+- **381 API routes**, all functional
 - **719 tests passing**
 - **118 Python modules**, ~64,700 lines
 - **18 frontend files**, ~10,000 lines

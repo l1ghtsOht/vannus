@@ -24,7 +24,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="max-w-[800px] mx-auto mt-8 pt-5 text-center text-[11px] text-white/25" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        &copy; 2026 Praxis AI
+        &copy; 2026 Praxis AI LLC &middot; <a href="/static/privacy-policy.html" className="text-white/25 no-underline hover:text-white/50 hover:underline">Privacy</a> &middot; <a href="/static/terms-of-service.html" className="text-white/25 no-underline hover:text-white/50 hover:underline">Terms</a>
       </div>
     </footer>
   );

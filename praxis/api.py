@@ -1629,6 +1629,16 @@ def create_app():
                 """Guided Journey — multi-step AI stack recommendation wizard."""
                 return FileResponse(frontend_dir / "journey.html")
 
+            @app.get("/privacy-policy", tags=["Product"])
+            def privacy_policy_page():
+                """Privacy Policy page."""
+                return FileResponse(frontend_dir / "privacy-policy.html")
+
+            @app.get("/terms-of-service", tags=["Product"])
+            def terms_of_service_page():
+                """Terms of Service page."""
+                return FileResponse(frontend_dir / "terms-of-service.html")
+
             @app.get("/room", tags=["Product"])
             def room_spa_entry():
                 """Praxis Room — persistent AI workspace."""
@@ -4940,7 +4950,7 @@ def create_app():
 
         # ── Page view tracking middleware ──
         # Records every HTML page load (not API calls, not static assets)
-        _PAGE_PATHS = {"/", "/journey", "/room", "/tools-app", "/advisor"}
+        _PAGE_PATHS = {"/", "/journey", "/room", "/tools-app", "/advisor", "/privacy-policy", "/terms-of-service"}
         _STATIC_PAGES = {".html"}
 
         from starlette.middleware.base import BaseHTTPMiddleware as _PVMiddleware

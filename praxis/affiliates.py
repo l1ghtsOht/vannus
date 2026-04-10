@@ -21,6 +21,11 @@ PARTNERS = {
         "label": "Try ActiveCampaign free for 14 days",
         "disclosure": "Partner link — Praxis earns a commission on signups",
     },
+    "Dify": {
+        "url": "https://affiliate.dify.ai/1shuj4rfyhiv",
+        "label": "Try Dify free — open source",
+        "disclosure": "Partner link — Praxis earns a commission on signups",
+    },
 }
 
 

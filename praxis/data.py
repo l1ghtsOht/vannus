@@ -4085,6 +4085,22 @@ TOOLS = [
         stack_roles=["primary"],
         languages=["no-code"],
     ),
+
+    Tool(
+        name="Dify",
+        description="Open-source LLM app development platform with visual workflow builder, RAG pipeline, agent capabilities, and multi-model management",
+        categories=["ai framework", "automation", "developer tools", "no-code"],
+        url="https://dify.ai",
+        tags=["LLM orchestration", "RAG", "AI agents", "workflow builder", "open-source"],
+        keywords=["LLM", "AI app builder", "RAG pipeline", "workflow", "agents", "orchestration", "open source"],
+        pricing={"free_tier": True, "starter": 59, "pro": 159, "enterprise": "custom"},
+        integrations=["OpenAI", "Anthropic", "Google Gemini", "Ollama", "Langfuse", "Zapier", "Slack", "Google Search"],
+        compliance=["SOC2", "ISO27001", "GDPR"],
+        skill_level="intermediate",
+        use_cases=["AI chatbot development", "RAG document Q&A", "multi-agent workflow automation", "LLM app prototyping"],
+        stack_roles=["primary", "infrastructure"],
+        languages=["Python", "TypeScript"],
+    ),
 ]
 
 

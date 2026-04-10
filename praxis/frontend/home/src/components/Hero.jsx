@@ -18,7 +18,7 @@ export default function Hero() {
         transition={{ duration: 0.6, delay: 0.15 }}
         className="text-lg text-white/50 mt-3 max-w-md mx-auto max-[600px]:text-base"
       >
-        Find the right AI tools for your business. Avoid the wrong ones.
+        Clarity in a crowded AI landscape.
       </motion.p>
     </div>
   );

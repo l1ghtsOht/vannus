@@ -1,6 +1,6 @@
 # Praxis — Elimination-First AI Tool Evaluation
 
-> **Find the right AI tools for your business. Avoid the wrong ones.**
+> **Clarity in a crowded AI landscape.**
 
 Praxis evaluates 253 AI tools across 9 trust dimensions and eliminates the ones that don't fit your constraints. Unlike recommendation engines that rank by relevance, Praxis ranks by survival — tools must pass budget, compliance, skill-level, and trust filters before they're ever scored.
 

@@ -350,6 +350,17 @@ def find_tools(user_input, top_n: int = 5, categories_filter: list = None, profi
         base = score_tool(tool, keywords)
         profile_mod = score_profile_fit(tool, profile, intent=user_input if isinstance(user_input, dict) else None)
 
+        # ── Intent alignment boost: if the interpreter identified a clear
+        # intent (e.g. "support"), tools whose primary category matches get
+        # a bonus so they rank above tangentially related tools ──
+        intent_str = None
+        if isinstance(user_input, dict):
+            intent_str = user_input.get("intent")
+        if intent_str:
+            tool_cats = {c.lower() for c in tool.categories}
+            if intent_str.lower() in tool_cats:
+                base += 3
+
         # ── Industry context boost ──
         industry_mod = 0
         if _INTEL_AVAILABLE and industry:
@@ -405,9 +416,17 @@ def find_tools(user_input, top_n: int = 5, categories_filter: list = None, profi
             except Exception:
                 pass
 
-    # ── Relevance floor: drop tools scoring less than 40% of the top score ──
-    # Prevents filler tools (Hugging Face, LangChain, Stripe) from appearing
-    # when fewer than top_n tools are genuinely relevant.
+    # ── Absolute relevance floor: if the best match scores below 6, nothing
+    # in the catalog is genuinely relevant. Return empty rather than filler.
+    # This catches advisory questions ("what's overrated?"), framework queries
+    # ("how should I classify?"), and garbled interpretations.
+    _MIN_ABSOLUTE_SCORE = _w("min_absolute_score", 6)
+    if top_score < _MIN_ABSOLUTE_SCORE:
+        log.info("find_tools: top_score=%d below threshold=%d — no confident matches",
+                 top_score, _MIN_ABSOLUTE_SCORE)
+        return []
+
+    # ── Relative relevance floor: drop tools scoring less than 40% of top ──
     if scored and top_score > 0:
         min_score = max(1, int(top_score * 0.4))
         scored = [(s, t) for s, t in scored if s >= min_score]

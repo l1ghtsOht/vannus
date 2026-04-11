@@ -87,8 +87,10 @@ class TestRegionalIndustry(unittest.TestCase):
         self.assertTrue(len(results) >= 1)
 
     def test_restaurant_operations(self):
+        # No restaurant-specific tools in catalog — should return empty
+        # rather than filler tools (absolute score threshold)
         results = _search("AI tool for restaurant inventory and ordering")
-        self.assertTrue(len(results) >= 1)
+        self.assertTrue(len(results) == 0, f"Expected empty (no restaurant tools); got {_names(results)}")
 
 
 # ==============================================================

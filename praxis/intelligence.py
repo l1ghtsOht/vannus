@@ -56,7 +56,7 @@ _SYNONYM_MAP = {
     "recruiting":   {"hiring", "hire", "recruitment", "talent", "applicants", "ats", "candidates", "job posting"},
     "legal":        {"contracts", "contract", "legal review", "compliance", "terms", "agreements"},
     "accounting":   {"bookkeeping", "finance", "financial", "expenses", "invoicing", "tax", "taxes"},
-    "security":     {"cybersecurity", "infosec", "authentication", "passwords", "encryption", "compliance"},
+    "security":     {"cybersecurity", "infosec", "authentication", "passwords", "encryption", "compliance", "pii", "safe", "safest", "privacy", "gdpr", "hipaa"},
 }
 
 # Build reverse lookup: synonym → canonical
@@ -306,13 +306,29 @@ def extract_negatives(text: str) -> Tuple[str, List[str]]:
     """Extract negative terms from query, return cleaned query + negatives.
 
     "I need a CRM not Salesforce" → ("I need a CRM", ["salesforce"])
+
+    Only negates words that look like tool names or product categories —
+    general verbs like "hiring", "coding", "paying" are NOT negated
+    because "without hiring" means "I don't want to hire", not "exclude
+    hiring tools".
     """
+    # Words that should never be treated as negatives — they describe
+    # the user's situation, not tools to exclude
+    _NEGATE_IGNORE = {
+        "hiring", "coding", "paying", "spending", "learning", "training",
+        "writing", "building", "buying", "selling", "working", "using",
+        "needing", "having", "being", "doing", "making", "getting",
+        "engineers", "developers", "people", "team", "staff", "employees",
+        "money", "time", "budget", "experience", "knowledge",
+    }
+
     negatives = []
     cleaned = text
     for pattern in _NEGATIVE_PATTERNS:
         matches = re.findall(pattern, cleaned, re.IGNORECASE)
         for m in matches:
-            negatives.append(m.lower())
+            if m.lower() not in _NEGATE_IGNORE:
+                negatives.append(m.lower())
         cleaned = re.sub(pattern, '', cleaned, flags=re.IGNORECASE)
 
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()

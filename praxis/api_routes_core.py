@@ -130,6 +130,38 @@ def register_core_routes(app, deps):
 
         struct = interpret(req.query)
 
+        # ── Non-search query detection ──
+        # Advisory, opinion, and framework questions can't be answered by
+        # returning tool lists. Detect them and return guidance instead.
+        _ADVISORY_PATTERNS = [
+            "should i ", "when does ", "how do i know", "biggest mistake",
+            "overrated", "avoid completely", "fail in production",
+            "biggest lie", "wont exist", "dont understand",
+            "how should i classify", "how do i map", "lifecycle of",
+            "how do different", "what categories", "how should i structure",
+            "should i build or", "invest in ai tools or hire",
+            "overengineering",
+        ]
+        _q_lower = req.query.lower()
+        _is_advisory = any(p in _q_lower for p in _ADVISORY_PATTERNS)
+
+        if _is_advisory:
+            return {
+                "results": [],
+                "meta": {
+                    "intent": struct.get("intent"),
+                    "query_type": "advisory",
+                    "message": "This looks like a strategic question rather than a tool search. "
+                               "Try our Diagnosis page for elimination-based evaluation, or "
+                               "Build My Stack for a guided recommendation.",
+                    "suggested_actions": [
+                        {"label": "Diagnosis", "url": "/static/differential.html"},
+                        {"label": "Build My Stack", "url": "/journey"},
+                        {"label": "Methodology", "url": "/static/manifesto.html"},
+                    ],
+                },
+            }
+
         profile = None
         if req.profile_id:
             profile = load_profile(req.profile_id)
@@ -184,6 +216,19 @@ def register_core_routes(app, deps):
             "expanded_keywords": struct.get("keywords", []),
             "suggested_questions": struct.get("suggested_questions", []),
         }
+
+        # If no results found (absolute score threshold), provide guidance
+        if not out:
+            meta["query_type"] = "low_confidence"
+            meta["message"] = (
+                "We couldn't find strong matches for this query in our catalog. "
+                "Try being more specific about the task (e.g. 'email marketing tools') "
+                "or use Build My Stack for a guided recommendation."
+            )
+            meta["suggested_actions"] = [
+                {"label": "Build My Stack", "url": "/journey"},
+                {"label": "Browse All Tools", "url": "/static/tools.html"},
+            ]
 
         return {"results": out, "meta": meta}
 

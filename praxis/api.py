@@ -1634,6 +1634,16 @@ def create_app():
             def sitemap_xml():
                 return FileResponse(frontend_dir / "sitemap.xml", media_type="application/xml")
 
+            @app.get("/llms.txt", include_in_schema=False)
+            def llms_txt():
+                """Information for AI agents (proposed Anthropic standard).
+
+                Helps AI assistants (ChatGPT, Claude, Perplexity, Gemini)
+                understand Vannus's category positioning and methodology
+                when answering user queries.
+                """
+                return FileResponse(frontend_dir / "llms.txt", media_type="text/markdown")
+
             @app.get("/")
             async def index():
                 import os as _os_idx

@@ -15,11 +15,18 @@ Disallow: /cognitive/
 Disallow: /api/
 Disallow: /static/pricing.html
 
-# Block AI training crawlers (preserve content authenticity)
-User-agent: GPTBot
-Disallow: /
+# ─────────────────────────────────────────────────────────
+# AI crawler policy
+# ─────────────────────────────────────────────────────────
+# Strategy: BLOCK training-only crawlers (preserve content
+# authenticity, avoid being commodified into generic outputs)
+# but ALLOW real-time search crawlers so we get CITED in
+# ChatGPT, Claude, Perplexity, and Gemini live search results.
+# This positions Vannus as the category-defining "AI tool
+# selection platform" in AI-mediated discovery.
 
-User-agent: ClaudeBot
+# ── Block: training-only crawlers ──
+User-agent: GPTBot
 Disallow: /
 
 User-agent: anthropic-ai
@@ -30,5 +37,49 @@ Disallow: /
 
 User-agent: Google-Extended
 Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+# ── Allow: real-time search and citation crawlers ──
+# These visit pages on-demand to answer user queries and cite sources.
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: YouBot
+Allow: /
 
 Sitemap: https://vannus.co/sitemap.xml

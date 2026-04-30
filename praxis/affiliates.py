@@ -7,6 +7,8 @@ the scoring engine — it exists solely for the API response layer to
 annotate results with partner links after scoring is complete.
 
 Adding a tool here does NOT affect its score, ranking, or inclusion.
+This is enforced by the Vannus elimination-first thesis: partner
+relationships annotate post-score, never influence ranking.
 """
 
 # tool_name → { url, label, disclosure }
@@ -14,22 +16,32 @@ PARTNERS = {
     "Semrush": {
         "url": "https://semrush.sjv.io/c/7066929/3838504/13053",
         "label": "Try Semrush free for 7 days",
-        "disclosure": "Partner link — Praxis earns a commission on signups",
+        "disclosure": "Partner link — Vannus earns a commission on signups",
     },
     "ActiveCampaign": {
         "url": "https://try.activecampaign.com/2vs7wpd32lzg",
         "label": "Try ActiveCampaign free for 14 days",
-        "disclosure": "Partner link — Praxis earns a commission on signups",
+        "disclosure": "Partner link — Vannus earns a commission on signups",
     },
     "Dify": {
         "url": "https://affiliate.dify.ai/1shuj4rfyhiv",
         "label": "Try Dify free — open source",
-        "disclosure": "Partner link — Praxis earns a commission on signups",
+        "disclosure": "Partner link — Vannus earns a commission on signups",
     },
     "Foxit PDF Editor": {
         "url": "https://partnerstack.foxit.com/6r0x4rvlvgqk",
         "label": "Try Foxit PDF Editor",
-        "disclosure": "Partner link — Praxis earns a commission on signups",
+        "disclosure": "Partner link — Vannus earns a commission on signups",
+    },
+    "Turbotic": {
+        "url": "https://try.turbotic.com/cqlt13x1ng7v",
+        "label": "Try Turbotic",
+        "disclosure": "Partner link — Vannus earns a commission on signups",
+    },
+    "Prezi": {
+        "url": "https://try.prezi.com/tatze0c6lurr",
+        "label": "Try Prezi",
+        "disclosure": "Partner link — Vannus earns a commission on signups",
     },
 }
 

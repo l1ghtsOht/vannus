@@ -14,6 +14,7 @@
   <meta name="twitter:title" content="Vannus — Not every AI tool deserves your time" />
   <meta name="twitter:description" content="An elimination-first AI tool selection platform. We evaluate across 9 trust dimensions and remove the unfit." />
   <link rel="canonical" href="https://vannus.co/" />
+  <link rel="alternate" type="text/markdown" href="https://vannus.co/llms.txt" title="Vannus information for AI agents (llms.txt)" />
 
   <!-- Inline SVG favicon (no asset file required) -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='0.4' stop-color='%23c7d2fe'/%3E%3Cstop offset='0.7' stop-color='%236366f1'/%3E%3Cstop offset='1' stop-color='%2334d399'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0f'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='url(%23g)'%3EV%3C/text%3E%3C/svg%3E" />
@@ -47,6 +48,87 @@
           },
           "query-input": "required name=search_term_string"
         }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://vannus.co/#software",
+        "name": "Vannus",
+        "applicationCategory": "BusinessApplication",
+        "applicationSubCategory": "AI Tool Selection Platform",
+        "operatingSystem": "Web",
+        "url": "https://vannus.co",
+        "description": "Elimination-first AI tool selection. Evaluates 258+ AI tools across 9 trust dimensions including data sovereignty, training privacy, compliance, exit portability, and operational resilience.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Elimination-first methodology",
+          "258+ pre-vetted AI tools",
+          "9 trust dimensions evaluation",
+          "Sovereignty and data residency analysis",
+          "Compliance verification (SOC 2, ISO 27001, GDPR)",
+          "ROI calculator",
+          "Stack advisor and gap analysis",
+          "RFP builder",
+          "No paid placements, no popularity boosts"
+        ],
+        "creator": { "@id": "https://vannus.co/#organization" }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://vannus.co/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Vannus?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Vannus is an AI tool selection platform that uses an elimination-first methodology. Instead of listing every AI tool and ranking them by user reviews or paid placements, Vannus evaluates tools across 9 trust dimensions and removes the ones that fail. The result is a much shorter list of tools that actually deserve consideration for a given task."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is Vannus different from AI directories like G2, Capterra, or There's An AI For That?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Traditional AI directories list tools and rank them by user reviews, popularity, or paid placement. Vannus is structurally different: we eliminate tools that fail evaluation rather than rank everything. We accept no paid placements, no sponsored rankings, and no popularity boosts. Affiliate partnerships exist but never affect scoring — this is verified at the code architecture level, not just promised in marketing."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the 9 trust dimensions Vannus uses?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The 9 trust dimensions are: Data Sovereignty, Allied Infrastructure, Training Privacy, Conditional Privacy, Compliance Standard (SOC 2, ISO 27001, GDPR), Operational Resilience, Exit Portability, Real-World Utility, and Elimination Flag for material disqualifying risks."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does elimination-first methodology work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Elimination-first means Vannus starts with the full catalog of 258+ AI tools, applies hard filters based on the user's task, role, compliance requirements, and budget, and removes every tool that fails any critical criterion. Only the surviving tools are presented, with reasoning for each elimination. This inverts the recommendation pattern: you see why tools are not for you, not just which tool to use."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is Vannus free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. The full Vannus platform including search, elimination pipeline, trust badge evaluation, ROI calculator, stack advisor, and RFP builder is free. There are no paid tiers currently."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does Vannus use AI to recommend tools?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Vannus uses a deterministic elimination engine, not a generative AI recommender. The methodology is reproducible: every score and elimination decision can be audited and verified. This is a deliberate architectural choice to remain transparent, unlike opaque LLM-based recommendation systems."
+            }
+          }
+        ]
       }
     ]
   }
@@ -54,7 +136,7 @@
 
   <style>
     /* ══════════════════════════════════════════════
-       PRAXIS 2026 — Liquid Glass Search Engine UI
+       Vannus 2026 — Liquid Glass Search Engine UI
        ══════════════════════════════════════════════ */
 
     :root {
@@ -1621,7 +1703,7 @@
           <div id="results-cards"></div>
           <div id="results-feedback" class="ir-feedback"></div>
           <div class="concierge-nudge" id="concierge-nudge">
-            <p>Need a deeper evaluation? <a href="https://vannus-concierge.netlify.app" target="_blank">Talk to a founder</a> — we audit your full stack, not just one tool.</p>
+            <p>Need a deeper evaluation? <a href="https://vannus-concierge.netlify.app" target="_blank" rel="noopener noreferrer">Talk to a founder</a> — we audit your full stack, not just one tool.</p>
           </div>
           <div class="ir-reset"><button onclick="resetSearch()">&larr; Search again</button></div>
         </div>
@@ -1723,7 +1805,7 @@
 
   <script>
     /* ══════════════════════════════════════════════
-       PRAXIS — Core Application Logic
+       Vannus — Core Application Logic
        ══════════════════════════════════════════════ */
 
     /* ── State ── */
@@ -2171,7 +2253,7 @@
             '<div class="ir-card-desc">' + desc.slice(0, 120) + (desc.length > 120 ? '...' : '') + '</div>' +
             '<div class="ir-card-row">' +
               '<div class="ir-badges">' + badges.join('') + '</div>' +
-              (url ? '<a class="ir-card-link" href="' + url + '" target="_blank">Visit site &rarr;</a>' : '') +
+              (url ? '<a class="ir-card-link" href="' + url + '" target="_blank" rel="noopener noreferrer">Visit site &rarr;</a>' : '') +
             '</div>' +
           '</div>' +
         '</div>';
@@ -2351,7 +2433,7 @@
         html += `<div class="seeing-panel" id="${uid}"><div class="empty-state pulse" style="padding:0.5rem;font-size:0.8rem;"><p>Loading…</p></div></div>`;
 
         html += `<div class="tool-actions">`;
-        if (tool.url) html += `<a class="btn-primary" href="${tool.url}" target="_blank">Try ${tool.name}</a>`;
+        if (tool.url) html += `<a class="btn-primary" href="${tool.url}" target="_blank" rel="noopener noreferrer">Try ${tool.name}</a>`;
         html += `<button class="btn-ghost" onclick="saveTool('${tool.name.replace(/'/g,"\\'")}')">☆ Save</button>`;
         html += `</div>`;
 

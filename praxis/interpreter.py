@@ -21,6 +21,7 @@ The caller always gets the same output shape regardless of mode:
 """
 
 import json
+import os
 import re
 import logging
 import importlib
@@ -86,7 +87,7 @@ def interpret(user_input: str) -> dict:
 # ======================================================================
 
 _SYSTEM_PROMPT = """\
-You are the intent-extraction module of Praxis, an AI decision engine.
+You are the intent-extraction module of Vannus, an AI decision engine.
 Given a user's free-form text, extract structured information.
 
 Return **only** a JSON object (no markdown fences) with these keys:
@@ -106,6 +107,10 @@ def _llm_interpret(raw: str) -> dict:
         return _openai_interpret(raw)
     elif provider == "anthropic":
         return _anthropic_interpret(raw)
+    elif provider == "google":
+        return _google_interpret(raw)
+    elif provider == "groq":
+        return _groq_interpret(raw)
     raise RuntimeError(f"Unknown LLM provider: {provider}")
 
 
@@ -142,6 +147,56 @@ def _anthropic_interpret(raw: str) -> dict:
     data = json.loads(text)
     if not isinstance(data, dict):
         log.warning("Anthropic returned non-dict JSON (%s); falling back to rule-based", type(data).__name__)
+        return _rule_based_interpret(raw)
+    return _normalize_llm_output(raw, data)
+
+
+def _google_interpret(raw: str) -> dict:
+    import urllib.request
+    api_key = os.environ.get("GOOGLE_API_KEY", _cfg.get("google_api_key", ""))
+    model = _cfg.get("google_model", "gemini-2.0-flash")
+    payload = {
+        "contents": [
+            {"role": "user", "parts": [{"text": _SYSTEM_PROMPT + "\n\nUser query: " + raw}]},
+        ],
+        "generationConfig": {"maxOutputTokens": 400, "temperature": 0.2},
+    }
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        result = json.loads(resp.read().decode())
+    text = result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+    text = text.strip().removeprefix("```json").removesuffix("```").strip()
+    data = json.loads(text)
+    if not isinstance(data, dict):
+        return _rule_based_interpret(raw)
+    return _normalize_llm_output(raw, data)
+
+
+def _groq_interpret(raw: str) -> dict:
+    import urllib.request
+    api_key = os.environ.get("GROQ_API_KEY", _cfg.get("groq_api_key", ""))
+    model = _cfg.get("groq_model", "llama-3.3-70b-versatile")
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "user", "content": raw},
+        ],
+        "temperature": 0.2,
+        "max_tokens": 400,
+    }
+    req = urllib.request.Request(
+        "https://api.groq.com/openai/v1/chat/completions",
+        data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
+    )
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        result = json.loads(resp.read().decode())
+    text = result["choices"][0]["message"]["content"].strip()
+    text = text.removeprefix("```json").removesuffix("```").strip()
+    data = json.loads(text)
+    if not isinstance(data, dict):
         return _rule_based_interpret(raw)
     return _normalize_llm_output(raw, data)
 

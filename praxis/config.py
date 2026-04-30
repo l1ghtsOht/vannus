@@ -25,6 +25,12 @@ DEFAULTS = {
     # Anthropic
     "anthropic_api_key": "",
     "anthropic_model": "claude-3-haiku-20240307",
+    # Google Gemini
+    "google_api_key": "",
+    "google_model": "gemini-2.0-flash",
+    # Groq
+    "groq_api_key": "",
+    "groq_model": "llama-3.3-70b-versatile",
     # Decision engine
     "default_top_n": 5,
     "stack_size": 3,
@@ -136,5 +142,9 @@ def llm_available() -> bool:
     if provider == "openai" and get("openai_api_key"):
         return True
     if provider == "anthropic" and get("anthropic_api_key"):
+        return True
+    if provider == "google" and (get("google_api_key") or os.environ.get("GOOGLE_API_KEY")):
+        return True
+    if provider == "groq" and (get("groq_api_key") or os.environ.get("GROQ_API_KEY")):
         return True
     return False

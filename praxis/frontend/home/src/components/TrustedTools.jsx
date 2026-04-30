@@ -39,7 +39,7 @@ export default function TrustedTools() {
         fadeOut={true}
         fadeOutColor="#0a0a0f"
         scaleOnHover={true}
-        ariaLabel="Top-rated AI tools evaluated by Praxis"
+        ariaLabel="Top-rated AI tools evaluated by Vannus"
       />
     </section>
   );

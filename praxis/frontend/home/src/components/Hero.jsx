@@ -10,7 +10,7 @@ export default function Hero() {
         className="text-6xl font-bold tracking-tight max-[600px]:text-4xl"
         style={{ background: 'linear-gradient(135deg, #f0f0f5 0%, #6366f1 50%, #50e3c2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
       >
-        Praxis
+        Vannus
       </motion.h1>
       <motion.p
         initial={{ opacity: 0, y: 12 }}

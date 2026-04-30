@@ -15,7 +15,7 @@ export default function FeedbackCapture({ query, results }) {
 
   const copyResults = () => {
     const tools = results?.tools || [];
-    let text = `Praxis recommendation for "${query}":\n`;
+    let text = `Vannus recommendation for "${query}":\n`;
     tools.slice(0, 8).forEach((t, i) => {
       text += `${i + 1}. ${t.name} (${t._pct}% fit) — ${(t.description || '').slice(0, 80)}\n`;
     });

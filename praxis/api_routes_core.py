@@ -206,6 +206,14 @@ def register_core_routes(app, deps):
                 affiliate=_get_aff(t.name),
             ))
 
+        # Sort final response by fit_score descending for UX consistency.
+        # Internal find_tools applies diversity rerank, but explain_tool
+        # computes fit_score independently — without this final sort,
+        # users see results like "70, 58, 76, 73" which looks broken.
+        # The set of returned tools (which ones survived elimination) is
+        # already determined; this only reorders for display.
+        out.sort(key=lambda r: (r.fit_score or r.confidence or 0), reverse=True)
+
         meta = {
             "intent": struct.get("intent"),
             "industry": struct.get("industry"),

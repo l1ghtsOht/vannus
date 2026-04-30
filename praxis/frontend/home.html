@@ -377,7 +377,7 @@
       background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.06);
       padding: 48px 40px 24px; margin-top: 40px;
     }
-    .footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 800px; margin: 0 auto; }
+    .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; max-width: 900px; margin: 0 auto; }
     @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; gap: 24px; } }
     .footer-col-title { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
     .footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; line-height: 2; transition: color 0.15s; }
@@ -478,6 +478,20 @@
       cursor: pointer; font-size: 13px; transition: color 0.15s;
     }
     .ir-reset button:hover { color: var(--accent); }
+
+    .concierge-nudge {
+      text-align: center; margin: 20px 0 4px;
+      padding: 14px 20px; border-radius: 10px;
+      background: rgba(99,102,241,0.04); border: 1px solid rgba(99,102,241,0.12);
+    }
+    .concierge-nudge p {
+      font-size: 13px; color: rgba(255,255,255,0.4); margin: 0;
+    }
+    .concierge-nudge a {
+      color: #6366f1; font-weight: 600; text-decoration: none;
+      transition: color 0.15s;
+    }
+    .concierge-nudge a:hover { color: #818cf8; text-decoration: underline; }
 
     /* ── Autocomplete Dropdown — Bento Grid (Glass) ── */
     .ac-dropdown {
@@ -1552,13 +1566,16 @@
         <div id="results-loading" style="display:none">
           <div class="ir-loading">
             <div class="ir-pulse"></div>
-            <span>Evaluating 254 tools...</span>
+            <span>Evaluating 258 tools...</span>
           </div>
         </div>
         <div id="results-content" style="display:none">
           <div id="results-summary" class="ir-summary"></div>
           <div id="results-cards"></div>
           <div id="results-feedback" class="ir-feedback"></div>
+          <div class="concierge-nudge" id="concierge-nudge">
+            <p>Need a deeper evaluation? <a href="https://vannus-concierge.netlify.app" target="_blank">Talk to a founder</a> — we audit your full stack, not just one tool.</p>
+          </div>
           <div class="ir-reset"><button onclick="resetSearch()">&larr; Search again</button></div>
         </div>
       </div>
@@ -2488,6 +2505,11 @@
         <div class="footer-heading">Company</div>
         <a href="/static/manifesto.html">Methodology</a>
         <a href="/static/partners.html">Partners</a>
+        <a href="/static/pricing.html">Pricing</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Services</div>
+        <a href="https://vannus-concierge.netlify.app" target="_blank">Concierge</a>
       </div>
     </div>
     <div class="footer-bottom">&copy; 2026 PRAXIS AI LLC &middot; <a href="/static/privacy-policy.html">Privacy</a> &middot; <a href="/static/terms-of-service.html">Terms</a></div>

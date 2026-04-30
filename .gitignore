@@ -25,6 +25,11 @@ htmlcov/
 .coverage
 coverage.xml
 
+# Config files with potential secrets
+praxis/config.json
+.env
+.env.*
+
 # Praxis runtime artifacts (regenerated on import)
 praxis/tools.db
 praxis/data/feedback.db

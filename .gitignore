@@ -25,9 +25,19 @@ htmlcov/
 .coverage
 coverage.xml
 
+# Config files with potential secrets
+praxis/config.json
+.env
+.env.*
+
 # Praxis runtime artifacts (regenerated on import)
 praxis/tools.db
 praxis/data/feedback.db
+
+# Runtime data files accidentally created at repo root
+# (real seed data lives in praxis/feedback.json and praxis/usage.json)
+/feedback.json
+/usage.json
 
 # Node
 node_modules/
@@ -45,3 +55,6 @@ audit_*.png
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Claude Code workspace metadata
+.claude/

@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://vannus.co/</loc><priority>1.0</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://vannus.co/static/tools.html</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://vannus.co/static/differential.html</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://vannus.co/journey</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://vannus.co/static/tuesday-test.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://vannus.co/static/rfp.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://vannus.co/static/stack-advisor.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://vannus.co/static/trust_badges.html</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://vannus.co/static/manifesto.html</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://vannus.co/static/pricing.html</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://vannus.co/static/partners.html</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://vannus.co/room</loc><priority>0.6</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://vannus.co/</loc><lastmod>2026-04-30</lastmod><priority>1.0</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://vannus.co/static/tools.html</loc><lastmod>2026-04-30</lastmod><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://vannus.co/static/differential.html</loc><lastmod>2026-04-30</lastmod><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/journey</loc><lastmod>2026-04-30</lastmod><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/static/tuesday-test.html</loc><lastmod>2026-04-30</lastmod><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/static/rfp.html</loc><lastmod>2026-04-30</lastmod><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/static/stack-advisor.html</loc><lastmod>2026-04-30</lastmod><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/static/trust_badges.html</loc><lastmod>2026-04-30</lastmod><priority>0.7</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://vannus.co/static/manifesto.html</loc><lastmod>2026-04-30</lastmod><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/static/partners.html</loc><lastmod>2026-04-30</lastmod><priority>0.5</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/static/privacy-policy.html</loc><lastmod>2026-04-30</lastmod><priority>0.4</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/static/terms-of-service.html</loc><lastmod>2026-04-30</lastmod><priority>0.4</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/room</loc><lastmod>2026-04-30</lastmod><priority>0.6</priority><changefreq>weekly</changefreq></url>
 </urlset>

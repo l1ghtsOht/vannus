@@ -1428,6 +1428,31 @@ def create_app():
     except Exception:
         pass
 
+    # ── Security Headers Middleware ──────────────────────────────────
+    # Applies baseline security headers to every response. Mirrors what
+    # netlify.toml provided when the site was Netlify-hosted; Railway
+    # doesn't add these by default.
+    try:
+        from starlette.middleware.base import BaseHTTPMiddleware as _SHBaseMW
+
+        class _SecurityHeadersMW(_SHBaseMW):
+            async def dispatch(self, request, call_next):
+                response = await call_next(request)
+                # Don't override headers if already set
+                hdrs = response.headers
+                hdrs.setdefault("X-Content-Type-Options", "nosniff")
+                hdrs.setdefault("X-Frame-Options", "DENY")
+                hdrs.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+                hdrs.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+                # HSTS only when behind HTTPS (Railway provides TLS termination)
+                if request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https":
+                    hdrs.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+                return response
+
+        app.add_middleware(_SecurityHeadersMW)
+    except Exception:
+        pass
+
     # ── RASP Enforcement Middleware ──────────────────────────────────
     # Converts runtime_protection from diagnostic-only endpoints into an
     # enforcing layer that scans every non-GET request body.

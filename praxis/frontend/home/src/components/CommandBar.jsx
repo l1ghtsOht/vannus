@@ -37,7 +37,7 @@ const CommandBar = forwardRef(function CommandBar({ onSubmit, value, onChange },
           value={value || ''}
           onChange={e => onChange?.(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleSubmit(); }}
-          placeholder="Find the right AI tool..."
+          placeholder="Search by task — we eliminate the unfit."
           className="flex-1 bg-transparent outline-none"
           style={{ height: '38px', fontSize: '15px', padding: '6px 8px', caretColor: '#6366f1', color: '#f0f0f5' }}
         />

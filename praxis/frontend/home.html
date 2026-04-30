@@ -4,12 +4,53 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vannus — AI Decision Engine</title>
-  <meta name="description" content="Clarity in a crowded AI landscape. Vannus evaluates AI tools across 9 trust dimensions and eliminates the unfit." />
-  <meta property="og:title" content="Vannus — Clarity in a crowded AI landscape" />
-  <meta property="og:description" content="Clarity in a crowded AI landscape. Vannus evaluates AI tools across 9 trust dimensions and eliminates the unfit." />
+  <meta name="description" content="Not every AI tool deserves your time. Vannus evaluates AI tools across 9 trust dimensions and eliminates the unfit." />
+  <meta property="og:title" content="Vannus — Not every AI tool deserves your time" />
+  <meta property="og:description" content="Not every AI tool deserves your time. Vannus evaluates AI tools across 9 trust dimensions and eliminates the unfit." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://vannus.co/static/home.html" />
+  <meta property="og:url" content="https://vannus.co/" />
+  <meta property="og:site_name" content="Vannus" />
   <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Vannus — Not every AI tool deserves your time" />
+  <meta name="twitter:description" content="An elimination-first AI tool selection platform. We evaluate across 9 trust dimensions and remove the unfit." />
+  <link rel="canonical" href="https://vannus.co/" />
+
+  <!-- Inline SVG favicon (no asset file required) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='0.4' stop-color='%23c7d2fe'/%3E%3Cstop offset='0.7' stop-color='%236366f1'/%3E%3Cstop offset='1' stop-color='%2334d399'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0f'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='url(%23g)'%3EV%3C/text%3E%3C/svg%3E" />
+
+  <!-- JSON-LD: Organization + WebSite with SearchAction -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://vannus.co/#organization",
+        "name": "Vannus",
+        "url": "https://vannus.co",
+        "legalName": "PRAXIS AI LLC",
+        "description": "Elimination-first AI tool selection platform.",
+        "slogan": "Not every AI tool deserves your time."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://vannus.co/#website",
+        "url": "https://vannus.co",
+        "name": "Vannus",
+        "description": "AI tool selection by elimination — we evaluate across 9 trust dimensions and remove the unfit.",
+        "publisher": { "@id": "https://vannus.co/#organization" },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://vannus.co/?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  }
+  </script>
 
   <style>
     /* ══════════════════════════════════════════════
@@ -377,7 +418,7 @@
       background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.06);
       padding: 48px 40px 24px; margin-top: 40px;
     }
-    .footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 800px; margin: 0 auto; }
+    .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; max-width: 900px; margin: 0 auto; }
     @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; gap: 24px; } }
     .footer-col-title { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
     .footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; line-height: 2; transition: color 0.15s; }
@@ -478,6 +519,26 @@
       cursor: pointer; font-size: 13px; transition: color 0.15s;
     }
     .ir-reset button:hover { color: var(--accent); }
+
+    .concierge-nudge {
+      text-align: center; margin: 24px 0 4px;
+      padding: 16px 22px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(99,102,241,0.02));
+      border: 1px solid rgba(99,102,241,0.14);
+      transition: border-color 0.25s, background 0.25s;
+    }
+    .concierge-nudge:hover {
+      border-color: rgba(99,102,241,0.22);
+      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(99,102,241,0.03));
+    }
+    .concierge-nudge p {
+      font-size: 13px; color: rgba(255,255,255,0.45); margin: 0; letter-spacing: 0.1px;
+    }
+    .concierge-nudge a {
+      color: #818cf8; font-weight: 600; text-decoration: none;
+      transition: color 0.15s;
+    }
+    .concierge-nudge a:hover { color: #a5b4fc; text-decoration: underline; }
 
     /* ── Autocomplete Dropdown — Bento Grid (Glass) ── */
     .ac-dropdown {
@@ -1436,30 +1497,30 @@
   <section class="hero" id="hero">
     <div class="hero-brand">
       <h1 class="hero-title">Vannus</h1>
-      <p class="hero-subtitle">Clarity in a crowded AI landscape.</p>
+      <p class="hero-subtitle">Not every AI tool deserves your time.</p>
     </div>
 
     <div class="search-container" id="search-container">
       <!-- Layer 1: Input Bar -->
       <div class="cb-bar" id="cb-bar">
         <div class="cb-modes" id="cb-modes">
-          <button class="cb-mode active" data-mode="find" title="Find">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <button class="cb-mode active" data-mode="find" title="Find" aria-label="Find mode">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </button>
-          <button class="cb-mode" data-mode="compare" title="Compare">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="5" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="3" width="5" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+          <button class="cb-mode" data-mode="compare" title="Compare" aria-label="Compare mode">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2" y="3" width="5" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="3" width="5" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
           </button>
-          <button class="cb-mode" data-mode="analyze" title="Analyze">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="9" width="3" height="5" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="6.5" y="5" width="3" height="9" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="3" height="12" rx="0.5" stroke="currentColor" stroke-width="1.5"/></svg>
+          <button class="cb-mode" data-mode="analyze" title="Analyze" aria-label="Analyze mode">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2" y="9" width="3" height="5" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="6.5" y="5" width="3" height="9" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="3" height="12" rx="0.5" stroke="currentColor" stroke-width="1.5"/></svg>
           </button>
         </div>
         <div class="cb-input-wrap">
-          <input id="query" class="cb-input" type="text" autocomplete="off" autofocus />
-          <div class="cb-placeholder" id="cb-placeholder">Find the right AI tool...</div>
+          <input id="query" class="cb-input" type="text" autocomplete="off" autofocus aria-label="Search by task or role" />
+          <div class="cb-placeholder" id="cb-placeholder">Search by task — we eliminate the unfit.</div>
           <div class="ac-dropdown" id="ac-dropdown"></div>
         </div>
-        <button class="cb-submit" id="searchBtn" onclick="doSearch()">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button class="cb-submit" id="searchBtn" onclick="doSearch()" aria-label="Run search">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
 
@@ -1527,7 +1588,7 @@
             <div class="path-icon" style="background:rgba(80,227,194,0.08);color:#50e3c2;">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </div>
-            <div><div class="path-title">Browse catalog</div><div class="path-sub">254 tools</div></div>
+            <div><div class="path-title">Browse catalog</div><div class="path-sub">258 tools</div></div>
           </a>
           <button class="path-card" id="path-compare" onclick="activateCompare()">
             <div class="path-icon" style="background:rgba(239,159,39,0.08);color:#f5a623;">
@@ -1545,20 +1606,23 @@
       </div>
 
       <!-- Footer line -->
-      <div class="hero-footer-line" id="hero-footer">254 tools &middot; 9 trust dimensions &middot; elimination-first methodology</div>
+      <div class="hero-footer-line" id="hero-footer">258 tools &middot; 9 trust dimensions &middot; elimination-first methodology</div>
 
       <!-- Inline Results (hidden until search) -->
       <div id="inline-results" style="display:none">
         <div id="results-loading" style="display:none">
           <div class="ir-loading">
             <div class="ir-pulse"></div>
-            <span>Evaluating 254 tools...</span>
+            <span>Evaluating 258 tools...</span>
           </div>
         </div>
         <div id="results-content" style="display:none">
           <div id="results-summary" class="ir-summary"></div>
           <div id="results-cards"></div>
           <div id="results-feedback" class="ir-feedback"></div>
+          <div class="concierge-nudge" id="concierge-nudge">
+            <p>Need a deeper evaluation? <a href="https://vannus-concierge.netlify.app" target="_blank">Talk to a founder</a> — we audit your full stack, not just one tool.</p>
+          </div>
           <div class="ir-reset"><button onclick="resetSearch()">&larr; Search again</button></div>
         </div>
       </div>
@@ -1582,7 +1646,7 @@
       <div class="hiw-card">
         <div class="hiw-step">2</div>
         <div class="hiw-title">We eliminate what doesn't fit</div>
-        <div class="hiw-desc">254 tools checked against your budget, compliance, trust scores, and skill level. Most don't survive.</div>
+        <div class="hiw-desc">258 tools checked against your budget, compliance, trust scores, and skill level. Most don't survive.</div>
       </div>
       <div class="hiw-card">
         <div class="hiw-step">3</div>
@@ -1601,7 +1665,7 @@
       <!-- Hero Cell (2x2) -->
       <div class="eb-cell eb-hero">
         <div class="eb-hero-eyebrow">Vannus Methodology</div>
-        <h2 class="eb-hero-title">Only <span class="eb-accent-num" id="hub-sov-count">20</span> of 254 tools meet Sovereign-grade resilience.</h2>
+        <h2 class="eb-hero-title">Only <span class="eb-accent-num" id="hub-sov-count">20</span> of 258 tools meet Sovereign-grade resilience.</h2>
         <p class="eb-hero-desc">Every tool is scored across 6 architectural dimensions. We surface the ones built to last — not just built to ship.</p>
         <a href="/static/manifesto.html" class="eb-link">Read our methodology →</a>
       </div>
@@ -1685,7 +1749,7 @@
 
     /* ── Mode Placeholders ── */
     const modePlaceholders = {
-      find: 'Find the right AI tool...',
+      find: 'Search by task — we eliminate the unfit.',
       compare: 'Compare vendors side-by-side...',
       analyze: 'Analyze your current stack...',
     };
@@ -2488,6 +2552,11 @@
         <div class="footer-heading">Company</div>
         <a href="/static/manifesto.html">Methodology</a>
         <a href="/static/partners.html">Partners</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Services</div>
+        <a href="https://vannus-concierge.netlify.app" target="_blank" rel="noopener">Concierge &nearr;</a>
+        <span style="display:block;font-size:11px;color:rgba(255,255,255,0.22);line-height:1.6;margin-top:4px;">Founder-led stack audits</span>
       </div>
     </div>
     <div class="footer-bottom">&copy; 2026 PRAXIS AI LLC &middot; <a href="/static/privacy-policy.html">Privacy</a> &middot; <a href="/static/terms-of-service.html">Terms</a></div>

@@ -24,7 +24,7 @@ export default function Hero() {
         className="text-lg text-white/45 mt-4 max-w-md mx-auto max-[600px]:text-base"
         style={{ letterSpacing: '0.01em', lineHeight: 1.5 }}
       >
-        Clarity in a crowded AI landscape.
+        Not every AI tool deserves your time.
       </motion.p>
     </div>
   );

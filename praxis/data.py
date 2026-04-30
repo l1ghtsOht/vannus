@@ -4117,6 +4117,44 @@ TOOLS = [
         stack_roles=["companion"],
         languages=["no-code"],
     ),
+
+    # ----- Automation & RPA -----
+    Tool(
+        name="Turbotic",
+        description="AI-powered automation platform for enterprise RPA, process mining, and intelligent workflow orchestration",
+        categories=["automation", "rpa", "process mining", "enterprise", "workflows"],
+        url="https://try.turbotic.com/cqlt13x1ng7v",
+        tags=["rpa", "automation", "process mining", "enterprise"],
+        keywords=["robotic process automation", "intelligent automation", "workflow orchestration", "process discovery", "hyperautomation", "SSO", "MFA"],
+        pricing={"free_tier": False, "starter": "custom", "pro": "custom", "enterprise": "custom"},
+        integrations=["SAP", "Salesforce", "ServiceNow", "UiPath", "Microsoft Power Automate", "Blue Prism", "Microsoft Azure"],
+        compliance=["SOC 2 Type II", "ISO 27001", "GDPR"],
+        skill_level="intermediate",
+        use_cases=["enterprise process automation", "process mining and discovery", "RPA orchestration", "intelligent document processing", "workflow optimization"],
+        stack_roles=["primary", "infrastructure"],
+        languages=["python", "no-code"],
+        country_of_origin="SWE",
+        last_updated="2026-04-30",
+    ),
+
+    # ----- Presentations -----
+    Tool(
+        name="Prezi",
+        description="AI-powered presentation platform with dynamic visual storytelling, zooming canvas, and real-time collaboration",
+        categories=["presentations", "design", "collaboration", "marketing"],
+        url="https://try.prezi.com/tatze0c6lurr",
+        tags=["presentations", "slides", "visual storytelling", "collaboration"],
+        keywords=["presentation software", "dynamic slides", "zooming presentations", "pitch decks", "visual communication", "SAML SSO"],
+        pricing={"free_tier": True, "starter": 7, "pro": 19, "enterprise": "custom"},
+        integrations=["Slack", "Microsoft Teams", "Zoom", "Google Meet", "Salesforce", "HubSpot", "Okta", "OneLogin"],
+        compliance=["GDPR", "EU-US Data Privacy Framework"],
+        skill_level="beginner",
+        use_cases=["sales presentations", "pitch decks", "training materials", "marketing presentations", "interactive storytelling"],
+        stack_roles=["primary", "companion"],
+        languages=["no-code"],
+        country_of_origin="HUN",
+        last_updated="2026-04-30",
+    ),
 ]
 
 

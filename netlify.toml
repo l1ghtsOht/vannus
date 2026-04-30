@@ -1,3 +1,6 @@
+# NOTE: Primary deployment is Railway (auto-deploys from GitHub).
+# This file is retained for reference only — not used in production.
+
 [build]
   command = "bash scripts/build-netlify.sh"
   publish = "_site"

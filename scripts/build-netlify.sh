@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# NOTE: Primary deployment is Railway. This script is retained for reference only.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

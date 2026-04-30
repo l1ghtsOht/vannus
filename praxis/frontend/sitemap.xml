@@ -11,5 +11,7 @@
   <url><loc>https://vannus.co/static/manifesto.html</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://vannus.co/static/pricing.html</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://vannus.co/static/partners.html</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/static/privacy-policy.html</loc><priority>0.4</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://vannus.co/static/terms-of-service.html</loc><priority>0.4</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://vannus.co/room</loc><priority>0.6</priority><changefreq>weekly</changefreq></url>
 </urlset>

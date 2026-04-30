@@ -6,5 +6,12 @@ Disallow: /pipeline/
 Disallow: /governance/
 Disallow: /v21/
 Disallow: /v22/
+Disallow: /search
+Disallow: /compare
+Disallow: /stack
+Disallow: /suggest
+Disallow: /intelligence/
+Disallow: /cognitive/
+Disallow: /api/
 
 Sitemap: https://vannus.co/sitemap.xml

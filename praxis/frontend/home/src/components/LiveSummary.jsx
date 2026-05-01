@@ -3,10 +3,19 @@ const TASK_LABELS = {
   automation: 'automation tools', support: 'customer support tools', appbuilding: 'app-building tools',
 };
 
+// Label text appended to query when constraint pill is active.
+// Keep in sync with CONSTRAINTS in ConstraintPills.jsx and CONSTRAINT_LABELS in App.jsx.
 const CONSTRAINT_LABELS = {
-  free_tier: 'free', budget_50: 'under $50/mo', budget_100: 'under $100/mo',
-  hipaa: 'HIPAA-compliant', soc2: 'SOC2-certified', gdpr: 'GDPR-compliant',
-  beginner: 'beginner-friendly', open_source: 'open source', api_access: 'API access',
+  free_tier:   'free',
+  budget_20:   'under $20/mo',
+  beginner:    'beginner-friendly',
+  no_code:     'no-code',
+  open_source: 'open source',
+  api_access:  'API access',
+  soc2:        'SOC 2 certified',
+  gdpr:        'GDPR compliant',
+  self_hosted: 'self-hosted',
+  no_training: 'no training on data',
 };
 
 export default function LiveSummary({ task, constraints, query, onSubmit, toolCount = 254 }) {

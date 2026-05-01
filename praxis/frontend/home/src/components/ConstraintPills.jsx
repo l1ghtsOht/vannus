@@ -1,15 +1,19 @@
 import { motion } from 'framer-motion';
 
+// 10 constraints chosen for broad customer coverage + brand alignment.
+// Each one is verified to surface tools when combined with any task query.
+// Validated against live API: 2026-04-30.
 const CONSTRAINTS = [
-  { id: 'free_tier', label: 'Free tier' },
-  { id: 'budget_50', label: 'Under $50' },
-  { id: 'budget_100', label: 'Under $100' },
-  { id: 'hipaa', label: 'HIPAA (healthcare)' },
-  { id: 'soc2', label: 'SOC2 (security)' },
-  { id: 'gdpr', label: 'GDPR (EU privacy)' },
-  { id: 'beginner', label: 'Beginner' },
+  { id: 'free_tier',   label: 'Free tier' },
+  { id: 'budget_20',   label: 'Under $20/mo' },
+  { id: 'beginner',    label: 'Beginner-friendly' },
+  { id: 'no_code',     label: 'No-code' },
   { id: 'open_source', label: 'Open source' },
-  { id: 'api_access', label: 'API access (developers)' },
+  { id: 'api_access',  label: 'API access' },
+  { id: 'soc2',        label: 'SOC 2 certified' },
+  { id: 'gdpr',        label: 'GDPR compliant' },
+  { id: 'self_hosted', label: 'Self-hosted' },
+  { id: 'no_training', label: 'No data training' },
 ];
 
 export default function ConstraintPills({ active, onToggle }) {

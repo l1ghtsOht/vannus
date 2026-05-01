@@ -17,10 +17,25 @@ import useSearch from './hooks/useSearch';
 import useToolCount from './hooks/useToolCount';
 import { generateSessionId, trackEvent } from './utils/feedback';
 
+// Label text appended to query when constraint pill is active.
+// Keep in sync with CONSTRAINTS in ConstraintPills.jsx and CONSTRAINT_LABELS in LiveSummary.jsx.
+//
+// TODO (consult with Jason): the current architecture passes constraints as
+// keywords appended to the search query string. Consider routing them through
+// a structured filter API instead so "Free tier" actually eliminates paid
+// tools rather than just boosting tools whose descriptions mention "free".
+// This would align constraint behavior with the elimination-first thesis.
 const CONSTRAINT_LABELS = {
-  free_tier: 'free', budget_50: 'under $50/mo', budget_100: 'under $100/mo',
-  hipaa: 'HIPAA-compliant', soc2: 'SOC2-certified', gdpr: 'GDPR-compliant',
-  beginner: 'beginner-friendly', open_source: 'open source', api_access: 'API access',
+  free_tier:   'free',
+  budget_20:   'under $20/mo',
+  beginner:    'beginner-friendly',
+  no_code:     'no-code',
+  open_source: 'open source',
+  api_access:  'API access',
+  soc2:        'SOC 2 certified',
+  gdpr:        'GDPR compliant',
+  self_hosted: 'self-hosted',
+  no_training: 'no training on data',
 };
 
 export default function App() {
@@ -41,10 +56,14 @@ export default function App() {
   }, []);
 
   const handleSubmit = useCallback((q) => {
-    const text = q || query;
-    if (!text.trim()) return;
+    const text = (q || query).trim();
     const cLabels = [...activeConstraints].map(c => CONSTRAINT_LABELS[c] || c);
-    const fullQuery = cLabels.length ? text + ', ' + cLabels.join(', ') : text;
+    // Allow constraint-only searches: if user picks pills without typing,
+    // build the query from constraints alone instead of bailing out.
+    if (!text && cLabels.length === 0) return;
+    const fullQuery = text
+      ? (cLabels.length ? text + ', ' + cLabels.join(', ') : text)
+      : cLabels.join(', ');
     trackEvent(sessionId, 'search', { query: fullQuery });
     search(fullQuery);
   }, [query, activeConstraints, search, sessionId]);

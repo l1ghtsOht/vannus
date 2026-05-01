@@ -20,11 +20,19 @@ import { generateSessionId, trackEvent } from './utils/feedback';
 // Label text appended to query when constraint pill is active.
 // Keep in sync with CONSTRAINTS in ConstraintPills.jsx and CONSTRAINT_LABELS in LiveSummary.jsx.
 //
-// TODO (consult with Jason): the current architecture passes constraints as
-// keywords appended to the search query string. Consider routing them through
-// a structured filter API instead so "Free tier" actually eliminates paid
-// tools rather than just boosting tools whose descriptions mention "free".
-// This would align constraint behavior with the elimination-first thesis.
+// TODO (consult with Jason — partial decision made 2026-04-30):
+//   Some constraints make sense as KEYWORDS (current behavior):
+//     - free_tier: hard-filtering would empty results since most AI tools
+//       have some paid component (Jason's call, confirmed)
+//     - beginner: graduated/contextual, not binary
+//     - api_access: graduated, not binary
+//   Some constraints would work better as HARD FILTERS:
+//     - open_source, no_code, soc2, gdpr, self_hosted, no_training
+//       (binary catalog facts with strong metadata coverage)
+//   Future iteration: route binary constraints through a structured filter
+//   path that prunes non-matching tools before scoring, while keeping soft
+//   constraints in the keyword path. Mixed model is the right answer, not
+//   all-keywords or all-filters. Hold for Jason's review before implementing.
 const CONSTRAINT_LABELS = {
   free_tier:   'free',
   budget_20:   'under $20/mo',

@@ -4226,3 +4226,26 @@ try:
             _t.last_updated = _today
 except Exception:
     pass
+
+
+# ------------------------------------------------------------------
+# Indirect prompt-injection scan on tool catalog (defense-in-depth)
+# Logs warnings on suspicious content in tool descriptions / tags /
+# keywords / use_cases. Non-blocking — does not refuse to load tools.
+# Operators should review warnings before deploy.
+# ------------------------------------------------------------------
+try:
+    try:
+        from .data_integrity import scan_tool_catalog as _scan_tool_catalog
+    except ImportError:
+        from praxis.data_integrity import scan_tool_catalog as _scan_tool_catalog
+    _injection_findings = _scan_tool_catalog(TOOLS)
+    if _injection_findings:
+        import logging as _di_log
+        _di_log.getLogger("praxis.data").warning(
+            "data_integrity: %d total injection pattern(s) found across catalog — see praxis.data_integrity logs",
+            _injection_findings,
+        )
+except Exception:
+    # Scanner is defense-in-depth, never block startup if it fails
+    pass

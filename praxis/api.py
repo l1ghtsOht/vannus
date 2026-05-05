@@ -1438,6 +1438,35 @@ def create_app():
     try:
         from starlette.middleware.base import BaseHTTPMiddleware as _SHBaseMW
 
+        # Content-Security-Policy is intentionally permissive for the existing
+        # inline <script> JSON-LD blocks and inline <style> sections. Tightening
+        # 'unsafe-inline' requires moving inline scripts/styles to external files
+        # or using nonce/hash directives — defer until that refactor is justified.
+        # External resources currently allowed:
+        #   - https://www.google.com  (favicon service used in tools.html / home.html)
+        # GEO note: this header is invisible to non-browser crawlers and does not
+        # affect indexing or AI-search citation behavior.
+        _CSP_DIRECTIVES = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: https://www.google.com; "
+            "font-src 'self' data:; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self' mailto:; "
+            "object-src 'none'; "
+            "upgrade-insecure-requests"
+        )
+        # Default to report-only mode. Set PRAXIS_CSP_MODE=enforce once a week
+        # of clean violation logs confirms nothing legitimate is broken.
+        _CSP_MODE = _os.environ.get("PRAXIS_CSP_MODE", "report-only").lower()
+        _CSP_HEADER = (
+            "Content-Security-Policy" if _CSP_MODE == "enforce"
+            else "Content-Security-Policy-Report-Only"
+        )
+
         class _SecurityHeadersMW(_SHBaseMW):
             async def dispatch(self, request, call_next):
                 response = await call_next(request)
@@ -1447,6 +1476,9 @@ def create_app():
                 hdrs.setdefault("X-Frame-Options", "DENY")
                 hdrs.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
                 hdrs.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+                hdrs.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+                hdrs.setdefault("Cross-Origin-Resource-Policy", "same-origin")
+                hdrs.setdefault(_CSP_HEADER, _CSP_DIRECTIVES)
                 # HSTS only when behind HTTPS (Railway provides TLS termination)
                 if request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https":
                     hdrs.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")

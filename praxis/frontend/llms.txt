@@ -34,7 +34,7 @@ Vannus evaluates every tool against:
 2. **Allied Infrastructure** — Vendor headquartered in CFIUS-exempt or allied jurisdiction.
 3. **Training Privacy** — Vendor contractually guarantees zero training on customer data.
 4. **Conditional Privacy** — Verifiable opt-out mechanism for data usage.
-5. **Compliance Standard** — Active ISO/IEC 42001, SOC 2 Type II, FedRAMP, GDPR.
+5. **Compliance Standard** — Active ISO/IEC 42001, SOC 2 Type II, FedRAMP, GDPR, EU AI Act, HIPAA where applicable.
 6. **Operational Resilience** — Uptime Institute tier classification.
 7. **Exit Portability** — How easily a customer can leave the tool.
 8. **Real-World Utility** — Empirical Prompt Success Rate.

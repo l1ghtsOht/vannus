@@ -4638,6 +4638,127 @@ TOOLS = [
         last_updated="2026-05-05",
     ),
 
+    Tool(
+        name="ScrapeGraphAI",
+        description="Open-source Python library using LLMs and graph logic to build AI-driven scraping pipelines for websites and local documents (HTML/JSON/MD/XML)",
+        categories=["web scraping", "data extraction", "open-source", "AI", "developer tools", "RAG"],
+        url="https://github.com/ScrapeGraphAI/Scrapegraph-ai",
+        tags=["open source", "MIT license", "graph scraping", "LLM scraper", "BYOK", "RAG"],
+        keywords=["AI scraping library", "graph-based scraping", "LLM web extraction", "open source RAG", "Python scraper", "natural language scraping"],
+        pricing={"free_tier": True, "starter": 0, "pro": 20, "enterprise": "custom"},
+        integrations=["OpenAI", "Anthropic", "Gemini", "Groq", "Ollama", "Azure OpenAI", "LangChain", "LlamaIndex"],
+        compliance=[],
+        skill_level="advanced",
+        use_cases=["AI agent web access", "RAG document ingestion", "structured data extraction", "academic research", "self-hosted scraping pipelines", "natural-language scraper composition"],
+        stack_roles=["infrastructure"],
+        languages=["python"],
+        country_of_origin="ITA",
+        is_us_controlled=False,
+        training_data_usage="never",
+        base_model="open-source, BYOK (OpenAI/Anthropic/Gemini/Ollama/etc.)",
+        data_jurisdiction="self-hosted",
+        last_updated="2026-05-05",
+    ),
+
+    # ====================================================================
+    # ----- 2026-05 Catalog Additions (Batch 3: Cross-industry coverage)
+    # Adds depth to underserved industry hooks: legal, sales/RevOps,
+    # agent builders, and open-source coding. Each tool was selected to
+    # widen the catalog's industry surface, not chase generic AI demand.
+    # ====================================================================
+
+    # ----- AI Sales / Revenue Operations -----
+    Tool(
+        name="Clay",
+        description="AI-native sales enrichment platform combining 100+ data providers with multi-LLM AI agents for outbound prospecting, list building, and contact enrichment",
+        categories=["sales", "AI", "data enrichment", "GTM", "automation", "lead generation"],
+        url="https://clay.com",
+        tags=["sales AI", "lead enrichment", "outbound", "AI prospecting", "GTM"],
+        keywords=["AI sales enrichment", "lead generation AI", "outbound prospecting", "sales data enrichment", "Clay AI", "GTM platform"],
+        pricing={"free_tier": True, "starter": 134, "pro": 314, "enterprise": 720},
+        integrations=["Salesforce", "HubSpot", "Apollo", "LinkedIn Sales Navigator", "Slack", "Zapier", "Outreach", "Salesloft"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="intermediate",
+        use_cases=["lead list building", "contact enrichment", "ICP-based prospecting", "intent-data outreach", "RevOps automation", "GTM workflow orchestration"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="multi-LLM + 100+ data providers",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Agent Builders -----
+    Tool(
+        name="Relevance AI",
+        description="No-code AI agent builder for sales, marketing, and operations workflows with multi-LLM support and pre-built agent templates",
+        categories=["AI agents", "automation", "no-code", "AI", "workflows"],
+        url="https://relevanceai.com",
+        tags=["AI agent builder", "no-code agents", "workflow automation", "agent templates"],
+        keywords=["AI agent platform", "no-code AI agents", "Relevance AI", "agent workflows", "AI workforce", "agentic automation"],
+        pricing={"free_tier": True, "starter": 199, "pro": 234, "enterprise": "custom"},
+        integrations=["Salesforce", "HubSpot", "Slack", "Zapier", "Make", "Google Workspace", "Microsoft 365"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="beginner",
+        use_cases=["sales agent automation", "customer support agents", "research agents", "ops automation", "marketing agent workflows"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="AUS",
+        is_us_controlled=False,
+        training_data_usage="opt_out",
+        base_model="multi-LLM agent framework",
+        data_jurisdiction="EU",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Coding (Open Source) -----
+    Tool(
+        name="Aider",
+        description="Open-source AI pair-programming agent for the terminal that edits code in your local git repository using BYOK LLM access (Claude, GPT, Gemini)",
+        categories=["coding", "AI", "open-source", "developer tools", "CLI"],
+        url="https://aider.chat",
+        tags=["open source", "CLI coding", "AI pair programming", "BYOK", "git-aware"],
+        keywords=["open source coding agent", "terminal AI coding", "AI pair programmer", "free Cursor alternative", "Aider CLI", "git-aware AI"],
+        pricing={"free_tier": True, "starter": 0, "pro": 0, "enterprise": 0},
+        integrations=["OpenAI", "Anthropic", "Gemini", "Groq", "Ollama", "OpenRouter", "Git", "GitHub"],
+        compliance=[],
+        skill_level="intermediate",
+        use_cases=["AI-assisted local coding", "refactoring with git history", "test-driven development with AI", "free pair programming", "private code AI"],
+        stack_roles=["primary"],
+        languages=["python", "javascript", "typescript", "rust", "go", "java", "ruby", "c++"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="never",
+        base_model="open-source CLI, BYOK (Claude/GPT/Gemini/Ollama/etc.)",
+        data_jurisdiction="self-hosted",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Legal -----
+    Tool(
+        name="Spellbook",
+        description="AI legal contract drafting and review platform integrated as a Microsoft Word add-in, using GPT-4 and proprietary clause-trained models for litigation, transactions, and corporate work",
+        categories=["legal", "AI", "contracts", "document review", "enterprise"],
+        url="https://spellbook.legal",
+        tags=["legal AI", "contract review", "Word add-in", "clause AI"],
+        keywords=["legal AI", "contract drafting AI", "clause review", "legal Word add-in", "Spellbook legal", "litigation AI", "transactional law AI"],
+        pricing={"free_tier": False, "starter": 179, "pro": 300, "enterprise": "custom"},
+        integrations=["Microsoft Word", "Microsoft 365", "iManage", "NetDocuments"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="intermediate",
+        use_cases=["contract drafting", "clause review", "redline negotiation", "due diligence", "transactional legal work", "litigation prep"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="CAN",
+        is_us_controlled=False,
+        training_data_usage="opt_out",
+        base_model="GPT-4 + proprietary clause-trained models",
+        data_jurisdiction="CAN",
+        last_updated="2026-05-05",
+    ),
+
 ]
 
 

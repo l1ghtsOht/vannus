@@ -47,6 +47,10 @@ _ALLIED_CODES = {
 
 _HIGH_RISK_CODES = {
     "CHN", "RUS", "IRN", "PRK", "BLR", "VEN", "CUB", "SYR", "MMR",
+    # HKG: post-2020 National Security Law brought Hong Kong effectively
+    # under PRC jurisdiction. Tools domiciled there carry similar
+    # data-access risk to mainland-China-domiciled tools.
+    "HKG",
 }
 
 # Known high-risk backend entities (normalized lowercase)
@@ -164,6 +168,103 @@ _SOVEREIGNTY_INTEL = {
     "n8n":              {"origin": "DEU", "us_controlled": False, "risk_backend": False, "base": None,                "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.80},
     "deepl":            {"origin": "DEU", "us_controlled": False, "risk_backend": False, "base": "proprietary NMT",   "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.84},
     "deepseek":         {"origin": "CHN", "us_controlled": False, "risk_backend": True,  "base": "DeepSeek-V3",       "zdr": False, "train_use": "opt_in",  "jurisdiction": "CN",       "kpi": "cost_reduction",  "roi": 0.55},
+
+    # --- May 2026 Phase 3 catalog backfill (Drake, batch 2) ---
+    # Coverage of the 235 catalog tools that lacked intel. Where origin
+    # was uncertain, the entry is omitted rather than guessed — it's
+    # better to fall back to TOOL.country_of_origin than fabricate intel.
+    # Sources: each vendor's About / Imprint / corporate-records page.
+
+    # ----- Non-US tools (highest sovereignty impact) -----
+    "tabnine":              {"origin": "ISR", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "ISR",      "kpi": "time_saved",      "roi": 0.78},
+    "codesandbox":          {"origin": "NLD", "us_controlled": False, "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.80},
+    "writesonic":           {"origin": "IND", "us_controlled": False, "risk_backend": False, "base": "GPT-4 + multi",   "zdr": False, "train_use": "opt_out", "jurisdiction": "IND",      "kpi": "revenue_growth",  "roi": 0.70},
+    "murf ai":              {"origin": "IND", "us_controlled": False, "risk_backend": False, "base": "proprietary voice","zdr": False, "train_use": "opt_out", "jurisdiction": "IND",      "kpi": "time_saved",      "roi": 0.72},
+    "remove.bg":            {"origin": "AUT", "us_controlled": False, "risk_backend": False, "base": "proprietary CV",  "zdr": False, "train_use": "opt_out", "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.78},
+    "lemlist":              {"origin": "FRA", "us_controlled": False, "risk_backend": False, "base": "GPT-4",           "zdr": False, "train_use": "opt_out", "jurisdiction": "EU",       "kpi": "revenue_growth",  "roi": 0.75},
+    "miro":                 {"origin": "NLD", "us_controlled": False, "risk_backend": False, "base": "GPT-4o",          "zdr": False, "train_use": "opt_out", "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.80},
+    "tally":                {"origin": "BEL", "us_controlled": False, "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.78},
+    "tidio":                {"origin": "POL", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "EU",       "kpi": "cost_reduction",  "roi": 0.72},
+    "shopify":              {"origin": "CAN", "us_controlled": False, "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "CAN/US",   "kpi": "revenue_growth",  "roi": 0.85},
+    "1password":            {"origin": "CAN", "us_controlled": False, "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "CAN",      "kpi": "cost_reduction",  "roi": 0.92},
+    "make (integromat)":    {"origin": "CZE", "us_controlled": False, "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.82},
+    "ahrefs":               {"origin": "SGP", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "SGP",      "kpi": "time_saved",      "roi": 0.85},
+    "hotjar":               {"origin": "MLT", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.74},
+    "typeform":             {"origin": "ESP", "us_controlled": False, "risk_backend": False, "base": "GPT-4",           "zdr": False, "train_use": "opt_out", "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.76},
+    "flawless ai":          {"origin": "GBR", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "UK",       "kpi": "time_saved",      "roi": 0.70},
+    "deepdub":              {"origin": "ISR", "us_controlled": False, "risk_backend": False, "base": "proprietary voice","zdr": False, "train_use": "opt_out", "jurisdiction": "ISR",      "kpi": "time_saved",      "roi": 0.74},
+    "featurespace":         {"origin": "GBR", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "UK",       "kpi": "cost_reduction",  "roi": 0.78},
+    "quantexa":             {"origin": "GBR", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "UK",       "kpi": "cost_reduction",  "roi": 0.76},
+    "darktrace":            {"origin": "GBR", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "UK",       "kpi": "cost_reduction",  "roi": 0.80},
+    "cognism":              {"origin": "GBR", "us_controlled": False, "risk_backend": False, "base": None,              "zdr": False, "train_use": "opt_out", "jurisdiction": "UK",       "kpi": "revenue_growth",  "roi": 0.74},
+    "imerso":               {"origin": "NOR", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.72},
+    "hyperganic":           {"origin": "DEU", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.70},
+    "aidoc":                {"origin": "ISR", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "ISR/US",   "kpi": "time_saved",      "roi": 0.78},
+    "taranis":              {"origin": "ISR", "us_controlled": False, "risk_backend": False, "base": "proprietary CV",  "zdr": False, "train_use": "opt_out", "jurisdiction": "ISR/US",   "kpi": "revenue_growth",  "roi": 0.72},
+    "cropx":                {"origin": "ISR", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "ISR",      "kpi": "cost_reduction",  "roi": 0.74},
+    "outpost vfx":          {"origin": "GBR", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "UK",       "kpi": "time_saved",      "roi": 0.72},
+    "weaviate":             {"origin": "NLD", "us_controlled": False, "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.80},
+    "neo4j":                {"origin": "SWE", "us_controlled": False, "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.82},
+    "qdrant":               {"origin": "DEU", "us_controlled": False, "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.78},
+    "skema":                {"origin": "FRA", "us_controlled": False, "risk_backend": False, "base": None,              "zdr": False, "train_use": "opt_out", "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.70},
+
+    # ----- High-risk / sanctioned-adjacent (CRITICAL flags) -----
+    "deepseek-r1":          {"origin": "CHN", "us_controlled": False, "risk_backend": True,  "base": "DeepSeek-R1",     "zdr": False, "train_use": "opt_in",  "jurisdiction": "CN",       "kpi": "cost_reduction",  "roi": 0.55},
+    "qwen3-235b":           {"origin": "CHN", "us_controlled": False, "risk_backend": True,  "base": "Qwen3-235B",      "zdr": False, "train_use": "opt_in",  "jurisdiction": "CN",       "kpi": "cost_reduction",  "roi": 0.50},
+    "foxit pdf editor":     {"origin": "CHN", "us_controlled": False, "risk_backend": True,  "base": None,              "zdr": False, "train_use": "opt_in",  "jurisdiction": "CN",       "kpi": "time_saved",      "roi": 0.60},
+    "dify":                 {"origin": "HKG", "us_controlled": False, "risk_backend": True,  "base": "multi-LLM",       "zdr": False, "train_use": "opt_out", "jurisdiction": "HKG/CN",   "kpi": "time_saved",      "roi": 0.62},
+
+    # ----- Major US AI / SaaS tools (verified, high-confidence US controlled) -----
+    "openai":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "GPT-5 family",    "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.85},
+    "anthropic":            {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "Claude family",   "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.88},
+    "cursor":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "Claude + GPT-4o", "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.86},
+    "replit":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "Claude + GPT-4o", "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.78},
+    "railway":              {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.82},
+    "postman":              {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.85},
+    "linear":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.85},
+    "writer":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "Palmyra",         "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "revenue_growth",  "roi": 0.78},
+    "hemingway editor":     {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.78},
+    "quillbot":             {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.74},
+    "pika":                 {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.72},
+    "apollo.io":            {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "GPT-4o",          "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "revenue_growth",  "roi": 0.82},
+    "tableau":              {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.84},
+    "looker":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.82},
+    "google gemini":        {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "Gemini 2.5",      "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.80},
+    "clickup":              {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "GPT-4o",          "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.74},
+    "monday.com":           {"origin": "ISR", "us_controlled": False, "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "ISR/US",   "kpi": "time_saved",      "roi": 0.74},
+    "calendly":             {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.86},
+    "bubble":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.76},
+    "retool":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.84},
+    "coursera ai":          {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "GPT-4o",          "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.72},
+    "mem":                  {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "GPT-4o",          "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.74},
+    "greenhouse":           {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "cost_reduction",  "roi": 0.80},
+    "harvey ai":            {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "GPT-4o + proprietary", "zdr": True, "train_use": "never", "jurisdiction": "US",     "kpi": "time_saved",      "roi": 0.82},
+    "brex":                 {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "cost_reduction",  "roi": 0.85},
+    "quickbooks":           {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "cost_reduction",  "roi": 0.88},
+    "replicate":            {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.76},
+    "sentry":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "cost_reduction",  "roi": 0.86},
+    "datadog":              {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "cost_reduction",  "roi": 0.85},
+    "pinecone":             {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.82},
+    "zoominfo":             {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "revenue_growth",  "roi": 0.78},
+    "clearbit":             {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "revenue_growth",  "roi": 0.75},
+    "hashicorp vault":      {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "self-hosted", "kpi": "cost_reduction", "roi": 0.88},
+    "stripe billing":       {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "cost_reduction",  "roi": 0.92},
+    "activecampaign":       {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "revenue_growth",  "roi": 0.80},
+    "perplexity computer":  {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.74},
+    "replit agent":         {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "Claude + GPT-4o", "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.76},
+    "lindy.ai":             {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "GPT-4o + proprietary", "zdr": False, "train_use": "opt_out", "jurisdiction": "US",   "kpi": "time_saved",      "roi": 0.76},
+    "microsoft agent framework": {"origin": "USA", "us_controlled": True, "risk_backend": False, "base": None,           "zdr": True, "train_use": "never",  "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.84},
+    "grok 4.20 multi-agent": {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "Grok 4.20",       "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.74},
+    "viz.ai":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary",     "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.78},
+    "pathai":               {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary",     "zdr": True,  "train_use": "never",   "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.76},
+    "kount":                {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,              "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "cost_reduction",  "roi": 0.78},
+    "lm studio":            {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "BYOK local",      "zdr": True,  "train_use": "never",   "jurisdiction": "self-hosted", "kpi": "cost_reduction", "roi": 0.80},
+    "testfit":              {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.74},
+    "autodesk forma":       {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.78},
+    "ntopology":            {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.74},
+    "climate fieldview":    {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "revenue_growth",  "roi": 0.76},
+    "nobleai":              {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary",     "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.72},
+    "dubformer":            {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "proprietary voice","zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.72},
 }
 
 

@@ -148,6 +148,22 @@ _SOVEREIGNTY_INTEL = {
     "aws":              {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,           "zdr": True,  "train_use": "never",    "jurisdiction": "US",       "kpi": "cost_reduction",  "roi": 0.82},
     "docker":           {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,           "zdr": True,  "train_use": "never",    "jurisdiction": "self-hosted", "kpi": "time_saved",   "roi": 0.80},
     "terraform":        {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": None,           "zdr": True,  "train_use": "never",    "jurisdiction": "self-hosted", "kpi": "time_saved",   "roi": 0.78},
+
+    # --- Notable non-US AI tools (May 2026 backfill, Drake) ---
+    # Adding the most-cited gaps so the runtime backfill in data.py
+    # propagates correct origin/jurisdiction to Tool objects. Each verified
+    # against the vendor's own corporate page or About / Imprint section.
+    "mistral ai":       {"origin": "FRA", "us_controlled": False, "risk_backend": False, "base": "Mistral / Mixtral", "zdr": False, "train_use": "opt_out", "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.78},
+    "cohere":           {"origin": "CAN", "us_controlled": False, "risk_backend": False, "base": "Command R+",        "zdr": True,  "train_use": "never",   "jurisdiction": "CAN",      "kpi": "time_saved",      "roi": 0.76},
+    "stability ai":     {"origin": "GBR", "us_controlled": False, "risk_backend": False, "base": "Stable Diffusion",  "zdr": False, "train_use": "opt_out", "jurisdiction": "UK",       "kpi": "time_saved",      "roi": 0.70},
+    "elevenlabs":       {"origin": "GBR", "us_controlled": False, "risk_backend": False, "base": "proprietary voice", "zdr": False, "train_use": "opt_out", "jurisdiction": "UK",       "kpi": "time_saved",      "roi": 0.78},
+    "ai21 labs":        {"origin": "ISR", "us_controlled": False, "risk_backend": False, "base": "Jamba / Jurassic",  "zdr": False, "train_use": "opt_out", "jurisdiction": "ISR/US",   "kpi": "time_saved",      "roi": 0.72},
+    "synthesia":        {"origin": "GBR", "us_controlled": False, "risk_backend": False, "base": "proprietary avatar","zdr": False, "train_use": "opt_out", "jurisdiction": "UK",       "kpi": "time_saved",      "roi": 0.74},
+    "runway":           {"origin": "USA", "us_controlled": True,  "risk_backend": False, "base": "Runway Gen-3",      "zdr": False, "train_use": "opt_out", "jurisdiction": "US",       "kpi": "time_saved",      "roi": 0.78},
+    "aleph alpha":      {"origin": "DEU", "us_controlled": False, "risk_backend": False, "base": "Luminous",          "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.71},
+    "n8n":              {"origin": "DEU", "us_controlled": False, "risk_backend": False, "base": None,                "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.80},
+    "deepl":            {"origin": "DEU", "us_controlled": False, "risk_backend": False, "base": "proprietary NMT",   "zdr": True,  "train_use": "never",   "jurisdiction": "EU",       "kpi": "time_saved",      "roi": 0.84},
+    "deepseek":         {"origin": "CHN", "us_controlled": False, "risk_backend": True,  "base": "DeepSeek-V3",       "zdr": False, "train_use": "opt_in",  "jurisdiction": "CN",       "kpi": "cost_reduction",  "roi": 0.55},
 }
 
 

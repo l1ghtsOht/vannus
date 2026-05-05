@@ -4838,6 +4838,103 @@ except Exception:
 
 
 # ------------------------------------------------------------------
+# Sovereignty intel backfill (May 2026, Drake)
+#
+# data.py historically defaulted country_of_origin to "USA" for tools
+# added before the Phase-3 sovereignty fields landed in tools.py.
+# sovereignty.py carries a hand-curated _SOVEREIGNTY_INTEL dict with
+# accurate origin / jurisdiction / training-usage data for ~65 tools
+# (Mistral=FRA, Cohere=CAN, Hugging Face=USA, etc.). The runtime
+# classifier (sovereignty.assess_sovereignty) already prefers the intel
+# dict over tool attributes, so trust-tier scoring has been correct.
+#
+# The gap was at the data layer: tool.country_of_origin still read
+# "USA" for non-US tools because data.py source set the default and
+# nothing back-propagated the intel. That meant tools.html, the API,
+# and any consumer reading tool.country_of_origin directly saw the
+# wrong country.
+#
+# This loop closes that gap by treating sovereignty.py as the single
+# source of truth and pushing intel-dict values back onto Tool objects
+# at startup. Idempotent and fast (one dict lookup per tool, log once).
+# Non-default values already set on the tool are NEVER overwritten —
+# so explicit data.py tags (Kling AI=CHN, Apify=CZE, etc.) stay intact.
+# ------------------------------------------------------------------
+try:
+    try:
+        from .sovereignty import _SOVEREIGNTY_INTEL as _SOV_INTEL
+    except ImportError:
+        from praxis.sovereignty import _SOVEREIGNTY_INTEL as _SOV_INTEL
+
+    _country_fixed = 0
+    _us_ctrl_fixed = 0
+    _risk_back_fixed = 0
+    _base_model_fixed = 0
+    _jurisdiction_fixed = 0
+    _train_use_fixed = 0
+    _zdr_fixed = 0
+
+    for _t in TOOLS:
+        _intel = _SOV_INTEL.get(_t.name.lower())
+        if not _intel:
+            continue
+
+        # country_of_origin: only override if tool still has the "USA" default
+        # AND intel disagrees. Explicitly-set non-USA tags are preserved.
+        if (_intel.get("origin") and _t.country_of_origin == "USA"
+                and _intel["origin"] != "USA"):
+            _t.country_of_origin = _intel["origin"]
+            _country_fixed += 1
+
+        # is_us_controlled: only flip True->False (the default) when intel says False.
+        if "us_controlled" in _intel and _t.is_us_controlled is True \
+                and _intel["us_controlled"] is False:
+            _t.is_us_controlled = False
+            _us_ctrl_fixed += 1
+
+        # high_risk_backend: only flip False->True (the default) when intel says True.
+        if _intel.get("risk_backend") is True and _t.high_risk_backend is False:
+            _t.high_risk_backend = True
+            _risk_back_fixed += 1
+
+        # base_model: only fill if currently empty.
+        if _intel.get("base") and not _t.base_model:
+            _t.base_model = _intel["base"]
+            _base_model_fixed += 1
+
+        # data_jurisdiction: override "US" default if intel disagrees.
+        if (_intel.get("jurisdiction") and _t.data_jurisdiction == "US"
+                and _intel["jurisdiction"] != "US"):
+            _t.data_jurisdiction = _intel["jurisdiction"]
+            _jurisdiction_fixed += 1
+
+        # training_data_usage: override "opt_out" default if intel disagrees.
+        if (_intel.get("train_use") and _t.training_data_usage == "opt_out"
+                and _intel["train_use"] != "opt_out"):
+            _t.training_data_usage = _intel["train_use"]
+            _train_use_fixed += 1
+
+        # zdr_compliant: only flip False->True (the default) when intel says True.
+        if _intel.get("zdr") is True and _t.zdr_compliant is False:
+            _t.zdr_compliant = True
+            _zdr_fixed += 1
+
+    # Single summary log line (info level — useful for ops, not noise).
+    if any([_country_fixed, _us_ctrl_fixed, _risk_back_fixed, _base_model_fixed,
+            _jurisdiction_fixed, _train_use_fixed, _zdr_fixed]):
+        import logging as _bf_log
+        _bf_log.getLogger("praxis.data").info(
+            "sovereignty backfill: country=%d, us_ctrl=%d, risk_back=%d, base_model=%d, jurisdiction=%d, train_use=%d, zdr=%d",
+            _country_fixed, _us_ctrl_fixed, _risk_back_fixed, _base_model_fixed,
+            _jurisdiction_fixed, _train_use_fixed, _zdr_fixed,
+        )
+except Exception:
+    # Backfill is correctness-improving but never required for startup.
+    # Sovereignty engine still classifies correctly via intel dict at runtime.
+    pass
+
+
+# ------------------------------------------------------------------
 # Indirect prompt-injection scan on tool catalog (defense-in-depth)
 # Logs warnings on suspicious content in tool descriptions / tags /
 # keywords / use_cases. Non-blocking — does not refuse to load tools.

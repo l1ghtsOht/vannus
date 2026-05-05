@@ -618,24 +618,31 @@
     .ir-reset button:hover { color: var(--accent); }
 
     .concierge-nudge {
-      text-align: center; margin: 24px 0 4px;
-      padding: 16px 22px; border-radius: 12px;
-      background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(99,102,241,0.02));
-      border: 1px solid rgba(99,102,241,0.14);
-      transition: border-color 0.25s, background 0.25s;
+      text-align: center; margin: 28px 0 8px;
+      padding: 18px 24px; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.10), rgba(80,227,194,0.04));
+      border: 1px solid rgba(99,102,241,0.28);
+      transition: border-color 0.25s, background 0.25s, transform 0.2s;
     }
     .concierge-nudge:hover {
-      border-color: rgba(99,102,241,0.22);
-      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(99,102,241,0.03));
+      border-color: rgba(99,102,241,0.45);
+      background: linear-gradient(135deg, rgba(99,102,241,0.14), rgba(80,227,194,0.06));
+      transform: translateY(-1px);
     }
     .concierge-nudge p {
-      font-size: 13px; color: rgba(255,255,255,0.45); margin: 0; letter-spacing: 0.1px;
+      font-size: 14px; color: rgba(255,255,255,0.78); margin: 0; letter-spacing: 0.1px;
+    }
+    .concierge-nudge .nudge-eyebrow {
+      display: inline-block; font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: #a5b4fc; font-weight: 700; margin-bottom: 6px;
     }
     .concierge-nudge a {
-      color: #818cf8; font-weight: 600; text-decoration: none;
+      color: #a5b4fc; font-weight: 600; text-decoration: none;
       transition: color 0.15s;
     }
-    .concierge-nudge a:hover { color: #a5b4fc; text-decoration: underline; }
+    .concierge-nudge a:hover { color: #c7d2fe; text-decoration: underline; }
+    .concierge-nudge .nudge-arrow { display: inline-block; transition: transform 0.2s; }
+    .concierge-nudge:hover .nudge-arrow { transform: translateX(3px); }
 
     /* ── Autocomplete Dropdown — Bento Grid (Glass) ── */
     .ac-dropdown {
@@ -1588,6 +1595,7 @@
     <a href="/static/differential.html">Diagnosis</a>
     <a href="/journey">Build My Stack</a>
     <a href="/static/manifesto.html">Methodology</a>
+    <a href="/static/concierge.html">Audit</a>
   </nav>
 
   <!-- Hero + Search -->
@@ -1718,7 +1726,8 @@
           <div id="results-cards"></div>
           <div id="results-feedback" class="ir-feedback"></div>
           <div class="concierge-nudge" id="concierge-nudge">
-            <p>Need a deeper evaluation? <a href="https://vannus-concierge.netlify.app" target="_blank" rel="noopener noreferrer">Talk to a founder</a> — we audit your full stack, not just one tool.</p>
+            <span class="nudge-eyebrow">Vannus Concierge</span>
+            <p>Want a written audit of your <em>full stack</em>, not just one tool? <a href="/static/concierge.html">Get a founder-led audit <span class="nudge-arrow">&rarr;</span></a><br><span style="font-size:12px;color:rgba(255,255,255,0.45);">$7,500 fixed &middot; 14-day deliverable &middot; 5&times; savings or refund</span></p>
           </div>
           <div class="ir-reset"><button onclick="resetSearch()">&larr; Search again</button></div>
         </div>
@@ -2652,8 +2661,8 @@
       </div>
       <div class="footer-col">
         <div class="footer-heading">Services</div>
-        <a href="https://vannus-concierge.netlify.app" target="_blank" rel="noopener">Concierge &nearr;</a>
-        <span style="display:block;font-size:11px;color:rgba(255,255,255,0.22);line-height:1.6;margin-top:4px;">Founder-led stack audits</span>
+        <a href="/static/concierge.html"><strong style="color:#a5b4fc;">Concierge Audit</strong></a>
+        <span style="display:block;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6;margin-top:4px;">$7,500 founder-led stack audit. 5&times; savings or refund.</span>
       </div>
     </div>
     <div class="footer-bottom">&copy; 2026 PRAXIS AI LLC &middot; <a href="/static/privacy-policy.html">Privacy</a> &middot; <a href="/static/terms-of-service.html">Terms</a></div>

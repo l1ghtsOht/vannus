@@ -124,7 +124,11 @@ def _notify_new_signup(email: str, source: str, count: int) -> None:
         except Exception as e:
             log.warning("waitlist Slack notify failed: %s", e)
 
-    # Email-via-Resend notification
+    # Email-via-Resend notification.
+    # The reply_to is set to the signup's email so when Drake hits "Reply"
+    # in his inbox, the reply goes directly to the person who signed up —
+    # no copy-paste required. Drake can individualize the welcome reply
+    # however he wants.
     resend_key = os.environ.get("RESEND_API_KEY", "").strip()
     notify_email = os.environ.get("VANNUS_WAITLIST_NOTIFY_EMAIL", "").strip()
     if resend_key and notify_email:
@@ -132,14 +136,21 @@ def _notify_new_signup(email: str, source: str, count: int) -> None:
             payload = {
                 "from": "Vannus Waitlist <noreply@vannus.co>",
                 "to": [notify_email],
-                "subject": f"New Founding-100 signup: {email}",
+                "reply_to": email,  # ← reply goes straight to the signup
+                "subject": f"🌱 Founding-100 signup #{count}: {email}",
                 "text": (
-                    f"A new email joined the Founding-100 waitlist.\n\n"
-                    f"Email: {email}\n"
-                    f"Source: {source}\n"
-                    f"Total signups: {count} / 100\n"
-                    f"Remaining founding spots: {max(0, 100 - count)}\n\n"
-                    f"View all entries (admin): vannus.co/admin/api/waitlist?token=...\n"
+                    f"A new email joined the Vannus Founding-100 waitlist.\n\n"
+                    f"==================================================\n"
+                    f"Email:                {email}\n"
+                    f"Source:               {source}\n"
+                    f"Signup number:        #{count} of 100\n"
+                    f"Remaining spots:      {max(0, 100 - count)}\n"
+                    f"==================================================\n\n"
+                    f"To reply directly to this person, just hit Reply.\n"
+                    f"This email's Reply-To is set to {email}.\n\n"
+                    f"To see all waitlist entries (admin):\n"
+                    f"  curl -H 'X-Admin-Token: $PRAXIS_ADMIN_TOKEN' \\\n"
+                    f"       https://vannus.co/admin/api/waitlist\n"
                 ),
             }
             req = urllib.request.Request(

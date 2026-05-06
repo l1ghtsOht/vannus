@@ -90,11 +90,83 @@ def _check_rate_limit(client_ip: Optional[str]) -> bool:
         return True
 
 
+def _notify_new_signup(email: str, source: str, count: int) -> None:
+    """
+    Optional outbound notification when someone joins the waitlist.
+
+    Two notification channels, both configured via env vars (set either,
+    both, or neither — silent if neither is set):
+
+    1. Slack incoming webhook: VANNUS_WAITLIST_SLACK_WEBHOOK
+       Posts "New Vannus waitlist signup: <email> (source=<src>, total=<n>)"
+
+    2. Email-via-Resend: VANNUS_WAITLIST_NOTIFY_EMAIL +
+       RESEND_API_KEY env vars. Sends a plain-text email to the
+       configured address (typically drake@vannus.co) per signup.
+
+    Both fail silently — the signup itself must succeed even if
+    notification fails.
+    """
+    import urllib.request
+
+    # Slack notification
+    slack_url = os.environ.get("VANNUS_WAITLIST_SLACK_WEBHOOK", "").strip()
+    if slack_url:
+        try:
+            text = f"🌱 New Vannus Founding-100 signup: `{email}` (source={source}, total={count}/100)"
+            req = urllib.request.Request(
+                slack_url,
+                data=json.dumps({"text": text}).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            urllib.request.urlopen(req, timeout=5).read()
+        except Exception as e:
+            log.warning("waitlist Slack notify failed: %s", e)
+
+    # Email-via-Resend notification
+    resend_key = os.environ.get("RESEND_API_KEY", "").strip()
+    notify_email = os.environ.get("VANNUS_WAITLIST_NOTIFY_EMAIL", "").strip()
+    if resend_key and notify_email:
+        try:
+            payload = {
+                "from": "Vannus Waitlist <noreply@vannus.co>",
+                "to": [notify_email],
+                "subject": f"New Founding-100 signup: {email}",
+                "text": (
+                    f"A new email joined the Founding-100 waitlist.\n\n"
+                    f"Email: {email}\n"
+                    f"Source: {source}\n"
+                    f"Total signups: {count} / 100\n"
+                    f"Remaining founding spots: {max(0, 100 - count)}\n\n"
+                    f"View all entries (admin): vannus.co/admin/api/waitlist?token=...\n"
+                ),
+            }
+            req = urllib.request.Request(
+                "https://api.resend.com/emails",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {resend_key}",
+                    "Content-Type": "application/json",
+                },
+                method="POST",
+            )
+            urllib.request.urlopen(req, timeout=5).read()
+        except Exception as e:
+            log.warning("waitlist Resend email notify failed: %s", e)
+
+
 def add_email(email: str, source: str = "pricing", client_ip: Optional[str] = None) -> Dict[str, Any]:
     """
     Add an email to the waitlist.
 
-    Returns: {"ok": bool, "count": int, "error": str | None}
+    Returns: {"ok": bool, "count": int, "error": str | None, "duplicate": bool}
+
+    Side effects (best-effort, never block the success response):
+      - Persists to praxis/waitlist.json
+      - Optional: Slack webhook ping (VANNUS_WAITLIST_SLACK_WEBHOOK)
+      - Optional: Resend email to drake@vannus.co or wherever
+        VANNUS_WAITLIST_NOTIFY_EMAIL points (also requires RESEND_API_KEY)
     """
     email = (email or "").strip().lower()
     if not email:
@@ -118,6 +190,7 @@ def add_email(email: str, source: str = "pricing", client_ip: Optional[str] = No
     if existing:
         existing["last_seen_at"] = _now_iso()
         _save(data)
+        # No notify for duplicates — Drake doesn't need to know about resubmits
         return {"ok": True, "count": len(entries), "duplicate": True}
 
     entries.append({
@@ -126,6 +199,13 @@ def add_email(email: str, source: str = "pricing", client_ip: Optional[str] = No
         "source": (source or "")[:32],
     })
     _save(data)
+
+    # Best-effort outbound notification (Slack and/or Resend email)
+    try:
+        _notify_new_signup(email, (source or "")[:32], len(entries))
+    except Exception as e:
+        log.warning("waitlist notify pipeline failed (non-fatal): %s", e)
+
     return {"ok": True, "count": len(entries), "duplicate": False}
 
 

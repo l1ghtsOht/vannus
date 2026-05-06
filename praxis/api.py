@@ -1134,11 +1134,14 @@ except ImportError:
         _register_room_routes = None
 
 try:
-    from fastapi import FastAPI
+    from fastapi import FastAPI, Request
     from pydantic import BaseModel, Field
     FASTAPI_AVAILABLE = True
 except ImportError:
     FASTAPI_AVAILABLE = False
+    # Stub so type hints in route signatures don't break at import time
+    class Request:  # type: ignore[no-redef]
+        pass
 
     class BaseModel:
         def __init__(self, **data):
@@ -1737,6 +1740,53 @@ def create_app():
                     media_type="text/html",
                     headers={"X-Robots-Tag": "noindex, nofollow"},
                 )
+
+            # ── Admin: cost monitor dashboard ────────────────────────────
+            # Token-gated. Admin token is the PRAXIS_ADMIN_TOKEN env var.
+            # Pass via ?token=... query param. See cost_monitor.py for the
+            # data layer; admin/costs.html renders the JSON returned from
+            # /admin/api/costs/summary.
+            def _check_admin_token(request) -> bool:
+                expected = _os.environ.get("PRAXIS_ADMIN_TOKEN", "").strip()
+                if not expected:
+                    # No token configured → deny by default in any env
+                    # except local dev. Production must set this env var.
+                    if _os.environ.get("PRAXIS_ENV", "").lower() in {"dev", "local", ""}:
+                        return True
+                    return False
+                provided = (
+                    request.query_params.get("token", "")
+                    or request.headers.get("x-admin-token", "")
+                ).strip()
+                return provided == expected
+
+            @app.get("/admin/costs.html", include_in_schema=False)
+            def admin_costs_html(request: Request):
+                if not _check_admin_token(request):
+                    from starlette.responses import Response as _R
+                    return _R(content="401 — admin token required", status_code=401,
+                              headers={"X-Robots-Tag": "noindex, nofollow"})
+                return FileResponse(
+                    frontend_dir / "admin" / "costs.html",
+                    media_type="text/html",
+                    headers={"X-Robots-Tag": "noindex, nofollow"},
+                )
+
+            @app.get("/admin/api/costs/summary", include_in_schema=False)
+            def admin_costs_summary(request: Request):
+                if not _check_admin_token(request):
+                    from starlette.responses import JSONResponse as _JR
+                    return _JR({"error": "admin token required"}, status_code=401)
+                try:
+                    try:
+                        from .cost_monitor import get_admin_summary
+                    except ImportError:
+                        from praxis.cost_monitor import get_admin_summary
+                    return get_admin_summary()
+                except Exception as e:
+                    from starlette.responses import JSONResponse as _JR
+                    return _JR({"error": "cost_monitor failed", "detail": str(e)},
+                               status_code=500)
 
             @app.get("/")
             async def index():

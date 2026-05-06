@@ -33,6 +33,8 @@ praxis/config.json
 # Praxis runtime artifacts (regenerated on import)
 praxis/tools.db
 praxis/data/feedback.db
+praxis/waitlist.json
+praxis/.waitlist_ratelimit.json
 
 # SQLite side-files (WAL / journal / shm — never commit these)
 *.sqlite

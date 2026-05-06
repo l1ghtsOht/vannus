@@ -1788,6 +1788,59 @@ def create_app():
                     return _JR({"error": "cost_monitor failed", "detail": str(e)},
                                status_code=500)
 
+            # ── Waitlist routes (Founding-100 pre-launch email collection) ──
+            @app.post("/api/waitlist", include_in_schema=False)
+            async def waitlist_add(request: Request):
+                from starlette.responses import JSONResponse as _JR
+                try:
+                    body = await request.json()
+                except Exception:
+                    body = {}
+                email = (body.get("email") or "").strip()
+                source = (body.get("source") or "pricing")[:32]
+                client_ip = request.client.host if request.client else None
+                try:
+                    try:
+                        from .waitlist import add_email
+                    except ImportError:
+                        from praxis.waitlist import add_email
+                    result = add_email(email=email, source=source, client_ip=client_ip)
+                except Exception as e:
+                    return _JR({"error": "waitlist storage error", "detail": str(e)},
+                               status_code=500)
+                if not result.get("ok"):
+                    return _JR({"error": result.get("error", "unknown error")},
+                               status_code=400)
+                return _JR({"ok": True, "count": result["count"], "duplicate": result.get("duplicate", False)})
+
+            @app.get("/api/waitlist/count", include_in_schema=False)
+            def waitlist_count():
+                from starlette.responses import JSONResponse as _JR
+                try:
+                    try:
+                        from .waitlist import get_summary
+                    except ImportError:
+                        from praxis.waitlist import get_summary
+                    return _JR(get_summary(admin=False))
+                except Exception as e:
+                    return _JR({"error": "waitlist read error", "detail": str(e)},
+                               status_code=500)
+
+            @app.get("/admin/api/waitlist", include_in_schema=False)
+            def admin_waitlist_list(request: Request):
+                from starlette.responses import JSONResponse as _JR
+                if not _check_admin_token(request):
+                    return _JR({"error": "admin token required"}, status_code=401)
+                try:
+                    try:
+                        from .waitlist import get_summary
+                    except ImportError:
+                        from praxis.waitlist import get_summary
+                    return _JR(get_summary(admin=True))
+                except Exception as e:
+                    return _JR({"error": "waitlist read error", "detail": str(e)},
+                               status_code=500)
+
             @app.get("/")
             async def index():
                 import os as _os_idx

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vannus Blog — AI Procurement, Tool Sprawl, and Stack Decisions</title>
+  <meta name="description" content="Long-form thinking on AI tool selection, sprawl, procurement, and the elimination methodology. Drake Schreiber, founder of Vannus." />
+  <meta property="og:title" content="Vannus Blog" />
+  <meta property="og:description" content="Long-form thinking on AI tool selection, sprawl, procurement, and the elimination methodology." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://vannus.co/static/blog/" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="canonical" href="https://vannus.co/static/blog/" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0f'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='%236366f1'%3EV%3C/text%3E%3C/svg%3E" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Vannus Blog",
+    "description": "Long-form thinking on AI tool selection, sprawl, procurement, and elimination methodology.",
+    "url": "https://vannus.co/static/blog/",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Vannus",
+      "legalName": "PRAXIS AI LLC"
+    }
+  }
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-glass: rgba(255,255,255,0.04);
+      --border-glass: rgba(255,255,255,0.08);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-dim: rgba(255,255,255,0.35);
+      --accent: #6366f1;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg-primary); color: var(--text-primary);
+      min-height: 100vh; line-height: 1.7;
+    }
+    .nav-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0.65rem 1.5rem; display: flex; justify-content: center; gap: 2rem;
+      background: rgba(6,6,14,0.75); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .nav-bar a { color: var(--text-secondary); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px; transition: color 0.18s; }
+    .nav-bar a:hover { color: var(--text-primary); }
+    .nav-bar a.active { color: var(--accent); }
+    .nav-logo { font-weight: 700; font-size: 0.95rem; color: var(--text-primary) !important; letter-spacing: -0.5px; }
+
+    .container { max-width: 760px; margin: 0 auto; padding: 110px 24px 80px; }
+    h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 12px; }
+    .subtitle { font-size: 16px; color: var(--text-secondary); max-width: 600px; margin-bottom: 56px; line-height: 1.6; }
+
+    .post-card {
+      display: block; background: var(--bg-glass); border: 1px solid var(--border-glass);
+      border-radius: 14px; padding: 24px 28px; text-decoration: none;
+      transition: border-color 0.2s, transform 0.2s; margin-bottom: 16px;
+    }
+    .post-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-1px); }
+    .post-meta { font-size: 12px; color: var(--text-dim); letter-spacing: 0.5px; margin-bottom: 8px; }
+    .post-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; line-height: 1.4; }
+    .post-summary { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+    .empty-state {
+      text-align: center; padding: 60px 20px; border: 1px dashed var(--border-glass);
+      border-radius: 14px; color: var(--text-dim); font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav-bar">
+    <a href="/" class="nav-logo">Vannus</a>
+    <a href="/static/tools.html">Tools</a>
+    <a href="/static/differential.html">Diagnosis</a>
+    <a href="/journey">Build My Stack</a>
+    <a href="/static/manifesto.html">Methodology</a>
+    <a href="/static/concierge.html">Audit</a>
+    <a href="/static/blog/" class="active">Blog</a>
+  </nav>
+
+  <main class="container">
+    <h1>Vannus Blog</h1>
+    <p class="subtitle">Long-form thinking on AI tool selection, sprawl, procurement, and the elimination methodology. Written by Drake Schreiber, founder.</p>
+
+    <a class="post-card" href="/static/blog/why-your-team-uses-4-ai-tools-and-pays-for-12.html">
+      <div class="post-meta">May 2026 &middot; ~7 min read</div>
+      <div class="post-title">Why your team uses 4 AI tools and pays for 12</div>
+      <div class="post-summary">90% of companies have employees using personal AI tools at work; only 40% bought subscriptions. The math on shadow AI, the trust gap, and what to do about it without buying a $45,000/yr SaaS-management platform.</div>
+    </a>
+
+    <div class="empty-state" style="margin-top:40px;">
+      More posts coming. Subscribe (when there's something to subscribe to) or check back &mdash; new posts roughly every 2 weeks.
+    </div>
+  </main>
+</body>
+</html>

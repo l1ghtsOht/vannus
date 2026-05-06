@@ -104,91 +104,130 @@
     <a href="/journey">Build My Stack</a>
     <a href="/static/manifesto.html">Methodology</a>
     <a href="/static/concierge.html">Audit</a>
+    <a href="/static/blog/">Blog</a>
   </nav>
 
   <div class="container">
-    <h1>Pricing</h1>
-    <p class="subtitle">Vannus is free today. The catalog, methodology, and procurement tools are open to anyone. Paid Room workspace tiers launch later in 2026 — pricing previewed below.</p>
+    <h1 style="text-align:center;">What is Vannus Room?</h1>
+    <p class="subtitle" style="text-align:center;font-size:16px;color:rgba(255,255,255,0.7);max-width:620px;margin-left:auto;margin-right:auto;">A multi-model AI workspace. You ask one prompt, three models answer side by side, and the elimination engine tells you which one actually won on your task. Paid only — see Founding 100 below.</p>
 
-    <!-- Free tier -->
-    <div class="pricing-card featured">
-      <div class="pricing-name">Free <span class="pricing-badge" style="background:rgba(99,102,241,0.15);color:#6366f1;">Available now</span></div>
-      <div class="pricing-price">$0 <span>/ month, forever</span></div>
-      <p style="font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:16px;">The free tier is permanent — we won&apos;t make it worse to push you toward paid tiers. New free features land here first.</p>
-      <ul class="pricing-features">
-        <li class="included">Full tool catalog (284+ tools)</li>
-        <li class="included">Elimination pipeline</li>
-        <li class="included">Trust badge evaluation (9 dimensions)</li>
-        <li class="included">ROI calculator</li>
-        <li class="included">Guided journey wizard</li>
-        <li class="included">RFP builder</li>
-        <li class="included">Stack advisor</li>
-      </ul>
-      <a href="/" class="pricing-btn pricing-btn-primary">Get started &rarr;</a>
+    <!-- Free tier — surfaces what's available right now -->
+    <div class="pricing-card featured" style="margin-top:36px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div class="pricing-name">Free platform <span class="pricing-badge" style="background:rgba(99,102,241,0.15);color:#6366f1;">Available now</span></div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:6px;">Catalog, elimination methodology, RFP builder, ROI calculator — open to anyone. Always free.</p>
+        </div>
+        <a href="/" class="pricing-btn pricing-btn-primary" style="white-space:nowrap;">Use the platform &rarr;</a>
+      </div>
     </div>
 
-    <!-- Pro + Pro+ (Room workspace tiers, launching with Room) -->
-    <div class="pricing-row">
+    <!-- Pro + Pro+ (Room workspace) — feature-led, prices secondary -->
+    <div class="pricing-row" style="margin-top:18px;">
       <div class="pricing-card">
-        <div class="pricing-name">Pro <span class="pricing-badge">Launches with Room</span></div>
-        <div class="pricing-price" style="color:var(--text-dim);">$24 <span>/ month</span> <span style="font-size:12px;color:rgba(255,255,255,0.4);">(planned)</span></div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:-8px;margin-bottom:14px;">or <strong style="color:rgba(255,255,255,0.6);">$239 / year</strong> &mdash; effective $19.92/mo, save $49/yr</div>
-        <p style="font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:16px;">Everything in Free, plus:</p>
-        <ul class="pricing-features">
-          <li class="upcoming">Room — multi-model AI workspace (3-model side-by-side comparison)</li>
-          <li class="upcoming">Cheap-tier models: Gemini Flash, GPT-4o-mini, Claude Haiku</li>
-          <li class="upcoming"><strong style="color:rgba(255,255,255,0.6);">$5 monthly compute cap (hard ceiling — no surprise bills)</strong></li>
-          <li class="upcoming">Saved searches and history</li>
-          <li class="upcoming">Email support</li>
+        <div class="pricing-name">Pro</div>
+        <ul class="pricing-features" style="margin-top:14px;">
+          <li class="upcoming">Multi-model comparison (3 cheap-tier models)</li>
+          <li class="upcoming">$5 monthly compute cap &mdash; hard ceiling, no surprise bills</li>
+          <li class="upcoming">Saved searches, comparison history</li>
         </ul>
-        <button class="pricing-btn pricing-btn-secondary" disabled style="cursor:not-allowed;opacity:0.4;">Not available yet</button>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:13px;color:rgba(255,255,255,0.45);">
+          <strong style="color:rgba(255,255,255,0.7);">$24/mo</strong> when Room ships, or <strong style="color:rgba(255,255,255,0.7);">$239/yr</strong> (save $49)
+        </div>
       </div>
-      <div class="pricing-card" style="position:relative;">
-        <span style="position:absolute;top:-10px;right:24px;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#a5b4fc;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);padding:4px 10px;border-radius:99px;">🌱 Founding Member offer</span>
-        <div class="pricing-name">Pro+ <span class="pricing-badge">Launches with Room</span></div>
-        <div class="pricing-price" style="color:var(--text-dim);">$59 <span>/ month</span> <span style="font-size:12px;color:rgba(255,255,255,0.4);">(planned)</span></div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:-8px;margin-bottom:14px;">or <strong style="color:rgba(255,255,255,0.6);">$589 / year</strong> &mdash; effective $49.08/mo, save $119/yr</div>
-        <p style="font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:16px;">Everything in Pro, plus:</p>
-        <ul class="pricing-features">
-          <li class="upcoming">Premium models: Claude Sonnet, GPT-4o, Gemini Pro</li>
-          <li class="upcoming"><strong style="color:rgba(255,255,255,0.6);">$15 monthly compute cap (hard ceiling)</strong></li>
-          <li class="upcoming">Smart routing via elimination engine</li>
-          <li class="upcoming">First 100 subscribers lock in $59/mo for life (Founding Member)</li>
-          <li class="upcoming">Priority support &mdash; questions go directly to founder</li>
+      <div class="pricing-card" style="position:relative;border-color:rgba(99,102,241,0.28);">
+        <span style="position:absolute;top:-10px;right:24px;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#a5b4fc;background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.35);padding:4px 10px;border-radius:99px;">🌱 Founding 100</span>
+        <div class="pricing-name">Pro+</div>
+        <ul class="pricing-features" style="margin-top:14px;">
+          <li class="upcoming">Multi-model comparison + premium models (Sonnet, GPT-4o, Gemini Pro)</li>
+          <li class="upcoming">$15 monthly compute cap &mdash; hard ceiling</li>
+          <li class="upcoming">Smart routing via elimination engine + priority founder support</li>
         </ul>
-        <button class="pricing-btn pricing-btn-secondary" disabled style="cursor:not-allowed;opacity:0.4;">Not available yet</button>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:13px;color:rgba(255,255,255,0.45);">
+          <strong style="color:rgba(255,255,255,0.7);">$59/mo</strong> when Room ships, or <strong style="color:rgba(255,255,255,0.7);">$589/yr</strong> (save $119). <strong style="color:#a5b4fc;">First 100 subscribers lock in $59/mo for 24 months.</strong>
+        </div>
       </div>
     </div>
 
-    <!-- Trust signals -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px;padding:0 4px;">
-      <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;">
-        <div style="font-size:18px;margin-bottom:6px;">🔒</div>
-        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:4px;">Hard compute cap</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);line-height:1.4;">Every plan has a maximum monthly LLM spend. We hit a wall before you do.</div>
-      </div>
-      <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;">
-        <div style="font-size:18px;margin-bottom:6px;">↺</div>
-        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:4px;">Cancel anytime</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);line-height:1.4;">Cancel from account settings whenever you want. Access stays active through the rest of the period you already paid for &mdash; no prorated refund (industry standard, same as Anthropic / OpenAI). No contracts, no minimum.</div>
-      </div>
-      <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;">
-        <div style="font-size:18px;margin-bottom:6px;">🛡</div>
-        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:4px;">Privacy by default</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);line-height:1.4;">Prompts never used to train models. Your data stays yours. GDPR, EU AI Act aligned.</div>
-      </div>
-      <div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;">
-        <div style="font-size:18px;margin-bottom:6px;">✉</div>
-        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:4px;">Founder-led support</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);line-height:1.4;">Strategic questions: <a href="mailto:drake@vannus.co" style="color:#a5b4fc;text-decoration:none;">drake@vannus.co</a>. Account / billing / general help: <a href="mailto:support@vannus.co" style="color:#a5b4fc;text-decoration:none;">support@vannus.co</a>. Real human reply.</div>
+    <!-- Founding 100 waitlist (the real CTA) -->
+    <div id="waitlist-block" style="margin-top:28px;padding:28px;background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(80,227,194,0.04));border:1px solid rgba(99,102,241,0.28);border-radius:14px;text-align:center;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#a5b4fc;margin-bottom:10px;">Reserve your Founding 100 spot</div>
+      <p style="font-size:14px;color:var(--text-primary);margin-bottom:6px;line-height:1.55;">Drop your email. We&apos;ll send the moment Room opens for Pro+ founding-member access &mdash; first 100 lock in $59/mo for 24 months.</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:18px;">No spam, no marketing list. One email when it&apos;s your turn. Unsubscribe never needed because there&apos;s nothing else to send.</p>
+      <form id="waitlist-form" onsubmit="return submitWaitlist(event)" style="display:flex;gap:8px;max-width:460px;margin:0 auto;flex-wrap:wrap;justify-content:center;">
+        <input type="email" id="waitlist-email" required placeholder="you@company.com"
+               style="flex:1;min-width:200px;padding:11px 16px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:var(--text-primary);font-size:14px;font-family:inherit;outline:none;" />
+        <button type="submit" class="pricing-btn pricing-btn-primary" id="waitlist-submit" style="white-space:nowrap;">Reserve spot &rarr;</button>
+      </form>
+      <div id="waitlist-status" style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.55);min-height:18px;">
+        <span id="waitlist-count" style="opacity:0.7;">Loading current spot count…</span>
       </div>
     </div>
-    <style>@media (max-width: 720px) { .container > div[style*="grid-template-columns:repeat(4"] { grid-template-columns: 1fr 1fr !important; } }</style>
 
-    <p style="font-size:13px;color:rgba(255,255,255,0.35);margin-top:24px;text-align:center;line-height:1.6;">
-      No payment required today. The platform stays free regardless of whether Room launches paid tiers. Pricing above is planned and may change before launch.<br>
-      EU/UK customers retain a 14-day statutory cooling-off right (waived once paid services are used). See <a href="/static/terms-of-service.html" style="color:rgba(165,180,252,0.7);">Terms of Service</a>.
+    <!-- Lighter trust signals — 2 instead of 4 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px;padding:0 4px;">
+      <div style="padding:14px 18px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;">
+        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:4px;">🔒 Hard compute cap</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Every plan has a maximum monthly LLM spend. We hit a wall before you do. No metered surprise bills.</div>
+      </div>
+      <div style="padding:14px 18px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;">
+        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:4px;">↺ Cancel anytime, same as Anthropic / OpenAI</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Cancel anytime. Access stays through your paid period; no prorated refunds. Prompts never trained on. <a href="/static/terms-of-service.html" style="color:#a5b4fc;text-decoration:none;">Full terms</a>.</div>
+      </div>
+    </div>
+    <style>@media (max-width: 720px) { .container > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; } }</style>
+
+    <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:20px;text-align:center;line-height:1.6;">
+      No payment required today. Pricing above is planned and may change before launch. The free platform stays free regardless of whether Room launches paid tiers.
     </p>
+
+    <script>
+      async function loadWaitlistCount() {
+        try {
+          const res = await fetch('/api/waitlist/count');
+          if (!res.ok) return;
+          const d = await res.json();
+          const el = document.getElementById('waitlist-count');
+          const total = Number(d.count || 0);
+          const remaining = Math.max(0, 100 - total);
+          if (total === 0) {
+            el.textContent = '100 founding-member spots available.';
+          } else if (remaining === 0) {
+            el.textContent = 'Waitlist closed — 100 spots claimed. We will notify when standard Pro+ opens.';
+          } else {
+            el.textContent = total + ' on the waitlist · ' + remaining + ' founding-member spots remaining';
+          }
+        } catch (e) { /* silent */ }
+      }
+      async function submitWaitlist(ev) {
+        ev.preventDefault();
+        const btn = document.getElementById('waitlist-submit');
+        const status = document.getElementById('waitlist-status');
+        const email = document.getElementById('waitlist-email').value.trim();
+        btn.disabled = true; btn.textContent = 'Reserving…';
+        try {
+          const res = await fetch('/api/waitlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, source: 'pricing-page' })
+          });
+          const d = await res.json().catch(() => ({}));
+          if (res.ok) {
+            status.innerHTML = '<span style="color:var(--accent-secondary,#50e3c2);">✓ You\'re on the list. We\'ll email when Pro+ opens.</span>';
+            document.getElementById('waitlist-form').style.display = 'none';
+            setTimeout(loadWaitlistCount, 500);
+          } else {
+            status.innerHTML = '<span style="color:#f5a623;">' + (d.error || 'Could not reserve. Please try again.') + '</span>';
+          }
+        } catch (e) {
+          status.innerHTML = '<span style="color:#f5a623;">Network error — try again in a moment.</span>';
+        } finally {
+          btn.disabled = false; btn.textContent = 'Reserve spot →';
+        }
+        return false;
+      }
+      loadWaitlistCount();
+    </script>
 
     <!-- Concierge upsell -->
     <div style="text-align:center;margin:40px 0 0;padding:28px 24px;background:rgba(99,102,241,0.04);border:1px solid rgba(99,102,241,0.12);border-radius:14px;">

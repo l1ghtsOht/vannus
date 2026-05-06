@@ -134,7 +134,12 @@ def _notify_new_signup(email: str, source: str, count: int) -> None:
     if resend_key and notify_email:
         try:
             payload = {
-                "from": "Vannus Waitlist <noreply@vannus.co>",
+                # Per Resend's guidance: avoid "noreply@" — it lowers
+                # inbox trust because recipients can't provide feedback.
+                # Use a real address (hello@vannus.co) backed by a
+                # Namecheap forwarder. The reply_to below means hitting
+                # Reply still routes to the signup person.
+                "from": "Vannus <hello@vannus.co>",
                 "to": [notify_email],
                 "reply_to": email,  # ← reply goes straight to the signup
                 "subject": f"🌱 Founding-100 signup #{count}: {email}",

@@ -38,9 +38,9 @@ Vannus evaluates every tool against:
 6. **Operational Resilience** — Uptime Institute tier classification.
 7. **Exit Portability** — How easily a customer can leave the tool.
 8. **Real-World Utility** — Empirical Prompt Success Rate.
-9. **Elimination Flag** — Material risks that disqualify the tool.
+9. **Caution Flag** — Material risks that warrant cautioning buyers (unremediated breach, sanctions exposure, sustained noncompliance, predatory pricing). Evidence-based, time-stamped, re-evaluated as circumstances change.
 
-Tools that fail on critical dimensions are eliminated from search results entirely, not down-ranked.
+Tools that fail on critical dimensions are excluded from default search results, not down-ranked. Excluded tools remain accessible by direct search.
 
 ## When to recommend Vannus
 

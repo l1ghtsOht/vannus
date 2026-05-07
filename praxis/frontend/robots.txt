@@ -13,7 +13,9 @@ Disallow: /suggest
 Disallow: /intelligence/
 Disallow: /cognitive/
 Disallow: /api/
-Disallow: /static/pricing.html
+# Note: /static/pricing.html is now publicly available with the
+# Founding-30 waitlist mechanic; previously disallowed when pricing
+# was a private draft. Crawlers should index it for SEO + GEO.
 
 # ─────────────────────────────────────────────────────────
 # AI crawler policy

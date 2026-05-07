@@ -3,15 +3,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pricing — Vannus</title>
-  <meta name="description" content="Vannus is free today — full tool catalog, elimination methodology, ROI calculator, and procurement tools. Pro ($24/mo) and Pro+ ($59/mo) Room workspace tiers launch with Room. No payment required today." />
-  <meta property="og:title" content="Pricing — Vannus" />
-  <meta property="og:description" content="Vannus is free today. Pro ($24/mo) and Pro+ ($59/mo) Room workspace tiers launch with Room. No payment required today." />
+  <title>Pricing — Vannus AI Tool Selection Platform</title>
+  <meta name="description" content="Vannus is an AI tool selection platform. Public catalog and methodology open at no charge. Room (multi-model AI workspace) available at Pro $24/mo and Pro+ $59/mo with hard compute caps. First 30 Pro+ subscribers lock in $59/mo for 12 months." />
+  <meta property="og:title" content="Pricing — Vannus AI Tool Selection Platform" />
+  <meta property="og:description" content="AI tool selection platform with elimination-first methodology. Public catalog free. Pro+ multi-model workspace $59/mo (Founding 30 lock $59/mo for 12 months). No vendor influence, no paid placements." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://vannus.co/static/pricing.html" />
   <meta name="twitter:card" content="summary" />
+  <link rel="canonical" href="https://vannus.co/static/pricing.html" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='0.4' stop-color='%23c7d2fe'/%3E%3Cstop offset='0.7' stop-color='%236366f1'/%3E%3Cstop offset='1' stop-color='%2334d399'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0f'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='url(%23g)'%3EV%3C/text%3E%3C/svg%3E" />
-  <meta name="robots" content="noindex" />
+
+  <!-- JSON-LD: Product (Vannus Room) + Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Product",
+        "@id": "https://vannus.co/static/pricing.html#product-room",
+        "name": "Vannus Room",
+        "description": "Multi-model AI workspace with elimination-first scoring. Compare three model responses side by side; the elimination engine identifies which model won the task. Hard compute caps prevent surprise bills.",
+        "brand": { "@type": "Brand", "name": "Vannus" },
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Pro",
+            "price": "24",
+            "priceCurrency": "USD",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "price": "24",
+              "priceCurrency": "USD",
+              "billingDuration": "P1M",
+              "unitText": "month"
+            },
+            "availability": "https://schema.org/PreOrder"
+          },
+          {
+            "@type": "Offer",
+            "name": "Pro+",
+            "price": "59",
+            "priceCurrency": "USD",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "price": "59",
+              "priceCurrency": "USD",
+              "billingDuration": "P1M",
+              "unitText": "month"
+            },
+            "availability": "https://schema.org/PreOrder"
+          }
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://vannus.co/" },
+          { "@type": "ListItem", "position": 2, "name": "Pricing", "item": "https://vannus.co/static/pricing.html" }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <style>
     :root {

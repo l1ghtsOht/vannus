@@ -1858,10 +1858,17 @@ def create_app():
 
             @app.get("/")
             async def index():
+                # Serve the comprehensive static home.html with full nav
+                # (Concierge + Blog + Audit links visible on first paint).
+                # The React build at home/dist/index.html does not render the
+                # nav until JS loads and is missing the Concierge/Blog links
+                # in its bundle entirely. Static home.html is the canonical
+                # homepage.
                 import os as _os_idx
-                if _os_idx.path.isfile(_react_index):
-                    return FileResponse(_react_index, media_type="text/html")
-                return FileResponse(_static_index, media_type="text/html")
+                if _os_idx.path.isfile(_static_index):
+                    return FileResponse(_static_index, media_type="text/html")
+                # Defensive fallback only: if static is somehow missing, use React build
+                return FileResponse(_react_index, media_type="text/html")
 
             @app.get("/tools-app", tags=["Product"])
             async def tools_app():

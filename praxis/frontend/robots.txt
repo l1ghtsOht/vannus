@@ -13,7 +13,23 @@ Disallow: /suggest
 Disallow: /intelligence/
 Disallow: /cognitive/
 Disallow: /api/
-Disallow: /static/pricing.html
+# Note: /static/pricing.html is now publicly available with the
+# Founding-30 waitlist mechanic; previously disallowed when pricing
+# was a private draft. Crawlers should index it for SEO + GEO.
+
+# Block deprecated/archive content + React build-artifact directories.
+# These are accessible (StaticFiles html=True auto-serves index.html
+# in any directory) but should NOT be indexed:
+#   /static/_archive/  → stale pages from earlier product iterations
+#   /static/home/      → React app source; canonical page is /
+#   /static/tools/     → React build; canonical is /static/tools.html
+#   /static/room/      → React build; canonical is /room
+# Disallow only blocks subdirectories — file paths like /static/tools.html
+# remain crawlable (different match pattern).
+Disallow: /static/_archive/
+Disallow: /static/home/
+Disallow: /static/tools/
+Disallow: /static/room/
 
 # ─────────────────────────────────────────────────────────
 # AI crawler policy

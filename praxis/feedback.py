@@ -23,7 +23,12 @@ def _load_feedback():
     try:
         with open(FEEDBACK_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
-    except Exception:
+    except (IOError, OSError, json.JSONDecodeError) as e:
+        # Specific catch — surfaces real I/O issues and corrupt JSON in
+        # logs while still degrading gracefully so the app keeps serving.
+        # Previously a bare `except Exception: return []` swallowed
+        # everything (including bugs).
+        log.warning("feedback: could not load %s — %s: %s", FEEDBACK_FILE, type(e).__name__, e)
         return []
 
 
@@ -59,9 +64,10 @@ def record_feedback(query: str, tool_name: str, accepted: bool = None, rating: i
     try:
         if entry.get("accepted") and tool_name:
             increment_usage(tool_name, 1)
-    except Exception:
-        # non-fatal if usage increment fails
-        pass
+    except Exception as e:
+        # Non-fatal if usage increment fails — but log it so flaky usage
+        # writes don't disappear silently. Previously this was an opaque pass.
+        log.debug("feedback: increment_usage failed for %s — %s: %s", tool_name, type(e).__name__, e)
 
     # Auto-learn: trigger learning cycle every N feedback entries
     _maybe_auto_learn(len(entries))

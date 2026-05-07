@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vannus Concierge — Founder-Led AI Stack Audit</title>
+  <meta name="description" content="A $7,500 founder-led audit of your full AI stack. Pre-screened intake, written deliverable in 14 days, walkthrough call, optional ongoing retainer." />
+  <meta property="og:title" content="Vannus Concierge — Founder-Led AI Stack Audit" />
+  <meta property="og:description" content="A $7,500 founder-led audit of your full AI stack. Pre-screened intake, written deliverable in 14 days, walkthrough call, optional ongoing retainer." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://vannus.co/static/concierge.html" />
+  <meta property="og:site_name" content="Vannus" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="canonical" href="https://vannus.co/static/concierge.html" />
+
+  <!-- Inline SVG favicon (matches home.html) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='0.4' stop-color='%23c7d2fe'/%3E%3Cstop offset='0.7' stop-color='%236366f1'/%3E%3Cstop offset='1' stop-color='%2334d399'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0f'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='url(%23g)'%3EV%3C/text%3E%3C/svg%3E" />
+
+  <!-- JSON-LD: Service + FAQ + Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Service",
+        "@id": "https://vannus.co/static/concierge.html#service",
+        "serviceType": "AI Stack Audit",
+        "name": "Vannus Concierge AI Stack Audit",
+        "description": "Founder-led audit of your full AI tool stack. Identifies cost waste, redundancy, and replacement opportunities. Pre-screened intake; we decline engagements where we don't believe we can find meaningful savings.",
+        "provider": {
+          "@type": "Organization",
+          "name": "Vannus",
+          "legalName": "PRAXIS AI LLC",
+          "url": "https://vannus.co"
+        },
+        "areaServed": "Global",
+        "offers": {
+          "@type": "Offer",
+          "price": "7500",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://vannus.co/static/concierge.html"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://vannus.co/" },
+          { "@type": "ListItem", "position": 2, "name": "Audit", "item": "https://vannus.co/static/concierge.html" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is the Vannus Concierge audit?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A founder-led, fixed-price evaluation of your full AI tool stack. We identify cost waste, redundancy, and replacement opportunities, then deliver a written report and a follow-up call within 14 days."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the outcome assurance?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Every engagement is pre-screened on a 20-minute intake call before contract signing. If we don't believe we can find meaningful savings in your stack, we decline the engagement rather than take the fee. After delivery, if your post-audit review at the 90-day mark surfaces concerns, we provide a follow-up assessment at no additional charge."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does the audit take?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Typically 10-14 days from kickoff to delivery, depending on the size and complexity of your stack."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much does it cost?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "$7,500 USD fixed. An optional $2,500/month retainer is available after the audit for ongoing optimization work."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-glass: rgba(255,255,255,0.06);
+      --bg-glass-hover: rgba(255,255,255,0.10);
+      --border-glass: rgba(255,255,255,0.08);
+      --border-glass-hover: rgba(255,255,255,0.18);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(255,255,255,0.55);
+      --text-dim: rgba(255,255,255,0.35);
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.35);
+      --accent-secondary: #50e3c2;
+      --accent-warm: #f5a623;
+      --accent-danger: #ef4444;
+      --radius-card: 20px;
+      --radius-sm: 12px;
+      --radius-pill: 999px;
+      --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg-primary); color: var(--text-primary);
+      min-height: 100vh; line-height: 1.7;
+    }
+
+    /* Aurora & noise (match site) */
+    .aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .aurora::before, .aurora::after {
+      content: ''; position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.2;
+    }
+    .aurora::before {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+      top: -10%; left: -5%;
+    }
+    .aurora::after {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #50e3c2 0%, transparent 70%);
+      bottom: -15%; right: -5%;
+    }
+    .noise {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.02;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 256px;
+    }
+
+    /* Nav (match site) */
+    .nav-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0.65rem 1.5rem;
+      display: flex; align-items: center; justify-content: center; gap: 2rem;
+      background: rgba(6,6,14,0.75);
+      backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.25);
+    }
+    .nav-bar a {
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px;
+      transition: color var(--transition-fast);
+    }
+    .nav-bar a:hover { color: var(--text-primary); }
+    .nav-bar a.active { color: var(--accent); }
+    .nav-logo { font-weight: 700; font-size: 0.95rem; color: var(--text-primary) !important; letter-spacing: -0.5px; }
+
+    /* Container */
+    .wrap {
+      position: relative; z-index: 2;
+      max-width: 880px; margin: 0 auto;
+      padding: 96px 1.25rem 80px;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 48px 0 56px;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); font-weight: 600;
+      padding: 6px 14px; border-radius: var(--radius-pill);
+      background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.22);
+      margin-bottom: 22px;
+    }
+    .hero-title {
+      font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight: 700;
+      letter-spacing: -1px; line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 60%, #6366f1 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero-sub {
+      font-size: 1.05rem; color: var(--text-secondary);
+      max-width: 640px; margin: 0 auto 32px;
+    }
+    .hero-cta-row {
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 24px; border-radius: var(--radius-pill);
+      font-size: 0.95rem; font-weight: 600; text-decoration: none;
+      transition: all var(--transition-fast);
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #818cf8);
+      color: #ffffff;
+      box-shadow: 0 4px 24px rgba(99,102,241,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(99,102,241,0.5);
+    }
+    .btn-secondary {
+      background: var(--bg-glass);
+      color: var(--text-primary);
+      border-color: var(--border-glass);
+      backdrop-filter: blur(12px);
+    }
+    .btn-secondary:hover {
+      background: var(--bg-glass-hover);
+      border-color: var(--border-glass-hover);
+    }
+
+    /* Trust bar under hero */
+    .trust-row {
+      display: flex; justify-content: center; gap: 28px; flex-wrap: wrap;
+      margin-top: 28px;
+      font-size: 0.83rem; color: var(--text-dim); letter-spacing: 0.3px;
+    }
+    .trust-row strong { color: var(--text-secondary); font-weight: 600; }
+
+    /* Section */
+    .section { margin: 64px 0; }
+    .section-eyebrow {
+      font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); font-weight: 700; margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: 1.6rem; font-weight: 700; letter-spacing: -0.5px;
+      margin-bottom: 14px;
+    }
+    .section-lede {
+      color: var(--text-secondary); font-size: 1rem; max-width: 700px;
+      margin-bottom: 28px;
+    }
+
+    /* Cards */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    @media (max-width: 720px) {
+      .grid-2, .grid-4 { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-card);
+      padding: 22px;
+      backdrop-filter: blur(20px);
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+    }
+    .card:hover { border-color: var(--border-glass-hover); background: var(--bg-glass-hover); }
+    .card-num {
+      display: inline-block;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 0.78rem; color: var(--accent);
+      padding: 4px 9px; border-radius: 6px;
+      background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
+      margin-bottom: 14px; letter-spacing: 1px;
+    }
+    .card h3 {
+      font-size: 1rem; font-weight: 600; margin-bottom: 8px;
+      color: var(--text-primary); letter-spacing: -0.2px;
+    }
+    .card p {
+      font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65;
+    }
+
+    /* Included list */
+    .included-list { list-style: none; padding: 0; margin: 0; }
+    .included-list li {
+      display: flex; gap: 14px; padding: 14px 0;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .included-list li:last-child { border-bottom: none; }
+    .included-list .check {
+      flex-shrink: 0; width: 22px; height: 22px;
+      border-radius: 50%; background: rgba(80,227,194,0.12);
+      border: 1px solid rgba(80,227,194,0.3);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--accent-secondary); font-weight: 700; font-size: 0.78rem;
+      margin-top: 2px;
+    }
+    .included-list .text strong { color: var(--text-primary); display: block; margin-bottom: 3px; font-size: 0.95rem; }
+    .included-list .text span { color: var(--text-secondary); font-size: 0.88rem; }
+
+    /* Pricing block */
+    .pricing-block {
+      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(80,227,194,0.04));
+      border: 1px solid rgba(99,102,241,0.22);
+      border-radius: var(--radius-card);
+      padding: 32px;
+      text-align: center;
+    }
+    .price { font-size: 2.6rem; font-weight: 700; letter-spacing: -1.5px; color: var(--text-primary); }
+    .price-note { font-size: 0.82rem; color: var(--text-dim); margin-top: 4px; }
+    .pricing-line { display: flex; justify-content: center; align-items: baseline; gap: 6px; margin: 6px 0; }
+
+    /* Guarantee callout */
+    .guarantee {
+      background: rgba(245,166,35,0.05);
+      border: 1px solid rgba(245,166,35,0.22);
+      border-radius: var(--radius-card);
+      padding: 20px 24px;
+      display: flex; gap: 18px; align-items: flex-start;
+    }
+    .guarantee-icon {
+      flex-shrink: 0; width: 32px; height: 32px;
+      border-radius: 50%; background: rgba(245,166,35,0.12);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--accent-warm); font-size: 1rem;
+    }
+    .guarantee p { font-size: 0.92rem; color: var(--text-secondary); }
+    .guarantee p strong { color: var(--text-primary); }
+
+    /* FAQ */
+    .faq-item {
+      border-bottom: 1px solid var(--border-glass);
+      padding: 18px 0;
+    }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-weight: 600; font-size: 0.98rem; color: var(--text-primary); margin-bottom: 6px; }
+    .faq-a { color: var(--text-secondary); font-size: 0.92rem; }
+
+    /* Footer */
+    .site-footer {
+      position: relative; z-index: 2;
+      border-top: 1px solid var(--border-glass);
+      padding: 36px 1.25rem 24px;
+      max-width: 1100px; margin: 60px auto 0;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 720px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+    .footer-heading {
+      font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.18em;
+      color: var(--text-dim); margin-bottom: 14px;
+    }
+    .footer-col a {
+      display: block; color: var(--text-secondary); text-decoration: none;
+      font-size: 0.86rem; padding: 4px 0;
+      transition: color var(--transition-fast);
+    }
+    .footer-col a:hover { color: var(--text-primary); }
+    .footer-bottom {
+      text-align: center; color: var(--text-dim);
+      font-size: 0.78rem; padding-top: 18px;
+      border-top: 1px solid var(--border-glass);
+    }
+    .footer-bottom a { color: var(--text-dim); margin: 0 8px; }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="noise"></div>
+
+  <nav class="nav-bar" id="nav-bar">
+    <a href="/" class="nav-logo">Vannus</a>
+    <a href="/static/tools.html">Tools</a>
+    <a href="/static/differential.html">Diagnosis</a>
+    <a href="/journey">Build My Stack</a>
+    <a href="/static/manifesto.html">Methodology</a>
+    <a href="/static/concierge.html" class="active">Audit</a>
+    <a href="/static/blog/">Blog</a>
+  </nav>
+
+  <main class="wrap">
+
+    <!-- HERO -->
+    <section class="hero">
+      <span class="hero-eyebrow">Vannus Concierge</span>
+      <h1 class="hero-title">A founder-led audit of your full AI stack &mdash; in 14 days.</h1>
+      <p class="hero-sub">Fixed price. Written deliverable. Walkthrough call. We screen every prospective engagement on the intake call: if we don't believe we can find meaningful savings in your stack, we decline rather than take the fee.</p>
+      <div class="hero-cta-row">
+        <a href="mailto:drake@vannus.co?subject=Vannus%20Concierge%20Audit%20Inquiry" class="btn btn-primary">Request an audit &rarr;</a>
+        <a href="#how-it-works" class="btn btn-secondary">How it works</a>
+      </div>
+      <div class="trust-row">
+        <span><strong>$7,500</strong> fixed price</span>
+        <span><strong>14-day</strong> deliverable</span>
+        <span><strong>Pre-screened</strong> &mdash; we decline bad-fit stacks</span>
+        <span><strong>Founder-led</strong> &mdash; not handed off</span>
+      </div>
+    </section>
+
+    <!-- WHO IT'S FOR -->
+    <section class="section">
+      <div class="section-eyebrow">Who it's for</div>
+      <h2 class="section-title">If you're paying for a stack of AI tools and you can't tell which ones earn their keep.</h2>
+      <p class="section-lede">Per Zylo's 2025 SaaS Management Index, the average org runs 305 SaaS apps and 53% of paid licenses go unused — and AI-native spend grew 108% year-over-year in 2026. Most teams paying for 8-15 AI subscriptions have no objective way to evaluate whether each tool is worth the line item. The Concierge audit answers the question for you, in writing, with numbers.</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Founders &amp; ops leaders</h3>
+          <p>Running a small or mid-size team, watching the monthly AI line items climb, and unsure which to cut. You want a fast, defensible answer.</p>
+        </div>
+        <div class="card">
+          <h3>AI procurement &amp; FinOps</h3>
+          <p>Centralizing AI tool decisions across departments. You need a vendor-neutral audit before negotiating contracts or consolidating to fewer tools.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY US — direct comparison to enterprise SaaS-management platforms -->
+    <section class="section">
+      <div class="section-eyebrow">Why us, not them</div>
+      <h2 class="section-title">SaaS-management platforms exist. They don't serve SMBs.</h2>
+      <p class="section-lede">Tools like Tropic, Zluri, Vendr, and Zylo do real work for enterprise procurement &mdash; but their floors put them out of reach for the 10,000+ SMBs that need this most. Vannus Concierge is the AI-tool audit for everyone they refuse to talk to.</p>
+
+      <table style="width:100%;border-collapse:collapse;font-size:0.88rem;margin-top:24px;background:var(--bg-glass);border-radius:14px;overflow:hidden;border:1px solid var(--border-glass);">
+        <thead>
+          <tr style="background:rgba(255,255,255,0.03);">
+            <th style="text-align:left;padding:12px 16px;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--text-dim);font-weight:600;">Provider</th>
+            <th style="text-align:left;padding:12px 16px;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--text-dim);font-weight:600;">Floor</th>
+            <th style="text-align:left;padding:12px 16px;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--text-dim);font-weight:600;">Min spend / engagement</th>
+            <th style="text-align:left;padding:12px 16px;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--text-dim);font-weight:600;">Serves SMB?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-top:1px solid var(--border-glass);">
+            <td style="padding:14px 16px;color:var(--text-secondary);">Tropic</td>
+            <td style="padding:14px 16px;color:var(--text-secondary);">$45,000/yr</td>
+            <td style="padding:14px 16px;color:var(--text-secondary);">$250K&ndash;$1M annual SaaS spend</td>
+            <td style="padding:14px 16px;color:var(--text-dim);">No</td>
+          </tr>
+          <tr style="border-top:1px solid var(--border-glass);">
+            <td style="padding:14px 16px;color:var(--text-secondary);">Zluri</td>
+            <td style="padding:14px 16px;color:var(--text-secondary);">~$38,000 ACV</td>
+            <td style="padding:14px 16px;color:var(--text-secondary);">Mid-market &amp; enterprise</td>
+            <td style="padding:14px 16px;color:var(--text-dim);">No</td>
+          </tr>
+          <tr style="border-top:1px solid var(--border-glass);">
+            <td style="padding:14px 16px;color:var(--text-secondary);">Vendr</td>
+            <td style="padding:14px 16px;color:var(--text-secondary);">Tied to total SaaS spend</td>
+            <td style="padding:14px 16px;color:var(--text-secondary);">Practical floor: enterprise</td>
+            <td style="padding:14px 16px;color:var(--text-dim);">No</td>
+          </tr>
+          <tr style="border-top:1px solid var(--border-glass);">
+            <td style="padding:14px 16px;color:var(--text-secondary);">Zylo</td>
+            <td style="padding:14px 16px;color:var(--text-secondary);">Custom enterprise</td>
+            <td style="padding:14px 16px;color:var(--text-secondary);">Mid-market+</td>
+            <td style="padding:14px 16px;color:var(--text-dim);">No</td>
+          </tr>
+          <tr style="border-top:1px solid var(--border-glass);background:rgba(99,102,241,0.05);">
+            <td style="padding:14px 16px;color:var(--text-primary);font-weight:600;">Vannus Concierge</td>
+            <td style="padding:14px 16px;color:var(--text-primary);font-weight:600;">$7,500 fixed</td>
+            <td style="padding:14px 16px;color:var(--text-secondary);">No minimum spend</td>
+            <td style="padding:14px 16px;color:var(--accent-secondary);font-weight:600;">Yes &mdash; only ROI-guaranteed offer in this band</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="font-size:0.82rem;color:var(--text-dim);margin-top:14px;line-height:1.6;">
+        Comparison floors verified May 2026 from each vendor's published pricing or marketplace listings. We aren't competing for Tropic's customers &mdash; we serve the SMBs Tropic refuses to talk to. AI-tool waste is concentrated at the SMB level (per Zylo, 53% of paid licenses go unused) and that's exactly the segment with no enterprise-SaaS-management option today.
+      </p>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section" id="how-it-works">
+      <div class="section-eyebrow">How it works</div>
+      <h2 class="section-title">Four steps. Fourteen days.</h2>
+      <p class="section-lede">No long retainer, no kickoff theater, no slide decks pretending to be insight. We take in your stack, run it through our methodology, write up the findings, and walk you through them on a call.</p>
+      <div class="grid-4">
+        <div class="card">
+          <span class="card-num">STEP 01</span>
+          <h3>Intake</h3>
+          <p>You share your current tool list, monthly spend per tool, and what each one is supposed to do. ~30 minutes of your time.</p>
+        </div>
+        <div class="card">
+          <span class="card-num">STEP 02</span>
+          <h3>Analysis</h3>
+          <p>We score each tool against the Vannus 9-dimension methodology and cross-reference against your team's actual workflow. ~7 days of our work.</p>
+        </div>
+        <div class="card">
+          <span class="card-num">STEP 03</span>
+          <h3>Written audit</h3>
+          <p>You receive a written report: keep, replace, or drop for each tool, with cited reasoning and a quantified savings estimate.</p>
+        </div>
+        <div class="card">
+          <span class="card-num">STEP 04</span>
+          <h3>Walkthrough call</h3>
+          <p>60-minute call to walk through the report, answer questions, and prioritize the first three changes to make. 30 days of follow-up email support.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHAT'S INCLUDED -->
+    <section class="section">
+      <div class="section-eyebrow">What's included</div>
+      <h2 class="section-title">Specifically, you get:</h2>
+      <ul class="included-list">
+        <li>
+          <span class="check">&check;</span>
+          <span class="text">
+            <strong>Full stack scoring report</strong>
+            <span>Every tool in your stack scored against the 9-dimension methodology, with explicit keep/replace/drop recommendations.</span>
+          </span>
+        </li>
+        <li>
+          <span class="check">&check;</span>
+          <span class="text">
+            <strong>Annualized savings estimate</strong>
+            <span>Projected annual dollar savings from the recommended changes, with cited assumptions you confirm during intake. The estimate is a directional projection based on your stated stack and pricing inputs &mdash; not a forecast or guarantee of realized outcomes.</span>
+          </span>
+        </li>
+        <li>
+          <span class="check">&check;</span>
+          <span class="text">
+            <strong>Replacement candidates</strong>
+            <span>For each tool flagged "replace," a shortlist of 2-3 alternatives drawn from our 284+ tool catalog with scoring rationale.</span>
+          </span>
+        </li>
+        <li>
+          <span class="check">&check;</span>
+          <span class="text">
+            <strong>60-minute walkthrough call</strong>
+            <span>Live Q&amp;A, prioritization, and a written 30/60/90-day action plan. Recorded if you want a copy.</span>
+          </span>
+        </li>
+        <li>
+          <span class="check">&check;</span>
+          <span class="text">
+            <strong>Up to 5 follow-up email exchanges within 30 days of delivery</strong>
+            <span>Implementation questions answered as you execute the recommendations. Bounded scope so we deliver real attention to each engagement; for ongoing implementation support, the optional retainer below is the right tier.</span>
+          </span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- PRICING -->
+    <section class="section">
+      <div class="section-eyebrow">Pricing</div>
+      <h2 class="section-title">Fixed price. No surprises.</h2>
+      <div class="pricing-block">
+        <div class="pricing-line">
+          <span class="price">$7,500</span>
+        </div>
+        <div class="price-note">USD &middot; one-time &middot; payable by ACH, wire, or card</div>
+        <div style="margin-top: 22px;">
+          <a href="mailto:drake@vannus.co?subject=Vannus%20Concierge%20Audit%20Inquiry" class="btn btn-primary">Request an audit &rarr;</a>
+        </div>
+        <div style="margin-top: 22px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7;">
+          Optional: <strong style="color: var(--text-primary);">$2,500/month retainer</strong> after the audit closes &mdash; ongoing optimization, quarterly reviews, vendor negotiation support. Available only to audit clients.
+        </div>
+      </div>
+    </section>
+
+    <!-- OUTCOME ASSURANCE -->
+    <section class="section">
+      <div class="guarantee">
+        <span class="guarantee-icon">&#9888;</span>
+        <div>
+          <p style="margin-bottom: 6px;"><strong>How we stand behind the work.</strong></p>
+          <p style="margin-bottom: 12px;"><strong>1. Pre-screened intake.</strong> Every prospective engagement starts with a 20-minute intake call before any contract is signed. If we don't believe we can find meaningful savings in your stack, we decline the engagement rather than take the fee. Our standard is to decline approximately one in three inquiries on this basis.</p>
+          <p style="margin-bottom: 12px;"><strong>2. Outcome-aligned follow-up.</strong> If, ninety (90) days after audit delivery, your post-audit review surfaces concerns about the analysis, we provide a follow-up assessment at no additional charge to revisit the recommendations against your real-world implementation experience. This is service, not refund &mdash; we think you'll get more value from a second look than from a check.</p>
+          <p>The terms of pre-screening and follow-up assessment are documented in your engagement letter and in our <a href="/static/terms-of-service.html" style="color: var(--accent); text-decoration: none;">Terms of Service</a>, Section 12.6.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section">
+      <div class="section-eyebrow">FAQ</div>
+      <h2 class="section-title">Common questions</h2>
+      <div>
+        <div class="faq-item">
+          <div class="faq-q">How is this different from a free Vannus search?</div>
+          <div class="faq-a">The free platform scores individual tools and lets you compare them. The Concierge audit takes your <em>full stack</em> as input, accounts for how the tools interact in your workflow, surfaces redundancy across categories, and delivers written recommendations specific to your team. The platform answers "is this tool good?" The audit answers "is your stack worth what you're paying for it?"</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Will you try to upsell us into other tools or services?</div>
+          <div class="faq-a">No. Replacement recommendations are drawn from our public catalog, vendor-neutral, and not tied to affiliate revenue from your specific case. The optional $2,500/month retainer exists if you want ongoing help, but the audit deliverable stands on its own.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">How is my data handled?</div>
+          <div class="faq-a">Your tool list and spend data are kept confidential and not shared. The audit deliverable is yours. We retain a redacted summary internally for case-study purposes only with your explicit permission.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">How fast can you start?</div>
+          <div class="faq-a">Typically within 5 business days of contract signing and intake. Audit completion is 10-14 days from kickoff.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Who actually does the work?</div>
+          <div class="faq-a">Every audit is founder-led. It is not handed off to a contractor, analyst, or third-party agency. That's the whole point of "Concierge."</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">What if my stack is already optimized?</div>
+          <div class="faq-a">We'll tell you on the intake call before you sign anything. If we don't believe we can find meaningful savings in your stack, we decline the engagement rather than take the fee. Our published standard is to decline approximately one in three inquiries on this basis.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Are the savings estimates guaranteed outcomes?</div>
+          <div class="faq-a">No. The savings figure in your written audit is an annualized projection based on your stated stack and pricing inputs at intake. Realized savings depend on which recommendations you implement and external factors (vendor pricing changes, organizational adoption, etc.) outside our control. The estimate is directional, not a forecast or guarantee. If at the 90-day mark your post-audit review surfaces concerns, we provide a follow-up assessment at no additional charge.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT CTA -->
+    <section class="section" style="text-align: center;">
+      <h2 class="section-title">Ready to find what you're wasting?</h2>
+      <p class="section-lede" style="margin-left: auto; margin-right: auto;">Email Drake directly. He'll reply within one business day with a 20-minute intake-call link if there's a fit, or an honest "not a fit" if there isn't.</p>
+      <a href="mailto:drake@vannus.co?subject=Vannus%20Concierge%20Audit%20Inquiry" class="btn btn-primary">drake@vannus.co &rarr;</a>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-heading">Product</div>
+        <a href="/static/tools.html">All Tools</a>
+        <a href="/static/differential.html">Diagnosis</a>
+        <a href="/journey">Build My Stack</a>
+        <a href="/room">Room</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Resources</div>
+        <a href="/static/tuesday-test.html">ROI Calculator</a>
+        <a href="/static/rfp.html">RFP Builder</a>
+        <a href="/static/stack-advisor.html">Stack Advisor</a>
+        <a href="/static/trust_badges.html">Trust Badges</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Company</div>
+        <a href="/static/manifesto.html">Methodology</a>
+        <a href="/static/partners.html">Partners</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Services</div>
+        <a href="/static/concierge.html"><strong style="color:#a5b4fc;">Concierge Audit</strong></a>
+        <span style="display:block;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6;margin-top:4px;">$7,500 founder-led stack audit. Pre-screened intake; we decline bad-fit engagements.</span>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 PRAXIS AI LLC &middot; <a href="/static/privacy-policy.html">Privacy</a> &middot; <a href="/static/terms-of-service.html">Terms</a></div>
+  </footer>
+</body>
+</html>

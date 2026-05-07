@@ -544,7 +544,7 @@ TOOLS = [
         keywords=["text-to-speech", "voice clone", "voiceover"],
         pricing={"free_tier": True, "starter": 5, "pro": 22, "enterprise": "custom"},
         integrations=["Zapier", "Descript"],
-        compliance=["SOC2", "GDPR"],
+        compliance=["SOC2", "GDPR", "EU AI Act"],
         skill_level="beginner",
         use_cases=["voiceover generation", "audiobook narration", "podcast intros", "multilingual voices"],
         stack_roles=["primary", "companion"],
@@ -561,7 +561,7 @@ TOOLS = [
         keywords=["AI avatar", "training video", "video generation"],
         pricing={"free_tier": True, "starter": 22, "pro": 67, "enterprise": "custom"},
         integrations=["LMS platforms", "Zapier", "PowerPoint"],
-        compliance=["SOC2", "GDPR"],
+        compliance=["SOC2", "GDPR", "EU AI Act"],
         skill_level="beginner",
         use_cases=["training videos", "marketing videos", "onboarding content", "multilingual videos"],
         stack_roles=["primary"],
@@ -611,7 +611,7 @@ TOOLS = [
         keywords=["transparent", "photo editing"],
         pricing={"free_tier": True, "starter": 9, "pro": 29},
         integrations=["Canva AI", "Zapier", "Adobe Photoshop"],
-        compliance=["GDPR"],
+        compliance=["GDPR", "EU AI Act"],
         skill_level="beginner",
         use_cases=["product photos", "profile pictures", "marketing images", "e-commerce"],
         stack_roles=["companion"],
@@ -895,7 +895,7 @@ TOOLS = [
         keywords=["Mistral", "Mixtral", "open-source LLM"],
         pricing={"free_tier": True, "pro": 0, "enterprise": "usage-based"},
         integrations=["LangChain", "Hugging Face", "Replicate"],
-        compliance=["GDPR"],
+        compliance=["GDPR", "EU AI Act"],
         skill_level="advanced",
         use_cases=["text generation", "code generation", "multilingual tasks", "on-premise AI"],
         stack_roles=["primary", "infrastructure"],
@@ -1116,7 +1116,7 @@ TOOLS = [
         keywords=["online store", "product management"],
         pricing={"free_tier": False, "starter": 5, "pro": 79, "enterprise": 299},
         integrations=["Zapier", "Mailchimp", "HubSpot", "Google Analytics", "Segment", "Tidio"],
-        compliance=["SOC2", "GDPR", "PCI-DSS"],
+        compliance=["SOC2", "GDPR", "PCI DSS"],
         skill_level="beginner",
         use_cases=["online store", "product catalog", "checkout", "inventory management"],
         stack_roles=["primary"],
@@ -1132,7 +1132,7 @@ TOOLS = [
         keywords=["invoicing"],
         pricing={"free_tier": True, "pro": 0, "enterprise": "usage-based"},
         integrations=["Zapier", "Shopify", "HubSpot", "Segment", "Vercel"],
-        compliance=["SOC2", "GDPR", "PCI-DSS"],
+        compliance=["SOC2", "GDPR", "PCI DSS"],
         skill_level="intermediate",
         use_cases=["payment processing", "subscription billing", "invoicing", "revenue dashboard"],
         stack_roles=["infrastructure"],
@@ -1152,7 +1152,7 @@ TOOLS = [
         keywords=["SOC2 automation", "security audit"],
         pricing={"free_tier": False, "starter": 0, "pro": 0, "enterprise": "custom"},
         integrations=["AWS", "Google Cloud", "GitHub Actions", "Slack", "Datadog"],
-        compliance=["SOC2", "GDPR", "HIPAA", "ISO27001"],
+        compliance=["SOC2", "GDPR", "HIPAA", "ISO 27001"],
         skill_level="intermediate",
         use_cases=["SOC 2 compliance", "continuous monitoring", "vendor assessments", "employee security training"],
         stack_roles=["infrastructure"],
@@ -1329,7 +1329,7 @@ TOOLS = [
         keywords=["corporate card", "expense management", "startup finance"],
         pricing={"free_tier": True, "pro": 12, "enterprise": "custom"},
         integrations=["Slack", "QuickBooks", "Netsuite", "Zapier"],
-        compliance=["SOC2", "GDPR", "PCI-DSS"],
+        compliance=["SOC2", "GDPR", "PCI DSS"],
         skill_level="beginner",
         use_cases=["expense management", "corporate cards", "bill pay", "budget tracking"],
         stack_roles=["infrastructure"],
@@ -1397,7 +1397,7 @@ TOOLS = [
         keywords=["text-to-image", "stable diffusion"],
         pricing={"free_tier": True, "starter": 10, "pro": 50, "enterprise": "custom"},
         integrations=["Replicate", "Hugging Face", "Canva AI"],
-        compliance=["GDPR"],
+        compliance=["GDPR", "EU AI Act"],
         skill_level="intermediate",
         use_cases=["image generation", "concept art", "marketing visuals", "product mockups"],
         stack_roles=["primary", "companion"],
@@ -1686,7 +1686,7 @@ TOOLS = [
         keywords=["topology", "3D printing", "additive manufacturing", "CFD", "heat exchanger", "orthopedic"],
         pricing={"free_tier": False, "enterprise": "custom"},
         integrations=["NVIDIA Omniverse", "STL/STEP exporters"],
-        compliance=["ISO 52900"],
+        compliance=["ISO 52900", "EU AI Act"],
         skill_level="advanced",
         use_cases=["lattice structure generation", "heat exchanger design", "mass-customized orthopedics"],
         stack_roles=["primary"],
@@ -1749,7 +1749,7 @@ TOOLS = [
         keywords=["lip sync", "TrueSync", "actor consent", "ethical", "ACES", "EXR"],
         pricing={"free_tier": False, "enterprise": "custom"},
         integrations=["DaVinci Resolve", "Nuke", "ACES EXR pipelines"],
-        compliance=["SAG-AFTRA AI Provisions"],
+        compliance=["SAG-AFTRA AI Provisions", "EU AI Act"],
         skill_level="advanced",
         use_cases=["ethical lip-sync localization", "foreign language adaptation", "theatrical distribution"],
         stack_roles=["primary"],
@@ -1920,7 +1920,7 @@ TOOLS = [
         keywords=["fraud", "AML", "KYC", "sanctions", "PEP", "watchlist", "identity", "verification"],
         pricing={"free_tier": False, "pro": 200, "enterprise": "custom"},
         integrations=["Salesforce", "Shopify", "PayPal"],
-        compliance=["PCI-DSS", "SOC2"],
+        compliance=["PCI DSS", "SOC2"],
         skill_level="intermediate",
         use_cases=["transaction fraud detection", "sanctions screening", "identity verification"],
         stack_roles=["primary"],
@@ -2014,7 +2014,7 @@ TOOLS = [
         keywords=["financial crime", "behavioral", "adaptive", "real-time", "banking"],
         pricing={"free_tier": False, "enterprise": "custom"},
         integrations=["Core banking systems", "Payment processors"],
-        compliance=["PCI-DSS", "SOC2"],
+        compliance=["PCI DSS", "SOC2"],
         skill_level="advanced",
         use_cases=["real-time fraud detection", "adaptive financial crime prevention", "behavioral risk scoring"],
         stack_roles=["primary"],
@@ -2241,7 +2241,7 @@ TOOLS = [
         keywords=["Darktrace", "cybersecurity", "threat detection", "anomaly", "network security", "zero-day"],
         pricing={"free_tier": False, "enterprise": "custom"},
         integrations=["SIEM platforms", "Azure Sentinel", "Splunk"],
-        compliance=["SOC2", "ISO27001", "GDPR"],
+        compliance=["SOC2", "ISO 27001", "GDPR"],
         skill_level="advanced",
         use_cases=["autonomous threat detection", "zero-day attack identification", "network anomaly monitoring", "email security"],
         stack_roles=["primary"],
@@ -3867,7 +3867,7 @@ TOOLS = [
         keywords=["stripe", "hybrid pricing", "inference credits", "invoicing"],
         pricing={"pay_per_use": True},
         integrations=["REST API", "Python", "JavaScript", "FastAPI", "webhooks"],
-        compliance=["SOC2", "PCI-DSS", "GDPR"],
+        compliance=["SOC2", "PCI DSS", "GDPR"],
         skill_level="intermediate",
         use_cases=["Hybrid action-based pricing", "inference credit management", "enterprise subscription billing", "usage metering and caps"],
         stack_roles=["infra"],
@@ -4095,7 +4095,7 @@ TOOLS = [
         keywords=["LLM", "AI app builder", "RAG pipeline", "workflow", "agents", "orchestration", "open source"],
         pricing={"free_tier": True, "starter": 59, "pro": 159, "enterprise": "custom"},
         integrations=["OpenAI", "Anthropic", "Google Gemini", "Ollama", "Langfuse", "Zapier", "Slack", "Google Search"],
-        compliance=["SOC2", "ISO27001", "GDPR"],
+        compliance=["SOC2", "ISO 27001", "GDPR"],
         skill_level="intermediate",
         use_cases=["AI chatbot development", "RAG document Q&A", "multi-agent workflow automation", "LLM app prototyping"],
         stack_roles=["primary", "infrastructure"],
@@ -4155,6 +4155,610 @@ TOOLS = [
         country_of_origin="HUN",
         last_updated="2026-04-30",
     ),
+
+    # ====================================================================
+    # ----- 2026-05 Catalog Additions (Batch 1: AI workspace + creative)
+    # Verified against vendor pricing pages and product docs as of May 2026.
+    # See ~/Desktop/vannus-catalog-audit-2026-05.md for sourcing.
+    # ====================================================================
+
+    # ----- AI Avatar / Video Generation -----
+    Tool(
+        name="HeyGen",
+        description="AI avatar video generation platform with text-to-video, voice cloning, and proprietary Avatar IV/V models for personalized video at scale",
+        categories=["video", "AI", "avatars", "marketing", "generative"],
+        url="https://heygen.com",
+        tags=["avatar", "video generation", "text-to-video", "voice cloning"],
+        keywords=["AI avatar video", "talking head video", "video automation", "marketing video", "training video", "personalized outreach"],
+        pricing={"free_tier": True, "starter": 24, "pro": 99, "enterprise": "custom"},
+        integrations=["Zapier", "Slack", "Salesforce", "HubSpot"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="beginner",
+        use_cases=["marketing videos", "training videos", "social media content", "personalized outreach", "product demos"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="proprietary (Avatar IV/V)",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="Higgsfield",
+        description="AI video diffusion platform with proprietary models (Soul, DoP, Nano Banana) for cinematic motion-aware video generation",
+        categories=["video", "AI", "generative", "creative", "marketing"],
+        url="https://higgsfield.ai",
+        tags=["AI video", "video diffusion", "cinematic AI", "motion video"],
+        keywords=["AI video generation", "cinematic video AI", "marketing video", "social media video", "creative video"],
+        pricing={"free_tier": False, "starter": 9, "pro": 29, "enterprise": "custom"},
+        integrations=[],
+        compliance=["GDPR"],
+        skill_level="beginner",
+        use_cases=["marketing videos", "social media ads", "creative experimentation", "music videos", "advertising"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="proprietary (Soul/DoP/Nano Banana diffusion)",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="Kling AI",
+        description="Kuaishou's AI video generation platform powered by Kling 2.6/3.0 models for high-quality text-to-video and image-to-video",
+        categories=["video", "AI", "generative", "creative"],
+        url="https://klingai.com",
+        tags=["AI video", "text-to-video", "image-to-video", "video generation"],
+        keywords=["AI video generation", "text-to-video", "Kling video model", "creative video AI", "long-form video"],
+        pricing={"free_tier": True, "starter": 6, "pro": 30, "enterprise": "custom"},
+        integrations=[],
+        compliance=["GDPR"],
+        skill_level="beginner",
+        use_cases=["short-form video", "marketing content", "creative video projects", "social media", "experimental video"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="CHN",
+        is_us_controlled=False,
+        high_risk_backend=True,
+        training_data_usage="opt_in",
+        base_model="Kling 2.6/3.0 (Kuaishou proprietary)",
+        data_jurisdiction="CN",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Music & Audio -----
+    Tool(
+        name="Suno",
+        description="AI music generation with proprietary diffusion models, producing full songs from text prompts including vocals and instrumentation",
+        categories=["audio", "AI", "music", "generative", "creative"],
+        url="https://suno.com",
+        tags=["music generation", "AI music", "song creation", "audio AI"],
+        keywords=["AI song generator", "AI music production", "text-to-music", "background music", "soundtrack creation"],
+        pricing={"free_tier": True, "starter": 10, "pro": 30, "enterprise": "custom"},
+        integrations=[],
+        compliance=["GDPR"],
+        skill_level="beginner",
+        use_cases=["background music", "podcast intros", "social media soundtracks", "songwriting", "creative experimentation"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="proprietary diffusion",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Documents & Presentations -----
+    Tool(
+        name="Gamma",
+        description="AI presentation and document generator combining 20+ underlying models for slides, web pages, and documents from text prompts",
+        categories=["presentations", "documents", "AI", "design", "productivity"],
+        url="https://gamma.app",
+        tags=["AI presentations", "AI slides", "document generation", "web pages"],
+        keywords=["AI pitch deck", "presentation generator", "AI slide deck", "document AI", "no-code design"],
+        pricing={"free_tier": True, "starter": 10, "pro": 20, "enterprise": "custom"},
+        integrations=["Notion", "Google Drive", "Figma"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="beginner",
+        use_cases=["pitch decks", "internal presentations", "marketing pages", "training materials", "client proposals"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="multi-LLM (20+ models incl. ChatGPT)",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Application Builders (No-Code / Low-Code) -----
+    Tool(
+        name="Lovable",
+        description="AI full-stack app builder defaulting to Gemini 3 Flash with selectable models including GPT-5, Gemini 3.1 Pro, and Claude variants",
+        categories=["coding", "AI", "no-code", "app development", "generative"],
+        url="https://lovable.dev",
+        tags=["AI coding", "app builder", "no-code", "full-stack generation"],
+        keywords=["AI app generation", "natural language coding", "rapid prototyping", "no-code development", "AI fullstack"],
+        pricing={"free_tier": True, "starter": 25, "pro": 25, "enterprise": "custom"},
+        integrations=["GitHub", "Supabase", "Stripe", "Vercel"],
+        compliance=["GDPR", "EU AI Act"],
+        skill_level="beginner",
+        use_cases=["MVP prototyping", "internal tools", "landing pages", "no-code apps", "client demos"],
+        stack_roles=["primary"],
+        languages=["javascript", "typescript", "no-code"],
+        country_of_origin="SWE",
+        is_us_controlled=False,
+        training_data_usage="opt_out",
+        base_model="Gemini 3 Flash + multi-LLM (selectable)",
+        data_jurisdiction="EU",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="Bolt.new",
+        description="In-browser AI fullstack development environment by StackBlitz, powered by Claude Sonnet 3.5 and Opus 4.6 for natural-language app building",
+        categories=["coding", "AI", "app development", "developer tools"],
+        url="https://bolt.new",
+        tags=["AI coding", "in-browser dev", "fullstack", "WebContainers"],
+        keywords=["AI fullstack development", "browser IDE", "natural language coding", "rapid prototyping", "Claude-powered coding"],
+        pricing={"free_tier": True, "starter": 20, "pro": 50, "enterprise": "custom"},
+        integrations=["GitHub", "Netlify", "Supabase", "StackBlitz"],
+        compliance=["GDPR"],
+        skill_level="intermediate",
+        use_cases=["fullstack prototyping", "client demos", "rapid MVP development", "design-to-code", "in-browser dev"],
+        stack_roles=["primary"],
+        languages=["javascript", "typescript", "python", "no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="Claude Sonnet 3.5 + Opus 4.6",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="v0",
+        description="Vercel's AI generative UI tool producing React/Next.js components from natural-language prompts with multi-tier model selection",
+        categories=["coding", "AI", "design", "developer tools", "generative"],
+        url="https://v0.app",
+        tags=["AI UI", "React generation", "design-to-code", "Vercel"],
+        keywords=["AI UI generation", "React component AI", "design-to-code", "Next.js AI", "frontend AI"],
+        pricing={"free_tier": True, "starter": 20, "pro": 30, "enterprise": 100},
+        integrations=["Vercel", "GitHub", "Figma", "Tailwind CSS"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="intermediate",
+        use_cases=["UI generation", "rapid prototyping", "design-to-code", "frontend development", "design systems"],
+        stack_roles=["primary", "companion"],
+        languages=["javascript", "typescript"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="multi-tier proprietary (Mini/Pro/Max)",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Coding IDE / Agent -----
+    Tool(
+        name="Windsurf",
+        description="AI-native IDE by Cognition Labs (formerly Codeium) using SWE-1.5 with multi-LLM support for agentic coding workflows",
+        categories=["coding", "AI", "developer tools", "IDE"],
+        url="https://windsurf.com",
+        tags=["AI IDE", "AI coding", "agentic coding", "SWE-1.5"],
+        keywords=["AI code editor", "agentic coding", "AI pair programming", "developer AI", "Cognition Windsurf"],
+        pricing={"free_tier": True, "starter": 15, "pro": 30, "enterprise": 60},
+        integrations=["GitHub", "GitLab", "Bitbucket", "Slack"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="intermediate",
+        use_cases=["AI-assisted coding", "code generation", "refactoring", "agentic workflows", "team coding"],
+        stack_roles=["primary"],
+        languages=["python", "javascript", "typescript", "rust", "go"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="SWE-1.5 + multi-LLM",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Video Production from Content -----
+    Tool(
+        name="Pictory",
+        description="AI video creation from long-form content (blogs, scripts, podcasts) using stock footage, ElevenLabs voice, and GPT scripting",
+        categories=["video", "AI", "marketing", "content creation"],
+        url="https://pictory.ai",
+        tags=["AI video", "content repurposing", "video automation"],
+        keywords=["blog to video", "AI video creator", "content repurposing", "video automation", "social video"],
+        pricing={"free_tier": True, "starter": 19, "pro": 35, "enterprise": "custom"},
+        integrations=["YouTube", "Vimeo", "Hootsuite", "Buffer"],
+        compliance=["GDPR"],
+        skill_level="beginner",
+        use_cases=["repurposing blog content", "video summarization", "social media videos", "training videos", "marketing reels"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="GPT scripting + ElevenLabs voice + stock footage",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Meeting Recording / Notes -----
+    Tool(
+        name="tl;dv",
+        description="AI meeting recording and summarization platform supporting Zoom, Google Meet, and Teams with OpenAI/Anthropic-powered transcription and notes",
+        categories=["meetings", "AI", "productivity", "transcription"],
+        url="https://tldv.io",
+        tags=["meeting AI", "transcription", "meeting notes", "summarization"],
+        keywords=["AI meeting notes", "Zoom transcription", "Google Meet AI", "automatic meeting summary", "meeting AI assistant"],
+        pricing={"free_tier": True, "starter": 18, "pro": 29, "enterprise": 98},
+        integrations=["Zoom", "Google Meet", "Microsoft Teams", "Slack", "Notion", "HubSpot", "Salesforce"],
+        compliance=["SOC2", "GDPR", "EU AI Act"],
+        skill_level="beginner",
+        use_cases=["meeting transcription", "automated meeting notes", "sales call analysis", "team collaboration", "interview recording"],
+        stack_roles=["companion"],
+        languages=["no-code"],
+        country_of_origin="DEU",
+        is_us_controlled=False,
+        training_data_usage="opt_out",
+        base_model="OpenAI/Anthropic for transcription + summarization",
+        data_jurisdiction="EU",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="Fathom",
+        description="AI meeting assistant with unlimited free recording, transcription, and LLM-powered summaries for sales and team meetings",
+        categories=["meetings", "AI", "productivity", "transcription", "sales"],
+        url="https://fathom.ai",
+        tags=["meeting AI", "transcription", "summarization", "free meeting recording"],
+        keywords=["free meeting recorder", "AI meeting notes", "Zoom transcription", "sales call AI", "automatic meeting summary"],
+        pricing={"free_tier": True, "starter": 19, "pro": 19, "enterprise": 25},
+        integrations=["Zoom", "Google Meet", "Microsoft Teams", "Salesforce", "HubSpot", "Slack", "Notion"],
+        compliance=["SOC2", "GDPR", "HIPAA"],
+        skill_level="beginner",
+        use_cases=["sales call recording", "meeting transcription", "team collaboration", "automated note-taking", "interview recording"],
+        stack_roles=["companion"],
+        languages=["no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="proprietary + LLM summarization",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    # ====================================================================
+    # ----- 2026-05 Catalog Additions (Batch 2: Web scraping & data extraction)
+    # 9 tools focused on AI-friendly web scraping, data extraction, and
+    # crawler infrastructure. Drake-prioritized category for May 2026.
+    # ====================================================================
+
+    Tool(
+        name="Firecrawl",
+        description="LLM-native web scraping platform with crawler + extraction API, returning markdown/JSON ready for RAG and AI agent ingestion",
+        categories=["web scraping", "AI", "data extraction", "developer tools", "infrastructure"],
+        url="https://firecrawl.dev",
+        tags=["scraper", "RAG", "data extraction", "LLM-native scraping"],
+        keywords=["AI scraper", "web data for LLM", "RAG data ingestion", "markdown scraper", "AI agent data"],
+        pricing={"free_tier": True, "starter": 19, "pro": 83, "enterprise": 333},
+        integrations=["LangChain", "LlamaIndex", "Mendable", "Zapier"],
+        compliance=["GDPR"],
+        skill_level="intermediate",
+        use_cases=["RAG data ingestion", "AI agent web access", "competitor intelligence", "content monitoring", "knowledge base building"],
+        stack_roles=["infrastructure"],
+        languages=["python", "javascript", "typescript"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="never",
+        base_model="open-source crawler + LLM extraction",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="Apify",
+        description="Web scraping marketplace with 27,000+ pre-built actors, custom scraper SDK, and proxy infrastructure for high-volume data extraction",
+        categories=["web scraping", "data extraction", "automation", "developer tools", "marketplace"],
+        url="https://apify.com",
+        tags=["scraper marketplace", "web scraping", "data extraction", "actors"],
+        keywords=["web scraping platform", "Apify actors", "scraper SDK", "proxy scraping", "data extraction at scale"],
+        pricing={"free_tier": True, "starter": 29, "pro": 199, "enterprise": 999},
+        integrations=["Zapier", "Make", "Slack", "Google Sheets", "Airtable", "LangChain"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="intermediate",
+        use_cases=["e-commerce price tracking", "lead generation", "social media scraping", "SERP scraping", "data pipeline backbone"],
+        stack_roles=["infrastructure"],
+        languages=["python", "javascript", "typescript", "no-code"],
+        country_of_origin="CZE",
+        is_us_controlled=False,
+        training_data_usage="never",
+        base_model="N/A (scraping infrastructure)",
+        data_jurisdiction="EU",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="Bright Data",
+        description="Enterprise-grade web data infrastructure with proxy networks, Web Scraper API, and Web Unlocker for compliance-safe high-volume scraping",
+        categories=["web scraping", "data extraction", "infrastructure", "enterprise", "proxy"],
+        url="https://brightdata.com",
+        tags=["enterprise scraper", "proxy network", "web data", "compliance-safe scraping"],
+        keywords=["enterprise web scraping", "proxy infrastructure", "compliance-safe data", "residential proxies", "web unlocker"],
+        pricing={"free_tier": False, "starter": 499, "pro": 999, "enterprise": "custom"},
+        integrations=["Snowflake", "BigQuery", "AWS", "Databricks"],
+        compliance=["SOC2", "GDPR", "ISO 27001"],
+        skill_level="advanced",
+        use_cases=["enterprise data extraction", "competitive intelligence", "market research", "pricing intelligence", "regulatory compliance research"],
+        stack_roles=["infrastructure"],
+        languages=["python", "javascript", "typescript"],
+        country_of_origin="ISR",
+        is_us_controlled=False,
+        training_data_usage="never",
+        base_model="N/A (proxy + scraping infrastructure)",
+        data_jurisdiction="EU",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="ScrapingBee",
+        description="Headless-browser scraping API with stealth proxy pool for JavaScript-heavy sites, anti-bot bypass, and developer-friendly REST interface",
+        categories=["web scraping", "data extraction", "developer tools", "infrastructure"],
+        url="https://scrapingbee.com",
+        tags=["headless browser", "scraping API", "JS rendering", "stealth scraping"],
+        keywords=["JavaScript scraping", "headless Chrome API", "anti-bot bypass", "scraping proxies", "REST scraping"],
+        pricing={"free_tier": True, "starter": 49, "pro": 249, "enterprise": 599},
+        integrations=["Zapier", "Make", "n8n"],
+        compliance=["GDPR"],
+        skill_level="intermediate",
+        use_cases=["JavaScript-heavy site scraping", "competitive monitoring", "SEO data collection", "API for scrapers", "anti-bot bypass"],
+        stack_roles=["infrastructure"],
+        languages=["python", "javascript", "typescript", "ruby", "php"],
+        country_of_origin="FRA",
+        is_us_controlled=False,
+        training_data_usage="never",
+        base_model="N/A (scraping infrastructure)",
+        data_jurisdiction="EU",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="Browse AI",
+        description="No-code visual web scraper with LLM-assisted selector generation, scheduled monitors, and structured data extraction without writing code",
+        categories=["web scraping", "data extraction", "no-code", "automation"],
+        url="https://browse.ai",
+        tags=["no-code scraper", "visual scraping", "scheduled monitors", "AI selectors"],
+        keywords=["no-code web scraping", "visual scraper", "scheduled scraping", "AI scraping selectors", "data monitoring"],
+        pricing={"free_tier": True, "starter": 49, "pro": 124, "enterprise": "custom"},
+        integrations=["Zapier", "Make", "Google Sheets", "Airtable", "Slack"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="beginner",
+        use_cases=["competitor price monitoring", "lead list building", "real-estate listing tracking", "job board scraping", "non-developer data collection"],
+        stack_roles=["primary", "infrastructure"],
+        languages=["no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="never",
+        base_model="LLM-assisted CSS/XPath selector generation",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="Octoparse",
+        description="No-code visual web scraping tool with point-and-click setup, cloud execution, and AI-assisted scraping templates for non-developers",
+        categories=["web scraping", "data extraction", "no-code"],
+        url="https://octoparse.com",
+        tags=["no-code scraper", "point-and-click", "visual scraping", "data extraction"],
+        keywords=["no-code web scraper", "visual scraping tool", "Octoparse cloud", "AI scraping", "point-and-click data"],
+        pricing={"free_tier": True, "starter": 69, "pro": 249, "enterprise": "custom"},
+        integrations=["Google Sheets", "Excel", "Zapier"],
+        compliance=["GDPR"],
+        skill_level="beginner",
+        use_cases=["e-commerce data collection", "lead generation", "market research", "academic research", "content aggregation"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="never",
+        base_model="proprietary point-and-click + AI selector",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="ScraperAPI",
+        description="High-volume scraping proxy API with anti-bot mesh, JavaScript rendering, and CAPTCHA bypass for developer-driven data extraction at scale",
+        categories=["web scraping", "data extraction", "developer tools", "infrastructure", "proxy"],
+        url="https://scraperapi.com",
+        tags=["scraping API", "proxy mesh", "anti-bot", "developer scraping"],
+        keywords=["scraper API", "proxy scraping", "anti-bot scraping", "high-volume scraping", "CAPTCHA bypass"],
+        pricing={"free_tier": True, "starter": 49, "pro": 149, "enterprise": 299},
+        integrations=["Zapier", "Make"],
+        compliance=["GDPR"],
+        skill_level="intermediate",
+        use_cases=["high-volume web scraping", "SEO monitoring", "ad verification", "price intelligence", "developer scraping pipelines"],
+        stack_roles=["infrastructure"],
+        languages=["python", "javascript", "typescript", "ruby", "php", "go"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="never",
+        base_model="proprietary anti-bot + proxy infrastructure",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="Diffbot",
+        description="AI knowledge-graph extraction platform using computer vision and proprietary LLMs to convert web pages into structured data without selectors",
+        categories=["web scraping", "data extraction", "AI", "knowledge graph", "enterprise"],
+        url="https://diffbot.com",
+        tags=["AI extraction", "knowledge graph", "structured data", "computer vision scraping"],
+        keywords=["AI web extraction", "knowledge graph API", "structured data extraction", "computer vision scraping", "no-selector scraping"],
+        pricing={"free_tier": True, "starter": 299, "pro": 999, "enterprise": "custom"},
+        integrations=["AWS", "Snowflake", "BigQuery", "Salesforce"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="advanced",
+        use_cases=["enterprise knowledge graphs", "structured data at scale", "competitive intelligence", "market mapping", "AI training data"],
+        stack_roles=["infrastructure"],
+        languages=["python", "javascript", "typescript"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="never",
+        base_model="proprietary CV + Knowledge Graph LLM",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="Crawl4AI",
+        description="Open-source LLM-friendly web crawler with self-hosting, BYOK model integration, and zero-cost license for AI agent data pipelines",
+        categories=["web scraping", "data extraction", "open-source", "developer tools", "infrastructure"],
+        url="https://docs.crawl4ai.com",
+        tags=["open source", "self-hosted scraper", "LLM-friendly", "BYOK", "free scraping"],
+        keywords=["open source web scraper", "self-hosted scraper", "AI agent crawler", "LLM scraping library", "free scraping"],
+        pricing={"free_tier": True, "starter": 0, "pro": 0, "enterprise": 0},
+        integrations=["LangChain", "LlamaIndex", "OpenAI", "Anthropic", "Gemini"],
+        compliance=[],
+        skill_level="advanced",
+        use_cases=["self-hosted RAG pipelines", "private data extraction", "free alternative to commercial scrapers", "open-source AI agents", "academic research"],
+        stack_roles=["infrastructure"],
+        languages=["python"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="never",
+        base_model="open-source, BYOK (Claude/GPT/Gemini)",
+        data_jurisdiction="self-hosted",
+        last_updated="2026-05-05",
+    ),
+
+    Tool(
+        name="ScrapeGraphAI",
+        description="Open-source Python library using LLMs and graph logic to build AI-driven scraping pipelines for websites and local documents (HTML/JSON/MD/XML)",
+        categories=["web scraping", "data extraction", "open-source", "AI", "developer tools", "RAG"],
+        url="https://github.com/ScrapeGraphAI/Scrapegraph-ai",
+        tags=["open source", "MIT license", "graph scraping", "LLM scraper", "BYOK", "RAG"],
+        keywords=["AI scraping library", "graph-based scraping", "LLM web extraction", "open source RAG", "Python scraper", "natural language scraping"],
+        pricing={"free_tier": True, "starter": 0, "pro": 20, "enterprise": "custom"},
+        integrations=["OpenAI", "Anthropic", "Gemini", "Groq", "Ollama", "Azure OpenAI", "LangChain", "LlamaIndex"],
+        compliance=[],
+        skill_level="advanced",
+        use_cases=["AI agent web access", "RAG document ingestion", "structured data extraction", "academic research", "self-hosted scraping pipelines", "natural-language scraper composition"],
+        stack_roles=["infrastructure"],
+        languages=["python"],
+        country_of_origin="ITA",
+        is_us_controlled=False,
+        training_data_usage="never",
+        base_model="open-source, BYOK (OpenAI/Anthropic/Gemini/Ollama/etc.)",
+        data_jurisdiction="self-hosted",
+        last_updated="2026-05-05",
+    ),
+
+    # ====================================================================
+    # ----- 2026-05 Catalog Additions (Batch 3: Cross-industry coverage)
+    # Adds depth to underserved industry hooks: legal, sales/RevOps,
+    # agent builders, and open-source coding. Each tool was selected to
+    # widen the catalog's industry surface, not chase generic AI demand.
+    # ====================================================================
+
+    # ----- AI Sales / Revenue Operations -----
+    Tool(
+        name="Clay",
+        description="AI-native sales enrichment platform combining 100+ data providers with multi-LLM AI agents for outbound prospecting, list building, and contact enrichment",
+        categories=["sales", "AI", "data enrichment", "GTM", "automation", "lead generation"],
+        url="https://clay.com",
+        tags=["sales AI", "lead enrichment", "outbound", "AI prospecting", "GTM"],
+        keywords=["AI sales enrichment", "lead generation AI", "outbound prospecting", "sales data enrichment", "Clay AI", "GTM platform"],
+        pricing={"free_tier": True, "starter": 134, "pro": 314, "enterprise": 720},
+        integrations=["Salesforce", "HubSpot", "Apollo", "LinkedIn Sales Navigator", "Slack", "Zapier", "Outreach", "Salesloft"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="intermediate",
+        use_cases=["lead list building", "contact enrichment", "ICP-based prospecting", "intent-data outreach", "RevOps automation", "GTM workflow orchestration"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="opt_out",
+        base_model="multi-LLM + 100+ data providers",
+        data_jurisdiction="US",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Agent Builders -----
+    Tool(
+        name="Relevance AI",
+        description="No-code AI agent builder for sales, marketing, and operations workflows with multi-LLM support and pre-built agent templates",
+        categories=["AI agents", "automation", "no-code", "AI", "workflows"],
+        url="https://relevanceai.com",
+        tags=["AI agent builder", "no-code agents", "workflow automation", "agent templates"],
+        keywords=["AI agent platform", "no-code AI agents", "Relevance AI", "agent workflows", "AI workforce", "agentic automation"],
+        pricing={"free_tier": True, "starter": 199, "pro": 234, "enterprise": "custom"},
+        integrations=["Salesforce", "HubSpot", "Slack", "Zapier", "Make", "Google Workspace", "Microsoft 365"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="beginner",
+        use_cases=["sales agent automation", "customer support agents", "research agents", "ops automation", "marketing agent workflows"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="AUS",
+        is_us_controlled=False,
+        training_data_usage="opt_out",
+        base_model="multi-LLM agent framework",
+        data_jurisdiction="EU",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Coding (Open Source) -----
+    Tool(
+        name="Aider",
+        description="Open-source AI pair-programming agent for the terminal that edits code in your local git repository using BYOK LLM access (Claude, GPT, Gemini)",
+        categories=["coding", "AI", "open-source", "developer tools", "CLI"],
+        url="https://aider.chat",
+        tags=["open source", "CLI coding", "AI pair programming", "BYOK", "git-aware"],
+        keywords=["open source coding agent", "terminal AI coding", "AI pair programmer", "free Cursor alternative", "Aider CLI", "git-aware AI"],
+        pricing={"free_tier": True, "starter": 0, "pro": 0, "enterprise": 0},
+        integrations=["OpenAI", "Anthropic", "Gemini", "Groq", "Ollama", "OpenRouter", "Git", "GitHub"],
+        compliance=[],
+        skill_level="intermediate",
+        use_cases=["AI-assisted local coding", "refactoring with git history", "test-driven development with AI", "free pair programming", "private code AI"],
+        stack_roles=["primary"],
+        languages=["python", "javascript", "typescript", "rust", "go", "java", "ruby", "c++"],
+        country_of_origin="USA",
+        is_us_controlled=True,
+        training_data_usage="never",
+        base_model="open-source CLI, BYOK (Claude/GPT/Gemini/Ollama/etc.)",
+        data_jurisdiction="self-hosted",
+        last_updated="2026-05-05",
+    ),
+
+    # ----- AI Legal -----
+    Tool(
+        name="Spellbook",
+        description="AI legal contract drafting and review platform integrated as a Microsoft Word add-in, using GPT-4 and proprietary clause-trained models for litigation, transactions, and corporate work",
+        categories=["legal", "AI", "contracts", "document review", "enterprise"],
+        url="https://spellbook.legal",
+        tags=["legal AI", "contract review", "Word add-in", "clause AI"],
+        keywords=["legal AI", "contract drafting AI", "clause review", "legal Word add-in", "Spellbook legal", "litigation AI", "transactional law AI"],
+        pricing={"free_tier": False, "starter": 179, "pro": 300, "enterprise": "custom"},
+        integrations=["Microsoft Word", "Microsoft 365", "iManage", "NetDocuments"],
+        compliance=["SOC2", "GDPR"],
+        skill_level="intermediate",
+        use_cases=["contract drafting", "clause review", "redline negotiation", "due diligence", "transactional legal work", "litigation prep"],
+        stack_roles=["primary"],
+        languages=["no-code"],
+        country_of_origin="CAN",
+        is_us_controlled=False,
+        training_data_usage="opt_out",
+        base_model="GPT-4 + proprietary clause-trained models",
+        data_jurisdiction="CAN",
+        last_updated="2026-05-05",
+    ),
+
 ]
 
 
@@ -4176,7 +4780,11 @@ def get_all_tools_dict() -> list:
 try:
     DB_PATH = Path(__file__).parent / "tools.db"
 
-    # If DB exists but has the old schema, delete it so we re-migrate
+    # If DB exists but has the old schema, delete it so we re-migrate.
+    # Bumped May 2026 (schema v3): require Phase 3 sovereignty fields so
+    # the elimination engine receives country_of_origin / base_model /
+    # is_us_controlled / etc. as set in this file. v2 DBs silently dropped
+    # these on round-trip, defaulting every tool to USA + opt_out.
     def _db_has_new_schema(p):
         import sqlite3 as _sq
         try:
@@ -4185,7 +4793,8 @@ try:
             cur.execute("PRAGMA table_info(tools)")
             cols = {row[1] for row in cur.fetchall()}
             conn.close()
-            return "pricing" in cols
+            # Schema v3 markers
+            return "pricing" in cols and "country_of_origin" in cols and "base_model" in cols
         except Exception:
             return False
 
@@ -4225,6 +4834,103 @@ try:
         if not getattr(_t, "last_updated", None):
             _t.last_updated = _today
 except Exception:
+    pass
+
+
+# ------------------------------------------------------------------
+# Sovereignty intel backfill (May 2026, Drake)
+#
+# data.py historically defaulted country_of_origin to "USA" for tools
+# added before the Phase-3 sovereignty fields landed in tools.py.
+# sovereignty.py carries a hand-curated _SOVEREIGNTY_INTEL dict with
+# accurate origin / jurisdiction / training-usage data for ~65 tools
+# (Mistral=FRA, Cohere=CAN, Hugging Face=USA, etc.). The runtime
+# classifier (sovereignty.assess_sovereignty) already prefers the intel
+# dict over tool attributes, so trust-tier scoring has been correct.
+#
+# The gap was at the data layer: tool.country_of_origin still read
+# "USA" for non-US tools because data.py source set the default and
+# nothing back-propagated the intel. That meant tools.html, the API,
+# and any consumer reading tool.country_of_origin directly saw the
+# wrong country.
+#
+# This loop closes that gap by treating sovereignty.py as the single
+# source of truth and pushing intel-dict values back onto Tool objects
+# at startup. Idempotent and fast (one dict lookup per tool, log once).
+# Non-default values already set on the tool are NEVER overwritten —
+# so explicit data.py tags (Kling AI=CHN, Apify=CZE, etc.) stay intact.
+# ------------------------------------------------------------------
+try:
+    try:
+        from .sovereignty import _SOVEREIGNTY_INTEL as _SOV_INTEL
+    except ImportError:
+        from praxis.sovereignty import _SOVEREIGNTY_INTEL as _SOV_INTEL
+
+    _country_fixed = 0
+    _us_ctrl_fixed = 0
+    _risk_back_fixed = 0
+    _base_model_fixed = 0
+    _jurisdiction_fixed = 0
+    _train_use_fixed = 0
+    _zdr_fixed = 0
+
+    for _t in TOOLS:
+        _intel = _SOV_INTEL.get(_t.name.lower())
+        if not _intel:
+            continue
+
+        # country_of_origin: only override if tool still has the "USA" default
+        # AND intel disagrees. Explicitly-set non-USA tags are preserved.
+        if (_intel.get("origin") and _t.country_of_origin == "USA"
+                and _intel["origin"] != "USA"):
+            _t.country_of_origin = _intel["origin"]
+            _country_fixed += 1
+
+        # is_us_controlled: only flip True->False (the default) when intel says False.
+        if "us_controlled" in _intel and _t.is_us_controlled is True \
+                and _intel["us_controlled"] is False:
+            _t.is_us_controlled = False
+            _us_ctrl_fixed += 1
+
+        # high_risk_backend: only flip False->True (the default) when intel says True.
+        if _intel.get("risk_backend") is True and _t.high_risk_backend is False:
+            _t.high_risk_backend = True
+            _risk_back_fixed += 1
+
+        # base_model: only fill if currently empty.
+        if _intel.get("base") and not _t.base_model:
+            _t.base_model = _intel["base"]
+            _base_model_fixed += 1
+
+        # data_jurisdiction: override "US" default if intel disagrees.
+        if (_intel.get("jurisdiction") and _t.data_jurisdiction == "US"
+                and _intel["jurisdiction"] != "US"):
+            _t.data_jurisdiction = _intel["jurisdiction"]
+            _jurisdiction_fixed += 1
+
+        # training_data_usage: override "opt_out" default if intel disagrees.
+        if (_intel.get("train_use") and _t.training_data_usage == "opt_out"
+                and _intel["train_use"] != "opt_out"):
+            _t.training_data_usage = _intel["train_use"]
+            _train_use_fixed += 1
+
+        # zdr_compliant: only flip False->True (the default) when intel says True.
+        if _intel.get("zdr") is True and _t.zdr_compliant is False:
+            _t.zdr_compliant = True
+            _zdr_fixed += 1
+
+    # Single summary log line (info level — useful for ops, not noise).
+    if any([_country_fixed, _us_ctrl_fixed, _risk_back_fixed, _base_model_fixed,
+            _jurisdiction_fixed, _train_use_fixed, _zdr_fixed]):
+        import logging as _bf_log
+        _bf_log.getLogger("praxis.data").info(
+            "sovereignty backfill: country=%d, us_ctrl=%d, risk_back=%d, base_model=%d, jurisdiction=%d, train_use=%d, zdr=%d",
+            _country_fixed, _us_ctrl_fixed, _risk_back_fixed, _base_model_fixed,
+            _jurisdiction_fixed, _train_use_fixed, _zdr_fixed,
+        )
+except Exception:
+    # Backfill is correctness-improving but never required for startup.
+    # Sovereignty engine still classifies correctly via intel dict at runtime.
     pass
 
 

@@ -1134,11 +1134,14 @@ except ImportError:
         _register_room_routes = None
 
 try:
-    from fastapi import FastAPI
+    from fastapi import FastAPI, Request
     from pydantic import BaseModel, Field
     FASTAPI_AVAILABLE = True
 except ImportError:
     FASTAPI_AVAILABLE = False
+    # Stub so type hints in route signatures don't break at import time
+    class Request:  # type: ignore[no-redef]
+        pass
 
     class BaseModel:
         def __init__(self, **data):
@@ -1438,6 +1441,35 @@ def create_app():
     try:
         from starlette.middleware.base import BaseHTTPMiddleware as _SHBaseMW
 
+        # Content-Security-Policy is intentionally permissive for the existing
+        # inline <script> JSON-LD blocks and inline <style> sections. Tightening
+        # 'unsafe-inline' requires moving inline scripts/styles to external files
+        # or using nonce/hash directives — defer until that refactor is justified.
+        # External resources currently allowed:
+        #   - https://www.google.com  (favicon service used in tools.html / home.html)
+        # GEO note: this header is invisible to non-browser crawlers and does not
+        # affect indexing or AI-search citation behavior.
+        _CSP_DIRECTIVES = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: https://www.google.com; "
+            "font-src 'self' data:; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self' mailto:; "
+            "object-src 'none'; "
+            "upgrade-insecure-requests"
+        )
+        # Default to report-only mode. Set PRAXIS_CSP_MODE=enforce once a week
+        # of clean violation logs confirms nothing legitimate is broken.
+        _CSP_MODE = _os.environ.get("PRAXIS_CSP_MODE", "report-only").lower()
+        _CSP_HEADER = (
+            "Content-Security-Policy" if _CSP_MODE == "enforce"
+            else "Content-Security-Policy-Report-Only"
+        )
+
         class _SecurityHeadersMW(_SHBaseMW):
             async def dispatch(self, request, call_next):
                 response = await call_next(request)
@@ -1447,6 +1479,9 @@ def create_app():
                 hdrs.setdefault("X-Frame-Options", "DENY")
                 hdrs.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
                 hdrs.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+                hdrs.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+                hdrs.setdefault("Cross-Origin-Resource-Policy", "same-origin")
+                hdrs.setdefault(_CSP_HEADER, _CSP_DIRECTIVES)
                 # HSTS only when behind HTTPS (Railway provides TLS termination)
                 if request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https":
                     hdrs.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
@@ -1705,6 +1740,120 @@ def create_app():
                     media_type="text/html",
                     headers={"X-Robots-Tag": "noindex, nofollow"},
                 )
+
+            # ── Admin: cost monitor dashboard ────────────────────────────
+            # Token-gated. Admin token is the PRAXIS_ADMIN_TOKEN env var.
+            # Pass via ?token=... query param OR X-Admin-Token header.
+            # See cost_monitor.py for the data layer; admin/costs.html
+            # renders the JSON returned from /admin/api/costs/summary.
+            #
+            # Security model (deny-by-default):
+            #   1. PRAXIS_ADMIN_TOKEN unset + non-localhost request → 403
+            #   2. PRAXIS_ADMIN_TOKEN unset + localhost AND PRAXIS_ENV in
+            #      {dev, local} → allow (developer convenience)
+            #   3. PRAXIS_ADMIN_TOKEN set → require constant-time match
+            import hmac as _hmac
+            def _check_admin_token(request) -> bool:
+                expected = _os.environ.get("PRAXIS_ADMIN_TOKEN", "").strip()
+                if not expected:
+                    # No token configured → DENY unless explicitly in dev
+                    # mode AND the request is from localhost. This closes
+                    # the "forgot to set the env var in prod" footgun.
+                    env = _os.environ.get("PRAXIS_ENV", "").lower()
+                    if env not in {"dev", "local"}:
+                        return False
+                    client_host = request.client.host if request.client else ""
+                    return client_host in {"127.0.0.1", "::1", "localhost"}
+                provided = (
+                    request.query_params.get("token", "")
+                    or request.headers.get("x-admin-token", "")
+                ).strip()
+                # Constant-time comparison defends against timing attacks.
+                # Bytes form required by hmac.compare_digest.
+                return _hmac.compare_digest(
+                    provided.encode("utf-8"), expected.encode("utf-8")
+                )
+
+            @app.get("/admin/costs.html", include_in_schema=False)
+            def admin_costs_html(request: Request):
+                if not _check_admin_token(request):
+                    from starlette.responses import Response as _R
+                    return _R(content="401 — admin token required", status_code=401,
+                              headers={"X-Robots-Tag": "noindex, nofollow"})
+                return FileResponse(
+                    frontend_dir / "admin" / "costs.html",
+                    media_type="text/html",
+                    headers={"X-Robots-Tag": "noindex, nofollow"},
+                )
+
+            @app.get("/admin/api/costs/summary", include_in_schema=False)
+            def admin_costs_summary(request: Request):
+                if not _check_admin_token(request):
+                    from starlette.responses import JSONResponse as _JR
+                    return _JR({"error": "admin token required"}, status_code=401)
+                try:
+                    try:
+                        from .cost_monitor import get_admin_summary
+                    except ImportError:
+                        from praxis.cost_monitor import get_admin_summary
+                    return get_admin_summary()
+                except Exception as e:
+                    from starlette.responses import JSONResponse as _JR
+                    return _JR({"error": "cost_monitor failed", "detail": str(e)},
+                               status_code=500)
+
+            # ── Waitlist routes (Founding-100 pre-launch email collection) ──
+            @app.post("/api/waitlist", include_in_schema=False)
+            async def waitlist_add(request: Request):
+                from starlette.responses import JSONResponse as _JR
+                try:
+                    body = await request.json()
+                except Exception:
+                    body = {}
+                email = (body.get("email") or "").strip()
+                source = (body.get("source") or "pricing")[:32]
+                client_ip = request.client.host if request.client else None
+                try:
+                    try:
+                        from .waitlist import add_email
+                    except ImportError:
+                        from praxis.waitlist import add_email
+                    result = add_email(email=email, source=source, client_ip=client_ip)
+                except Exception as e:
+                    return _JR({"error": "waitlist storage error", "detail": str(e)},
+                               status_code=500)
+                if not result.get("ok"):
+                    return _JR({"error": result.get("error", "unknown error")},
+                               status_code=400)
+                return _JR({"ok": True, "count": result["count"], "duplicate": result.get("duplicate", False)})
+
+            @app.get("/api/waitlist/count", include_in_schema=False)
+            def waitlist_count():
+                from starlette.responses import JSONResponse as _JR
+                try:
+                    try:
+                        from .waitlist import get_summary
+                    except ImportError:
+                        from praxis.waitlist import get_summary
+                    return _JR(get_summary(admin=False))
+                except Exception as e:
+                    return _JR({"error": "waitlist read error", "detail": str(e)},
+                               status_code=500)
+
+            @app.get("/admin/api/waitlist", include_in_schema=False)
+            def admin_waitlist_list(request: Request):
+                from starlette.responses import JSONResponse as _JR
+                if not _check_admin_token(request):
+                    return _JR({"error": "admin token required"}, status_code=401)
+                try:
+                    try:
+                        from .waitlist import get_summary
+                    except ImportError:
+                        from praxis.waitlist import get_summary
+                    return _JR(get_summary(admin=True))
+                except Exception as e:
+                    return _JR({"error": "waitlist read error", "detail": str(e)},
+                               status_code=500)
 
             @app.get("/")
             async def index():

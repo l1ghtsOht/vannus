@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Why your team uses 4 AI tools and pays for 12 — Vannus</title>
+  <meta name="description" content="90% of companies have employees using personal AI tools at work; only 40% bought subscriptions. The math on shadow AI, the trust gap, and what to do about it without buying a $45,000/yr platform." />
+  <meta property="og:title" content="Why your team uses 4 AI tools and pays for 12" />
+  <meta property="og:description" content="The math on shadow AI, the trust gap, and what to do about it without buying a $45,000/yr platform." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://vannus.co/static/blog/why-your-team-uses-4-ai-tools-and-pays-for-12.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="author" content="Drake Schreiber" />
+  <link rel="canonical" href="https://vannus.co/static/blog/why-your-team-uses-4-ai-tools-and-pays-for-12.html" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0f'/%3E%3Ctext x='16' y='23' font-family='-apple-system,Helvetica,sans-serif' font-size='20' font-weight='700' text-anchor='middle' fill='%236366f1'%3EV%3C/text%3E%3C/svg%3E" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Why your team uses 4 AI tools and pays for 12",
+    "description": "The math on shadow AI, the trust gap, and what to do about it without buying a $45,000/yr platform.",
+    "author": {
+      "@type": "Person",
+      "name": "Drake Schreiber",
+      "jobTitle": "Founder",
+      "worksFor": { "@type": "Organization", "name": "Vannus" }
+    },
+    "datePublished": "2026-05-06",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Vannus",
+      "legalName": "PRAXIS AI LLC"
+    }
+  }
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-glass: rgba(255,255,255,0.04);
+      --border-glass: rgba(255,255,255,0.08);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(220,220,228,0.85);
+      --text-dim: rgba(255,255,255,0.45);
+      --accent: #6366f1;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg-primary); color: var(--text-primary);
+      min-height: 100vh; line-height: 1.8;
+    }
+    .nav-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0.65rem 1.5rem; display: flex; justify-content: center; gap: 2rem;
+      background: rgba(6,6,14,0.75); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .nav-bar a { color: rgba(255,255,255,0.55); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.3px; transition: color 0.18s; }
+    .nav-bar a:hover { color: var(--text-primary); }
+    .nav-bar a.active { color: var(--accent); }
+    .nav-logo { font-weight: 700; font-size: 0.95rem; color: var(--text-primary) !important; letter-spacing: -0.5px; }
+
+    .article { max-width: 680px; margin: 0 auto; padding: 110px 24px 80px; }
+    .post-meta { font-size: 13px; color: var(--text-dim); letter-spacing: 0.4px; margin-bottom: 12px; }
+    .post-meta a { color: var(--text-dim); text-decoration: none; }
+    .post-meta a:hover { color: var(--text-primary); }
+    h1 { font-size: 36px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 36px; max-width: 620px; }
+    h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin: 40px 0 14px; }
+    h3 { font-size: 17px; font-weight: 700; margin: 28px 0 10px; }
+    p { font-size: 17px; color: var(--text-secondary); margin-bottom: 18px; line-height: 1.75; }
+    a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    a:hover { color: #818cf8; }
+    blockquote {
+      border-left: 3px solid var(--accent); padding: 4px 20px; margin: 24px 0;
+      color: var(--text-secondary); font-style: italic;
+    }
+    ul { margin: 0 0 18px 22px; padding: 0; }
+    ul li { margin-bottom: 8px; color: var(--text-secondary); font-size: 17px; line-height: 1.7; }
+    .stat-callout {
+      background: var(--bg-glass); border: 1px solid var(--border-glass);
+      padding: 20px 24px; border-radius: 12px; margin: 24px 0;
+      font-size: 15px; color: var(--text-secondary);
+    }
+    .stat-callout strong { color: var(--text-primary); }
+    .footer-cta {
+      margin-top: 56px; padding: 28px; background: rgba(99,102,241,0.05);
+      border: 1px solid rgba(99,102,241,0.18); border-radius: 14px; text-align: center;
+    }
+    .footer-cta strong { color: var(--text-primary); font-size: 16px; display: block; margin-bottom: 6px; }
+    .footer-cta a { display: inline-block; margin-top: 12px; padding: 10px 24px;
+      background: var(--accent); color: white; border-radius: 8px; text-decoration: none;
+      font-weight: 600; font-size: 14px; }
+    .footer-cta a:hover { background: #818cf8; }
+    em { color: var(--text-primary); font-style: italic; }
+  </style>
+</head>
+<body>
+  <nav class="nav-bar">
+    <a href="/" class="nav-logo">Vannus</a>
+    <a href="/static/tools.html">Tools</a>
+    <a href="/static/differential.html">Diagnosis</a>
+    <a href="/journey">Build My Stack</a>
+    <a href="/static/manifesto.html">Methodology</a>
+    <a href="/static/concierge.html">Audit</a>
+    <a href="/static/blog/" class="active">Blog</a>
+  </nav>
+
+  <article class="article">
+    <div class="post-meta">May 6, 2026 &middot; Drake Schreiber &middot; ~7 min read &middot; <a href="/static/blog/">All posts</a></div>
+    <h1>Why your team uses 4 AI tools and pays for 12</h1>
+
+    <p>Last quarter I asked twenty SMB founders the same question: how many AI subscriptions does your company pay for?</p>
+
+    <p>The average answer was six. The average <em>actual</em> answer &mdash; the one I got after we pulled their corporate cards and ran the line items &mdash; was thirteen.</p>
+
+    <p>This isn't a one-off pattern. It's the macro story of AI procurement in 2026, and it costs the average mid-size org $21 million a year in unused SaaS waste. That's not my number. That's <a href="https://zylo.com/reports/2026-saas-management-index/">Zylo's 2026 SaaS Management Index</a>, which found that 53% of paid SaaS licenses go unused and AI-native spend grew 108% year-over-year.</p>
+
+    <h2>The trust gap</h2>
+
+    <p>Stack Overflow's 2025 developer survey (n &asymp; 49,000) found that 84% of developers now use AI tools at work, up from 76% the previous year. But the share of developers who <em>trust</em> the tools dropped 11 points to 29%. Use is going up. Trust is going down. That's the gap that's filling with personal-account subscriptions, free-tier abuses, and shadow workflows.</p>
+
+    <div class="stat-callout">
+      <strong>The most damning number:</strong> 90% of companies have employees using personal AI tools at work; only 40% bought subscriptions. <a href="https://fortune.com/2025/08/19/shadow-ai-economy-mit-study-genai-divide-llm-chatbots/">Fortune / MIT, August 2025.</a> That's a 50-point gap between what's being used and what's being procured.
+    </div>
+
+    <p>Half the AI tools your team uses are not on your books. The other half &mdash; the ones that are on your books &mdash; are probably not the ones being used. That's the procurement reality of 2026, and most ops leaders don't have time to map it.</p>
+
+    <h2>How tools accumulate</h2>
+
+    <p>This is the actual sequence I see at almost every SMB:</p>
+
+    <ul>
+      <li>Founder buys ChatGPT Plus when GPT-4 lands. $20/mo.</li>
+      <li>Marketing lead expenses Jasper because it's "AI for marketers." $49/mo.</li>
+      <li>A new hire has Claude Pro on their personal account; the company starts paying for it. $20/mo.</li>
+      <li>Someone buys Notion AI as a checkbox add-on to existing Notion. $10/seat.</li>
+      <li>A contractor recommends Copy.ai. The trial converts. $36/mo.</li>
+      <li>Founder also buys Perplexity Pro because of a podcast they listened to. $20/mo.</li>
+      <li>Sales team starts using Apollo with AI features. $99/seat.</li>
+      <li>Six months later: nobody knows which of these are still being used. Nobody has cut any of them.</li>
+    </ul>
+
+    <p>I described this exact sequence to a procurement leader last week. Her response: "you forgot the calendar AI, the meeting recorder, and probably two video tools." She was right.</p>
+
+    <h2>Why it's hard to fix</h2>
+
+    <p>The conventional answer is "buy a SaaS-management platform like Tropic or Zluri." Here's why that doesn't work for SMBs:</p>
+
+    <ul>
+      <li><strong>Tropic charges $45,000/yr</strong> with a $250K&ndash;$1M annual SaaS-spend floor.</li>
+      <li><strong>Zluri's average contract value is $38,000.</strong> They don't take SMB customers.</li>
+      <li><strong>Vendr's pricing is tied to total SaaS spend</strong> &mdash; the practical floor puts them in enterprise territory.</li>
+      <li><strong>Zylo, by their own marketplace listings, are "not a fit for SMB."</strong></li>
+    </ul>
+
+    <p>If you have $250K+/yr in SaaS spend, these platforms are great. If you're a 12-person team with $75K of AI subscriptions and growing, none of them will return your call.</p>
+
+    <h2>What actually works at SMB scale</h2>
+
+    <p>You don't need a platform. You need a <em>method</em>. Specifically: an objective framework that tells you which tools to keep, replace, or kill, and the math to back the recommendation.</p>
+
+    <p>The framework that's worked for me, in 2026, has nine inputs:</p>
+
+    <ul>
+      <li><strong>Data sovereignty</strong> &mdash; where is the backend? Who controls the underlying corporate entity? Are you exposed to the US CLOUD Act, the EU Data Governance Act, or PRC data laws?</li>
+      <li><strong>Allied infrastructure</strong> &mdash; vendor in a CFIUS-exempt or allied jurisdiction, or quietly dependent on sanctioned cloud providers?</li>
+      <li><strong>Training privacy</strong> &mdash; contractually guaranteed zero-training on customer data, or default opt-in?</li>
+      <li><strong>Conditional privacy</strong> &mdash; verifiable opt-out, or just a privacy policy that says "we may use this for product improvement"?</li>
+      <li><strong>Compliance standard</strong> &mdash; SOC 2 Type II, ISO/IEC 42001, FedRAMP, GDPR Article 35, EU AI Act, HIPAA where applicable?</li>
+      <li><strong>Operational resilience</strong> &mdash; native IP and proprietary algorithms vs. thin wrapper over upstream APIs?</li>
+      <li><strong>Exit portability</strong> &mdash; can you actually leave with your data, or is it locked into a proprietary format?</li>
+      <li><strong>Real-world utility</strong> &mdash; verifiable success rate on real tasks, not just marketing claims?</li>
+      <li><strong>Caution flag</strong> &mdash; is there a material risk warranting buyer caution (unremediated breach, vendor under sanctions, predatory pricing, sustained noncompliance)?</li>
+    </ul>
+
+    <p>You score every tool on those nine. You eliminate the ones that fail any critical dimension. Whatever survives is what you actually buy. That's the elimination methodology.</p>
+
+    <p>This sounds laborious. It is. That's why I built <a href="https://vannus.co/">Vannus</a> &mdash; to do the scoring once for the 284+ AI tools that matter, and to make the framework auditable so customers can verify the work.</p>
+
+    <h2>What this means in dollars</h2>
+
+    <p>For a typical 12-person SMB with $75K of annual AI subscriptions, an honest application of this framework eliminates three to five tools that are paying for the same workflow under different brand names. Average savings I see: $1,500&ndash;$3,000 per year on tooling alone, before counting the time recovered from people no longer context-switching across redundant interfaces.</p>
+
+    <p>For larger SMBs (50+ people, $250K+ AI spend), the savings compound: we've seen single audits surface $30,000&ndash;$50,000 in subscription waste. Tropic and Zluri would charge enterprise contracts to find that. Vannus's <a href="/static/concierge.html">Concierge audit</a> charges $7,500 fixed price &mdash; with pre-screened intake (we decline bad-fit stacks before any contract signs) and a 90-day free follow-up assessment if post-audit review surfaces concerns.</p>
+
+    <h2>The takeaway</h2>
+
+    <p>You're paying for 12 AI tools. Your team is using 4 of them. The other 8 are either redundant, abandoned, or quietly violating your compliance posture (often without the procurement leader knowing). The fix isn't another tool. It's a methodology that lets you decide objectively which to keep.</p>
+
+    <p>If you want help running yours through the framework, the <a href="https://vannus.co/">public catalog and methodology</a> handle the per-tool scoring at no charge. If you want a written audit of the whole stack with replacement recommendations and founder-led delivery, the <a href="/static/concierge.html">Concierge audit</a> is what we built for that.</p>
+
+    <p>Either way, the math doesn't move until someone runs it.</p>
+
+    <div class="footer-cta">
+      <strong>Want to audit your own AI stack?</strong>
+      The free platform scores individual tools. The Concierge audit takes your full stack as input.
+      <a href="/static/concierge.html">See the Concierge audit &rarr;</a>
+    </div>
+  </article>
+</body>
+</html>

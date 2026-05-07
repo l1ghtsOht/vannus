@@ -1662,7 +1662,8 @@ def create_app():
             if tools_dist.exists() and (tools_dist / "assets").exists():
                 app.mount("/tools-assets", StaticFiles(directory=str(tools_dist.resolve())), name="tools-assets")
 
-            app.mount("/static", StaticFiles(directory=str(frontend_dir.resolve())), name="static")
+            # html=True auto-serves index.html for directory URLs (e.g. /static/blog/ → blog/index.html)
+            app.mount("/static", StaticFiles(directory=str(frontend_dir.resolve()), html=True), name="static")
 
             @app.get("/robots.txt", include_in_schema=False)
             def robots_txt():

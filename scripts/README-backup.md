@@ -1,6 +1,12 @@
 # Vannus Nightly Backup — Setup Guide
 
-**Status (May 2026):** scaffold only — `backup_to_s3.py` is written and tested in dry-run mode but is **not yet scheduled** in production. Schedule it before the first paying Pro+ user lands. Prereq: AWS account with S3 bucket created.
+**Status (May 6, 2026):** ✅ AWS infrastructure provisioned (bucket, IAM user, billing alert). ✅ Backup script tested end-to-end against the production bucket — 3 files uploaded successfully. ⏳ **Pending only:** Railway env vars set + cron job scheduled, both blocked on Railway access. See `~/Desktop/vannus-jason-railway-handoff.md` for the env var list and cron command.
+
+**Production resources (do NOT change):**
+- Bucket: `vannus-praxis-backups-813724788137-us-east-2-an`
+- Region: `us-east-2` (Ohio)
+- IAM user: `vannus-backup-writer` (bucket-scoped policy)
+- Account: `813724788137` (Drake / PRAXIS AI LLC)
 
 ---
 
@@ -14,41 +20,55 @@
 
 ---
 
-## One-time setup (10-15 min)
+## One-time setup (already done as of May 6, 2026)
 
-### 1. Create the S3 bucket
+Steps 1–2 below are **already complete** in Drake's AWS account. They're documented here for re-creation in a fresh AWS account if ever needed (e.g., DR migration, account rotation).
+
+### 1. S3 bucket (already created)
+
+The actual bucket name was set during console creation:
+`vannus-praxis-backups-813724788137-us-east-2-an` in `us-east-2`.
+
+To recreate from scratch:
 
 ```
-aws s3 mb s3://vannus-backups --region us-east-1
-aws s3api put-bucket-versioning --bucket vannus-backups \
+aws s3 mb s3://<your-bucket-name> --region us-east-2
+aws s3api put-bucket-versioning --bucket <your-bucket-name> \
   --versioning-configuration Status=Enabled
-aws s3api put-public-access-block --bucket vannus-backups \
+aws s3api put-public-access-block --bucket <your-bucket-name> \
   --public-access-block-configuration \
   "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
 ```
 
-The bucket should be private. Versioning protects against accidental script bugs that delete real data.
+Then add a 30-day lifecycle rule (`expire-old-backups`) via Console → Management tab.
 
-### 2. Create an IAM user with minimal permissions
+### 2. IAM user (already created: `vannus-backup-writer`)
+
+Inline policy `vannus-backup-s3-access`:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": ["s3:PutObject", "s3:GetObject", "s3:ListBucket", "s3:DeleteObject"],
+    "Resource": [
+      "arn:aws:s3:::vannus-praxis-backups-813724788137-us-east-2-an",
+      "arn:aws:s3:::vannus-praxis-backups-813724788137-us-east-2-an/*"
+    ]
+  }]
+}
+```
+
+### 3. Railway env vars (PENDING — Jason or Drake to set when Railway access is sorted)
 
 ```
-aws iam create-user --user-name vannus-backup-bot
-aws iam attach-user-policy --user-name vannus-backup-bot --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
-# OR (preferred, narrower) attach an inline policy that only allows
-# s3:PutObject, s3:GetObject, s3:DeleteObject, s3:ListBucket on this bucket only.
-aws iam create-access-key --user-name vannus-backup-bot
-# -> save the AccessKeyId and SecretAccessKey
-```
-
-### 3. Add Railway env vars
-
-```
-AWS_ACCESS_KEY_ID         = AKIA...
-AWS_SECRET_ACCESS_KEY     = ...
-AWS_REGION                = us-east-1
-VANNUS_S3_BACKUP_BUCKET   = vannus-backups
+AWS_ACCESS_KEY_ID            = AKIA325OG4WU5JA5FNWR
+AWS_SECRET_ACCESS_KEY        = <from 1Password>
+AWS_REGION                   = us-east-2
+VANNUS_S3_BACKUP_BUCKET      = vannus-praxis-backups-813724788137-us-east-2-an
 VANNUS_BACKUP_RETENTION_DAYS = 30
-VANNUS_SLACK_BACKUP_WEBHOOK = https://hooks.slack.com/services/...   (optional)
+VANNUS_SLACK_BACKUP_WEBHOOK  = https://hooks.slack.com/services/...   (optional)
 ```
 
 ### 4. Test locally
@@ -82,14 +102,19 @@ python3 scripts/backup_to_s3.py               # full nightly run
 
 ## Cost
 
-S3 Standard pricing (May 2026):
-- Storage: ~$0.023/GB/month
-- 30 days × 5 MB/day = 150 MB max → **~$0.003/month**
-- PUT requests: ~$0.005 per 1K → **3-4 per night = $0**
-- DELETE requests: free
-- Egress: $0 unless you actually restore
+**Through November 6, 2026:** $0 (AWS Free Tier covers it — 5 GB storage, 2K PUTs/month, 20K GETs/month — backup uses ≪1% of any limit). Drake also has $100 in account credits.
 
-**Total: under $0.05/month. Drake's master plan budgeted $5/mo — actual cost is nothing.**
+**After Nov 6, 2026** (S3 Standard pricing in `us-east-2`):
+- Actual measured volume: ~221 KB per night × 3 files (tools.db 213K + feedback.json 7K + usage.json 1K)
+- 30-day rolling: ~6.6 MB total (with versioning enabled, slightly more)
+- Storage: ~$0.023/GB/month → **$0.00015/month**
+- PUT requests: 3 PUTs/night × 30 = 90/month × $0.005/1K → **$0.00045/month**
+- DELETE requests: free
+- Egress: $0 unless restoring
+
+**Total real cost after free tier: under $0.001/month** (one tenth of a cent). Restore-time egress is the only meaningful cost vector and only kicks in during disaster recovery.
+
+DB will grow as Room ships and paying users hit the catalog (`llm_cost_events` table). Even at 100 MB/file, monthly cost stays under $0.10.
 
 ---
 
@@ -97,10 +122,10 @@ S3 Standard pricing (May 2026):
 
 ```
 # 1. Find the latest backup date
-aws s3 ls s3://vannus-backups/backups/ | tail -5
+aws s3 ls s3://vannus-praxis-backups-813724788137-us-east-2-an/backups/ --region us-east-2 | tail -5
 
 # 2. Download all files from the chosen date
-aws s3 cp s3://vannus-backups/backups/2026-05-30/ ./restored/ --recursive
+aws s3 cp s3://vannus-praxis-backups-813724788137-us-east-2-an/backups/2026-05-30/ ./restored/ --recursive --region us-east-2
 
 # 3. Replace runtime files
 cp restored/tools.db praxis/tools.db
@@ -119,7 +144,7 @@ Test the restore procedure once when the bucket is alive — restore-untested ba
 The script exits non-zero on errors. Hook the cron failure into:
 - Railway's email notifications (if cron fails 3+ times)
 - The `VANNUS_SLACK_BACKUP_WEBHOOK` for live status posts
-- A weekly check of `aws s3 ls s3://vannus-backups/backups/` to confirm yesterday's backup landed
+- A weekly check of `aws s3 ls s3://vannus-praxis-backups-813724788137-us-east-2-an/backups/ --region us-east-2` to confirm yesterday's backup landed
 
 Common failure patterns (all surface in script logs):
 - Expired AWS credentials → rotate, update Railway env vars

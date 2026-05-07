@@ -19,8 +19,8 @@ when STAGE=prune is set.
 Required env vars:
     AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY
-    AWS_REGION                (e.g. "us-east-1")
-    VANNUS_S3_BACKUP_BUCKET   (e.g. "vannus-backups")
+    AWS_REGION                (production: "us-east-2")
+    VANNUS_S3_BACKUP_BUCKET   (production: "vannus-praxis-backups-813724788137-us-east-2-an")
 
 Optional:
     VANNUS_BACKUP_RETENTION_DAYS  (default: 30)
@@ -32,9 +32,9 @@ Usage:
     python3 scripts/backup_to_s3.py --backup   # backup only
     python3 scripts/backup_to_s3.py --prune    # prune old backups only
 
-Cost: trivial. ~5 MB/day uploaded to S3 Standard ≈ $0.12/year storage,
-$0 egress unless restoring. Well under the $5/mo Drake budgeted in
-the master plan.
+Cost: $0 through Nov 2026 (AWS Free Tier covers usage). After that,
+~$0.001/month at current data volumes (3 files, ~221 KB/night).
+$0 egress unless restoring. Well inside the master-plan budget.
 """
 
 import argparse
@@ -85,7 +85,7 @@ def _get_s3_client():
             "(or add to requirements.txt and redeploy)"
         )
         sys.exit(2)
-    return boto3.client("s3", region_name=os.environ.get("AWS_REGION", "us-east-1"))
+    return boto3.client("s3", region_name=os.environ.get("AWS_REGION", "us-east-2"))
 
 
 def backup(dry_run: bool = False) -> dict:

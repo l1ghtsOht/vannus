@@ -63,7 +63,7 @@ Inline policy `vannus-backup-s3-access`:
 ### 3. Railway env vars (PENDING — Jason or Drake to set when Railway access is sorted)
 
 ```
-AWS_ACCESS_KEY_ID            = AKIA325OG4WU5JA5FNWR
+AWS_ACCESS_KEY_ID            = <from Drake's 1Password — AKIA... format>
 AWS_SECRET_ACCESS_KEY        = <from 1Password>
 AWS_REGION                   = us-east-2
 VANNUS_S3_BACKUP_BUCKET      = vannus-praxis-backups-813724788137-us-east-2-an

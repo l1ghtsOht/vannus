@@ -1743,22 +1743,36 @@ def create_app():
 
             # ── Admin: cost monitor dashboard ────────────────────────────
             # Token-gated. Admin token is the PRAXIS_ADMIN_TOKEN env var.
-            # Pass via ?token=... query param. See cost_monitor.py for the
-            # data layer; admin/costs.html renders the JSON returned from
-            # /admin/api/costs/summary.
+            # Pass via ?token=... query param OR X-Admin-Token header.
+            # See cost_monitor.py for the data layer; admin/costs.html
+            # renders the JSON returned from /admin/api/costs/summary.
+            #
+            # Security model (deny-by-default):
+            #   1. PRAXIS_ADMIN_TOKEN unset + non-localhost request → 403
+            #   2. PRAXIS_ADMIN_TOKEN unset + localhost AND PRAXIS_ENV in
+            #      {dev, local} → allow (developer convenience)
+            #   3. PRAXIS_ADMIN_TOKEN set → require constant-time match
+            import hmac as _hmac
             def _check_admin_token(request) -> bool:
                 expected = _os.environ.get("PRAXIS_ADMIN_TOKEN", "").strip()
                 if not expected:
-                    # No token configured → deny by default in any env
-                    # except local dev. Production must set this env var.
-                    if _os.environ.get("PRAXIS_ENV", "").lower() in {"dev", "local", ""}:
-                        return True
-                    return False
+                    # No token configured → DENY unless explicitly in dev
+                    # mode AND the request is from localhost. This closes
+                    # the "forgot to set the env var in prod" footgun.
+                    env = _os.environ.get("PRAXIS_ENV", "").lower()
+                    if env not in {"dev", "local"}:
+                        return False
+                    client_host = request.client.host if request.client else ""
+                    return client_host in {"127.0.0.1", "::1", "localhost"}
                 provided = (
                     request.query_params.get("token", "")
                     or request.headers.get("x-admin-token", "")
                 ).strip()
-                return provided == expected
+                # Constant-time comparison defends against timing attacks.
+                # Bytes form required by hmac.compare_digest.
+                return _hmac.compare_digest(
+                    provided.encode("utf-8"), expected.encode("utf-8")
+                )
 
             @app.get("/admin/costs.html", include_in_schema=False)
             def admin_costs_html(request: Request):

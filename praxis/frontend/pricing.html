@@ -109,14 +109,14 @@
 
   <div class="container">
     <h1 style="text-align:center;">What is Vannus Room?</h1>
-    <p class="subtitle" style="text-align:center;font-size:16px;color:rgba(255,255,255,0.7);max-width:620px;margin-left:auto;margin-right:auto;">A multi-model AI workspace. You ask one prompt, three models answer side by side, and the elimination engine tells you which one actually won on your task. Paid only — see Founding 100 below.</p>
+    <p class="subtitle" style="text-align:center;font-size:16px;color:rgba(255,255,255,0.7);max-width:620px;margin-left:auto;margin-right:auto;">A multi-model AI workspace. You ask one prompt, three models answer side by side, and the elimination engine tells you which one actually won on your task. Paid only — see Founding 30 below.</p>
 
     <!-- Free tier — surfaces what's available right now -->
     <div class="pricing-card featured" style="margin-top:36px;">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <div>
           <div class="pricing-name">Free platform <span class="pricing-badge" style="background:rgba(99,102,241,0.15);color:#6366f1;">Available now</span></div>
-          <p style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:6px;">Catalog, elimination methodology, RFP builder, ROI calculator — open to anyone. Always free.</p>
+          <p style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:6px;">Catalog, elimination methodology, RFP builder, ROI calculator — open to individual users at no charge today. Paid features (Room workspace) are separate.</p>
         </div>
         <a href="/" class="pricing-btn pricing-btn-primary" style="white-space:nowrap;">Use the platform &rarr;</a>
       </div>
@@ -136,7 +136,7 @@
         </div>
       </div>
       <div class="pricing-card" style="position:relative;border-color:rgba(99,102,241,0.28);">
-        <span style="position:absolute;top:-10px;right:24px;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#a5b4fc;background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.35);padding:4px 10px;border-radius:99px;">🌱 Founding 100</span>
+        <span style="position:absolute;top:-10px;right:24px;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#a5b4fc;background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.35);padding:4px 10px;border-radius:99px;">🌱 Founding 30</span>
         <div class="pricing-name">Pro+</div>
         <ul class="pricing-features" style="margin-top:14px;">
           <li class="upcoming">Multi-model comparison + premium models (Sonnet, GPT-4o, Gemini Pro)</li>
@@ -144,15 +144,15 @@
           <li class="upcoming">Smart routing via elimination engine + priority founder support</li>
         </ul>
         <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:13px;color:rgba(255,255,255,0.45);">
-          <strong style="color:rgba(255,255,255,0.7);">$59/mo</strong> when Room ships, or <strong style="color:rgba(255,255,255,0.7);">$589/yr</strong> (save $119). <strong style="color:#a5b4fc;">First 100 subscribers lock in $59/mo for 24 months.</strong>
+          <strong style="color:rgba(255,255,255,0.7);">$59/mo</strong> when Room ships, or <strong style="color:rgba(255,255,255,0.7);">$589/yr</strong> (save $119). <strong style="color:#a5b4fc;">First 30 subscribers lock in $59/mo for 24 months. If standard pricing decreases below your locked rate during the period, we'll match it.</strong>
         </div>
       </div>
     </div>
 
-    <!-- Founding 100 waitlist (the real CTA) -->
+    <!-- Founding 30 waitlist (the real CTA) -->
     <div id="waitlist-block" style="margin-top:28px;padding:28px;background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(80,227,194,0.04));border:1px solid rgba(99,102,241,0.28);border-radius:14px;text-align:center;">
-      <div style="font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#a5b4fc;margin-bottom:10px;">Reserve your Founding 100 spot</div>
-      <p style="font-size:14px;color:var(--text-primary);margin-bottom:6px;line-height:1.55;">Drop your email. We&apos;ll send the moment Room opens for Pro+ founding-member access &mdash; first 100 lock in $59/mo for 24 months.</p>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#a5b4fc;margin-bottom:10px;">Reserve your Founding 30 spot</div>
+      <p style="font-size:14px;color:var(--text-primary);margin-bottom:6px;line-height:1.55;">Drop your email. We&apos;ll send the moment Room opens for Pro+ founding-member access &mdash; first 30 lock in $59/mo for 24 months.</p>
       <p style="font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:18px;">No spam, no marketing list. One email when it&apos;s your turn. Unsubscribe never needed because there&apos;s nothing else to send.</p>
       <form id="waitlist-form" onsubmit="return submitWaitlist(event)" style="display:flex;gap:8px;max-width:460px;margin:0 auto;flex-wrap:wrap;justify-content:center;">
         <input type="email" id="waitlist-email" required placeholder="you@company.com"
@@ -189,11 +189,13 @@
           const d = await res.json();
           const el = document.getElementById('waitlist-count');
           const total = Number(d.count || 0);
-          const remaining = Math.max(0, 100 - total);
-          if (total === 0) {
-            el.textContent = '100 founding-member spots available.';
+          const remaining = Math.max(0, 30 - total);
+          // Hide the live count until we have meaningful traction (>= 10 signups).
+          // Avoids a "1 / 30" display that signals weakness during the early waitlist period.
+          if (total < 10) {
+            el.textContent = 'Reserve a Founding-30 spot.';
           } else if (remaining === 0) {
-            el.textContent = 'Waitlist closed — 100 spots claimed. We will notify when standard Pro+ opens.';
+            el.textContent = 'Waitlist closed — 30 founding spots claimed. We will notify when standard Pro+ opens.';
           } else {
             el.textContent = total + ' on the waitlist · ' + remaining + ' founding-member spots remaining';
           }

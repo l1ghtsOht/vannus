@@ -1,5 +1,5 @@
 """
-waitlist.py — Founding-100 email waitlist for Pro+ pre-launch.
+waitlist.py — Founding-30 email waitlist for Pro+ pre-launch.
 
 Stores submitted emails in praxis/waitlist.json (gitignored). Provides
 add/count APIs that the /api/waitlist routes wrap. Anti-abuse via:
@@ -8,9 +8,13 @@ add/count APIs that the /api/waitlist routes wrap. Anti-abuse via:
   - dedup (one entry per email; updates timestamp on resubmit)
   - cap at 1000 entries (prevents disk-fill via spam)
 
-When Room ships and Pro+ checkout opens, the founding-100 logic
+When Room ships and Pro+ checkout opens, the Founding-30 logic
 walks this file, sends the announcement email via Resend, and
-applies a Stripe coupon for the first 100 emails to subscribe.
+applies a Stripe coupon for the first 30 emails to subscribe.
+The 30-spot target is a realistic solo-founder pre-revenue
+benchmark; if/when conversion exceeds 30, the offer can be
+re-extended with new terms — but the public-facing commitment
+is 30 to keep underpromising honest.
 """
 
 from __future__ import annotations
@@ -113,7 +117,7 @@ def _notify_new_signup(email: str, source: str, count: int) -> None:
     slack_url = os.environ.get("VANNUS_WAITLIST_SLACK_WEBHOOK", "").strip()
     if slack_url:
         try:
-            text = f"🌱 New Vannus Founding-100 signup: `{email}` (source={source}, total={count}/100)"
+            text = f"🌱 New Vannus Founding-30 signup: `{email}` (source={source}, total={count}/30)"
             req = urllib.request.Request(
                 slack_url,
                 data=json.dumps({"text": text}).encode("utf-8"),
@@ -142,14 +146,14 @@ def _notify_new_signup(email: str, source: str, count: int) -> None:
                 "from": "Vannus <hello@vannus.co>",
                 "to": [notify_email],
                 "reply_to": email,  # ← reply goes straight to the signup
-                "subject": f"🌱 Founding-100 signup #{count}: {email}",
+                "subject": f"🌱 Founding-30 signup #{count}: {email}",
                 "text": (
-                    f"A new email joined the Vannus Founding-100 waitlist.\n\n"
+                    f"A new email joined the Vannus Founding-30 waitlist.\n\n"
                     f"==================================================\n"
                     f"Email:                {email}\n"
                     f"Source:               {source}\n"
-                    f"Signup number:        #{count} of 100\n"
-                    f"Remaining spots:      {max(0, 100 - count)}\n"
+                    f"Signup number:        #{count} of 30\n"
+                    f"Remaining spots:      {max(0, 30 - count)}\n"
                     f"==================================================\n\n"
                     f"To reply directly to this person, just hit Reply.\n"
                     f"This email's Reply-To is set to {email}.\n\n"
@@ -241,11 +245,11 @@ def get_summary(admin: bool = False) -> Dict[str, Any]:
     data = _load()
     entries = data["entries"]
     total = len(entries)
-    remaining = max(0, 100 - total)
+    remaining = max(0, 30 - total)
     out: Dict[str, Any] = {
         "count": total,
         "remaining_founding_spots": remaining,
-        "founding_full": total >= 100,
+        "founding_full": total >= 30,
     }
     if admin:
         out["entries"] = entries[-200:]  # last 200, most recent first
